@@ -72,7 +72,7 @@
   (let [w (or ?win-id 0)
         bufnr (nvim.win_get_buf w)
         cursor-node (ts.get_node_at_cursor w)
-        next-node next-sexp-fn cursor-node)]
+        next-node (next-sexp-fn cursor-node)]
     (when next-node
       (ts.swap_nodes next-node cursor-node bufnr true))))
 
