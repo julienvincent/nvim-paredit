@@ -93,22 +93,42 @@
   []
   (let [node (find-nearest-seq-node (cursor-node))
         lc (last-child node)
-        sib (node:next_named_sibling)]
-    (ts.swap_nodes lc sib (vim.fn.bufnr) false)))
+        lcr [(: lc :range)]
+        sib (node:next_named_sibling)
+        sibr [(: sib :range)]]
+    (if (= (. lcr 3) (. sibr 1))
+      (tset sibr 2 (. lcr 4))
+      (do (tset sibr 1 (. lcr 3))
+        (tset sibr 2 (. lcr 4))))
+    (ts.swap_nodes lcr sibr (vim.fn.bufnr) false)))
 
 (defn barf-forward
   []
   (let [node (find-nearest-seq-node (cursor-node))
         lc (last-child node)
-        plc (: lc :prev_sibling)]
-    (ts.swap_nodes plc lc (vim.fn.bufnr) false)))
+        lcr [(: lc :range)]
+        plc (: lc :prev_named_sibling)
+        plcr [(: plc :range)]
+        pplcr [(-?> plc (: :prev_named_sibling) (: :range))]]
+    (if (first pplcr)
+      (if (= (. plcr 1) (. pplcr 3))
+        (tset plcr 2 (. pplcr 4))
+        (do (tset plcr 1 (. pplcr 3))
+          (tset plcr 2 (. pplcr 4)))))
+    (ts.swap_nodes plcr lcr (vim.fn.bufnr) false)))
 
 (defn slurp-back
   []
   (let [node (find-nearest-seq-node (cursor-node))
         fc (first-child node)
-        sib (node:prev_named_sibling)]
-    (ts.swap_nodes fc sib (vim.fn.bufnr) false)))
+        fcr [(: fc :range)]
+        sib (node:prev_named_sibling)
+        sibr [(: sib :range)]]
+    (if (= (. sibr 3) (. fcr 1))
+      (tset sibr 4 (. fcr 2))
+      (do (tset sibr 3 (. fcr 1))
+        (tset sibr 4 (. fcr 2))))
+    (ts.swap_nodes fcr sibr (vim.fn.bufnr) false)))
 
 (defn barf-back
   []
@@ -118,17 +138,18 @@
         nlc (: fc :next_named_sibling)
         nlcr [(: nlc :range)]
         nnlcr [(-?> nlc (: :next_named_sibling) (: :range))]]
-    ;; WIP: Handle whitespace stuff
     (if (first nnlcr)
-      (if (= (. nnlcr 1) (. nlcr 1))
-        (tset nlcr 4 (. nnlcr 2))))
+      (if (= (. nnlcr 1) (. nlcr 3))
+        (tset nlcr 4 (. nnlcr 2))
+        (do (tset nlcr 3 (. nnlcr 1))
+          (tset nlcr 4 (- (. nnlcr 2) 1)))))
     (ts.swap_nodes fcr
                    nlcr
                    (vim.fn.bufnr) false)))
 
-(nvim.ex.unmap :<M-t>)
-(vim.keymap.set :n :<M-t>
-                barf-back)
+;;(nvim.ex.unmap :<M-t>)
+(vim.keymap.set :n 
+                :<M-t> barf-forward)
 
 (defn slurp
   [?win-id]
