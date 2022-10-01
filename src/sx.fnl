@@ -10,12 +10,14 @@
 
 (local lists {:fennel {:list true
                        :table true
+                       :quoted_list true
                        :sequential_table true}
               :clojure {:set_lit true 
                         :list_lit true 
                         :str_lit true
                         :map_lit true
-                        :vec_lit true}})
+                        :vec_lit true
+                        :anon_fn_lit true}})
 
 (defn filetype [] vim.bo.filetype)
 
@@ -89,6 +91,31 @@
     (when (> child-count 0)
       (node:named_child (- child-count 1)))))
 
+(defn default-opening-delimiter-range
+  [node]
+  [(-?> node first-child (: :range))])
+
+(defn fennel-opening-delimiter-range
+  [node]
+  (match (node:type)
+    :quoted_list (let [p (node:parent)
+                       pfcr [(: (first-child (node:parent)) :range)]
+                       fcr [(: (first-child node) :range)]]
+                   [(. pfcr 1) (. pfcr 2) (. fcr 3) (. fcr 4)])
+    :list (if (= (: (node:parent) :type) :hashfn)
+            (let [p (node:parent)
+                  pfcr [(: (first-child (node:parent)) :range)]
+                  fcr [(: (first-child node) :range)]]
+              [(. pfcr 1) (. pfcr 2) (. fcr 3) (. fcr 4)])
+            (default-opening-delimiter-range node))
+    _ (default-opening-delimiter-range node)))
+
+(defn opening-delimiter-range
+  [node]
+  (match (filetype)
+    :fennel (fennel-opening-delimiter-range node)
+    _ (default-opening-delimiter-range node)))
+
 (defn slurp-forward
   []
   (let [node (find-nearest-seq-node (cursor-node))
@@ -134,7 +161,7 @@
   []
   (let [node (find-nearest-seq-node (cursor-node))
         fc (first-child node)
-        fcr [(: fc :range)]
+        fcr (opening-delimiter-range node)
         nlc (: fc :next_named_sibling)
         nlcr [(: nlc :range)]
         nnlcr [(-?> nlc (: :next_named_sibling) (: :range))]]
@@ -142,14 +169,11 @@
       (if (= (. nnlcr 1) (. nlcr 3))
         (tset nlcr 4 (. nnlcr 2))
         (do (tset nlcr 3 (. nnlcr 1))
-          (tset nlcr 4 (- (. nnlcr 2) 1)))))
-    (ts.swap_nodes fcr
-                   nlcr
-                   (vim.fn.bufnr) false)))
+          (tset nlcr 4 (. nnlcr 2)))))
+    (ts.swap_nodes fcr nlcr (vim.fn.bufnr) false)))
 
 ;;(nvim.ex.unmap :<M-t>)
-(vim.keymap.set :n 
-                :<M-t> barf-forward)
+(vim.keymap.set :n :<M-t> barf-back)
 
 (defn slurp
   [?win-id]
@@ -224,11 +248,3 @@
 (vim.keymap.set :n "<M-s>" slurp {:desc "Slurp sexp"})
 (vim.keymap.set :n "<M-p>" move-sexp-backward {:desc "Move sexp backward"})
 (vim.keymap.set :n "<M-f>" move-sexp-forward {:desc "Move sexp forward"})
-(nvim.ex.unmap "<M-n>")
-(vim.keymap.set :n "<M-n>" (fn [_] (ts.goto_node (: (ts.get_node_at_cursor) :parent)))
-               ;; (fn [wid] (let [bufnr (vim.fn.bufnr)
-               ;;                            [row col] (vim.api.nvim_win_get_cursor 0)
-               ;;                            tsnode (vim.treesitter.get_node_at_pos bufnr row col)]
-               ;;                        (tsnode.start)))
-                {:desc "Highlight parent node"})
-
