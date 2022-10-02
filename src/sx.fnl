@@ -5,7 +5,7 @@
              core aniseed.core}})
 
 ;; repl friendlyness
-(local WIN_ID 1043)
+(local WIN_ID 0)
 (local FILE_TYPE "clojure")
 
 (defn first [itbl] (. itbl 1))
