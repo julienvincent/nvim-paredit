@@ -60,7 +60,7 @@
       node)))
 
 (defn cursor-node [] 
-  (let [[r c] (vim.api.nvim_win_get_cursor 0)]
+  (let [[r c] (nvim.win_get_cursor 0)]
     (ts.get_node_at_cursor 0 (vim.fn.bufnr) r c)))
 
 (defn start [node]
