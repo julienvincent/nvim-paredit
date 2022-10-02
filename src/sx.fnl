@@ -4,6 +4,10 @@
              wk which-key
              core aniseed.core}})
 
+;; repl friendlyness
+(local WIN_ID 1043)
+(local FILE_TYPE "clojure")
+
 (defn first [itbl] (. itbl 1))
 ;; lua print(vim.fn.win_getid()) 
 (local get-node-text vim.treesitter.query.get_node_text)
@@ -19,7 +23,16 @@
                         :vec_lit true
                         :anon_fn_lit true}})
 
-(defn filetype [] vim.bo.filetype)
+(defn filetype []
+  (if (not= WIN_ID 0)
+    FILE_TYPE
+    vim.bo.filetype))
+
+(defn get-bufnr 
+  []
+  (if (not= WIN_ID 0)
+    (nvim.win_get_buf WIN_ID)
+    (vim.fn.bufnr)))
 
 (defn find-nearest-seq-node
   [node]
@@ -60,8 +73,7 @@
       node)))
 
 (defn cursor-node [] 
-  (let [[r c] (nvim.win_get_cursor 0)]
-    (ts.get_node_at_cursor 0 (vim.fn.bufnr) r c)))
+  (ts.get_node_at_cursor WIN_ID))
 
 (defn start [node]
   (let [(r c) (unpack [(node:start)])]
@@ -127,7 +139,7 @@
       (tset sibr 2 (. lcr 4))
       (do (tset sibr 1 (. lcr 3))
         (tset sibr 2 (. lcr 4))))
-    (ts.swap_nodes lcr sibr (vim.fn.bufnr) false)))
+    (ts.swap_nodes lcr sibr (get-bufnr) false)))
 
 (defn barf-forward
   []
@@ -142,7 +154,19 @@
         (tset plcr 2 (. pplcr 4))
         (do (tset plcr 1 (. pplcr 3))
           (tset plcr 2 (. pplcr 4)))))
-    (ts.swap_nodes plcr lcr (vim.fn.bufnr) false)))
+    (ts.swap_nodes plcr lcr (get-bufnr) false)))
+
+(comment
+  (local n (cursor-node))
+  (start n)
+  (end n)
+  (first-child n)
+  (default-opening-delimiter-range n)
+  (slurp-forward)
+  (barf-forward)
+  (barf-back)
+  (slurp-back)
+  nil)
 
 (defn slurp-back
   []
@@ -155,7 +179,7 @@
       (tset sibr 4 (. fcr 2))
       (do (tset sibr 3 (. fcr 1))
         (tset sibr 4 (. fcr 2))))
-    (ts.swap_nodes fcr sibr (vim.fn.bufnr) false)))
+    (ts.swap_nodes fcr sibr (get-bufnr) false)))
 
 (defn barf-back
   []
@@ -170,7 +194,7 @@
         (tset nlcr 4 (. nnlcr 2))
         (do (tset nlcr 3 (. nnlcr 1))
           (tset nlcr 4 (. nnlcr 2)))))
-    (ts.swap_nodes fcr nlcr (vim.fn.bufnr) false)))
+    (ts.swap_nodes fcr nlcr (get-bufnr) false)))
 
 ;;(nvim.ex.unmap :<M-t>)
 (vim.keymap.set :n :<M-t> barf-back)
