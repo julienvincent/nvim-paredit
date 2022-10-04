@@ -103,21 +103,155 @@
     (when (> child-count 0)
       (node:named_child (- child-count 1)))))
 
-(defn default-opening-delimiter-range
-  [node]
-  [(-?> node first-child (: :range))])
-
 (defn rec_prev_named_sibling
   [node]
   (or (node:prev_named_sibling) 
       (when (node:parent)
           (rec_prev_named_sibling (node:parent)))))
 
+(defn clojure-slurp-prev-sibling
+  [node]
+  (if (= :tagged_or_ctor_lit (-> (node:parent) (: :type)))
+    (rec_prev_named_sibling (node:parent))
+    (rec_prev_named_sibling node)))
+
+(defn slurp-prev-sibing
+  [node]
+  (match (filetype)
+    :clojure (clojure-slurp-prev-sibling node)
+    _ (rec_prev_named_sibling node)))
+
 (defn rec_next_named_sibling
   [node]
   (or (node:next_named_sibling)
       (when (node:parent)
         (rec_next_named_sibling (node:parent)))))
+
+
+(defn fennel-first-node-of-opening-delimiter
+  [node]
+  (match (node:type)
+    :quoted_list (first-node-of-opening-delimiter 
+                   (node:parent))
+    :quote (first-child node)
+    :list (if (= :hashfn (-?> (node:parent) (: :type)))
+            (first-node-of-opening-delimiter (node:parent))
+            (first-child node))
+    _ (first-child node)))
+
+(defn clojure-first-node-of-opening-delimiter
+  [node]
+  (match (node:type)
+    :anon_fn_lit (first-child node)
+    :tagged_or_ctor_lit (first-child node)
+    _ (if (= :tagged_or_ctor_lit (-?> (node:parent) (: :type)))
+        (clojure-first-node-of-opening-delimiter (node:parent))
+        (= :meta_lit (-?> (first-child node) (: :type)))
+        (first-child node)
+        (first-child node))))
+
+(defn clojure-last-node-of-opening-delimiter
+  [node]
+  (match (node:type)
+    :anon_fn_lit (-?> (first-child node) (: :next_sibling))
+    :meta_lit (if (= :meta_lit (-?> (node:next_sibling) (: :type)))
+                (clojure-last-node-of-opening-delimiter 
+                  (node:next_sibling))
+                (node:next_sibling))
+    _ (if (= :meta_lit (-?> (first-child node) (: :type)))
+        (clojure-last-node-of-opening-delimiter (first-child node))
+        (first-child node))))
+
+(defn fennel-last-node-of-opening-delimiter
+  [node]
+  (first-child node))
+
+(defn first-node-of-opening-delimiter
+  [node]
+  (match (filetype)
+    :fennel (fennel-first-node-of-opening-delimiter node)
+    :clojure (clojure-first-node-of-opening-delimiter node)
+    _ (first-child node)))
+
+(defn last-node-of-opening-delimiter
+  [node]
+  (match (filetype)
+    :fennel (fennel-last-node-of-opening-delimiter node)
+      :clojure (clojure-last-node-of-opening-delimiter node)
+    _ (first-child node)))
+
+(defn sort-node-pair
+  [[node1 node2]]
+  (let [nr1 [(node1:range)] nr2 [(node2:range)]]
+    (if (< (. nr1 1) (. nr2 1))
+      [node1 node2]
+      (< (. nr2 1) (. nr1 1))
+      [node2 node1]
+      (< (. nr1 2) (. nr2 2))
+      [node1 node2]
+      [node2 node1])))
+
+(defn node-pair->range
+  [[node1 node2]]
+  (let [nr1 [(node1:range)] nr2 [(node2:range)]]
+    [(. nr1 1) (. nr1 2) (. nr2 3) (. nr2 4)]))
+
+(defn get-range
+  [[sl sc el ec]]
+  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ el 1) true)]
+    (string.sub l (+ sc 1) ec)))
+
+(defn set-range
+  [[sl sc el ec] s]
+  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ el 1) true)]
+    (vim.api.nvim_buf_set_lines 
+      (vim.fn.bufnr)
+      sl (+ el 1) true
+      [(.. (string.sub l 1 sc)
+           s
+           (string.sub l (+ ec 1)))])))
+
+(defn prepend-with
+  [[sl sc el ec] s]
+  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
+    (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
+      [(.. s l)])))
+
+(defn subtend-from
+  [[sl sc el ec] s]
+  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
+    (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
+      [(string.sub l (+ (length s) 1))])))
+
+(defn slurp-back-2
+  []
+  (let [node (find-nearest-seq-node (cursor-node))
+        fc (first-child node)
+        fcd (first-node-of-opening-delimiter node)
+        lcd (last-node-of-opening-delimiter node)
+        fcr (-> [fcd lcd] sort-node-pair node-pair->range)
+        sib (slurp-prev-sibing node)
+        sibr [(: sib :range)]]
+    (if (= (. sibr 3) (. fcr 1))
+      (tset sibr 4 (. fcr 2))
+      (do (tset sibr 3 (. fcr 1))
+        (tset sibr 4 (. fcr 2))))
+    (prepend-with sibr (get-range fcr))
+    (subtend-from fcr (get-range fcr))))
+
+(vim.keymap.set :n :<M-t> slurp-back-2
+               ; (fn [] (let [n (-> (cursor-node)
+               ;                    find-nearest-seq-node)
+               ;              r (-> [(first-node-of-opening-delimiter n)
+               ;                     (last-node-of-opening-delimiter n)]
+               ;                    sort-node-pair
+               ;                    node-pair->range)]
+               ;          (prepend-with r (get-range r))))
+                )
+
+(defn default-opening-delimiter-range
+  [node]
+  [(-?> node first-child (: :range))])
 
 (defn include-parent-opening-delimiter
   [node]
