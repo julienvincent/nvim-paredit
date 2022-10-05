@@ -89,12 +89,6 @@
   (let [nr1 [(node1:range)] nr2 [(node2:range)]]
     [(. nr1 1) (. nr1 2) (. nr2 3) (. nr2 4)]))
 
-(defn insert-in-range
-  [[sl sc ?ec] s]
-  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
-    (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
-      [(.. (string.sub l 1 sc) s (string.sub l (+ (or ?ec sc) 1)))])))
-
 (defn dis_expr-node [node]
   (if (= (-?> node (: :type)) :dis_expr)
     node
@@ -104,14 +98,14 @@
   []
   (let [node (util.smallest-movable-node (util.cursor-node))
         noder [(node:range)]]
-    (insert-in-range [(. noder 1) (. noder 2)] "#_")))
+    (util.insert-in-range [(. noder 1) (. noder 2)] "#_")))
 
 (defn dedisexpress-node
   []
   (let [node (dis_expr-node (util.cursor-node))
         fc (util.first-child node)
         fcr [(fc:range)]]
-    (insert-in-range [(. fcr 1) (. fcr 2) (. fcr 4)] "")))
+    (util.insert-in-range [(. fcr 1) (. fcr 2) (. fcr 4)] "")))
 
 (defn slurp-back-2
   []
@@ -161,6 +155,23 @@
 
 (defn move-sexp-forward [?win-id]
   (move-sexp (fn [n] (n:next_named_sibling)) ?win-id))
+
+(defn raise-node [node]
+  (let [nodep (node:parent)]
+    (when nodep
+      (util.insert-in-range [(nodep:range)] 
+                            (vim.treesitter.get_node_text
+                              node
+                              (util.get-bufnr))))))
+
+(defn raise-element []
+  (raise-node (util.smallest-movable-node (util.cursor-node))))
+
+(defn raise-form []
+  (-?> (util.cursor-node)
+       util.find-nearest-seq-node
+       util.smallest-movable-node
+       raise-node))
 
 ;; TODO remove soon
 (defn default-opening-delimiter-range

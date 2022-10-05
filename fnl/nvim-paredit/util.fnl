@@ -116,3 +116,19 @@
         (rec-next-named-sibling (node:parent)))))
 
 (defn itbl [...] [...])
+
+(defn delete-range
+  [[sl sc el ec]]
+  (let [ls (vim.api.nvim_buf_get_lines (get-bufnr) sl (+ el 1) true)]
+    (vim.api.nvim_buf_set_lines (get-bufnr) sl (+ el 1) true
+      [(.. (string.sub (. ls 1) 1 sc) (string.sub (. ls (length ls)) (+ ec 1)))])))
+
+(defn split-lines [s]
+  (icollect [k (string.gmatch s "[^\n]+")] k))
+
+(defn insert-in-range
+  [[sl sc el ec] s]
+  (delete-range [sl sc el ec])
+  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
+    (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
+      (split-lines (.. (string.sub l 1 sc) s (string.sub l (+ ec 1)))))))
