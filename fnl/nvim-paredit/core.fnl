@@ -151,10 +151,10 @@
       (ts.goto_node next-node))))
 
 (defn move-sexp-backward [?win-id]
-  (move-sexp (fn [n] (n:prev_named_sibling)) ?win-id))
+  (move-sexp (fn [n] (-?> n (: :prev_named_sibling))) ?win-id))
 
 (defn move-sexp-forward [?win-id]
-  (move-sexp (fn [n] (n:next_named_sibling)) ?win-id))
+  (move-sexp (fn [n] (-?> n (: :next_named_sibling))) ?win-id))
 
 (defn raise-node [node]
   (let [nodep (node:parent)
