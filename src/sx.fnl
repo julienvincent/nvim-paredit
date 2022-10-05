@@ -225,11 +225,31 @@
 ;;     (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
 ;;       [(string.sub l (+ (length s) 1))])))
 ;; 
-;; (defn insert-in-range
-;;   [[sl sc] s]
-;;   (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
-;;     (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
-;;       [(.. (string.sub l 1 sc) s (string.sub l (+ sc 1)))])))
+(defn insert-in-range
+  [[sl sc ?ec] s]
+  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
+    (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
+      [(.. (string.sub l 1 sc) s (string.sub l (+ (or ?ec sc) 1)))])))
+
+(defn dis_expr-node [node]
+  (if (= (-?> node (: :type)) :dis_expr)
+    node
+    (when node (dis_expr-node (node:parent)))))
+
+(defn disexpress-node
+  []
+  (let [node (smallest-movable-node (cursor-node))
+        noder [(node:range)]]
+    (insert-in-range [(. noder 1) (. noder 2)] "#_")))
+
+(defn dedisexpress-node
+  []
+  (let [node (dis_expr-node (cursor-node))
+        fc (first-child node)
+        fcr [(fc:range)]]
+    (insert-in-range [(. fcr 1) (. fcr 2) (. fcr 4)] "")))
+
+(vim.keymap.set :n :<M-t> dedisexpress-node)
 ;; 
 ;; (defn exise-from-range
 ;;   [sl [sc ec]]
@@ -268,7 +288,7 @@
           (tset nlcr 4 (. nnlcr 2)))))
     (ts.swap_nodes fcr nlcr (get-bufnr) false)))
 
-(vim.keymap.set :n :<M-t> barf-back-2)
+(vim.keymap.set :n :<M-t> comment-node)
 
 (defn default-opening-delimiter-range
   [node]
