@@ -240,7 +240,6 @@
 (defn slurp-back-2
   []
   (let [node (find-nearest-seq-node (cursor-node))
-        fc (first-child node)
         fcd (first-node-of-opening-delimiter node)
         lcd (last-node-of-opening-delimiter node)
         fcr (-> [fcd lcd] sort-node-pair node-pair->range)
@@ -253,15 +252,23 @@
         (tset sibr 4 (. fcr 2))))
     (ts.swap_nodes fcr sibr (get-bufnr) false)))
 
-(vim.keymap.set :n :<M-t> slurp-back-2
-               ; (fn [] (let [n (-> (cursor-node)
-               ;                    find-nearest-seq-node)
-               ;              r (-> [(first-node-of-opening-delimiter n)
-               ;                     (last-node-of-opening-delimiter n)]
-               ;                    sort-node-pair
-               ;                    node-pair->range)]
-               ;          (prepend-with r (get-range r))))
-                )
+(defn barf-back-2
+  []
+  (let [node (find-nearest-seq-node (cursor-node))
+        fcd (first-node-of-opening-delimiter node)
+        lcd (last-node-of-opening-delimiter node)
+        fcr (-> [fcd lcd] sort-node-pair node-pair->range)
+        nlc (: lcd :next_named_sibling)
+        nlcr [(: nlc :range)]
+        nnlcr [(-?> nlc (: :next_named_sibling) (: :range))]]
+    (if (first nnlcr)
+      (if (= (. nnlcr 1) (. nlcr 3))
+        (tset nlcr 4 (. nnlcr 2))
+        (do (tset nlcr 3 (. nnlcr 1))
+          (tset nlcr 4 (. nnlcr 2)))))
+    (ts.swap_nodes fcr nlcr (get-bufnr) false)))
+
+(vim.keymap.set :n :<M-t> barf-back-2)
 
 (defn default-opening-delimiter-range
   [node]
