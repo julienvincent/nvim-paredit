@@ -138,7 +138,7 @@
         nlc (: lcd :next_named_sibling)
         nlcr [(: nlc :range)]
         nnlcr [(-?> nlc (: :next_named_sibling) (: :range))]]
-    (if (first nnlcr)
+    (if (util.first nnlcr)
       (if (= (. nnlcr 1) (. nlcr 3))
         (tset nlcr 4 (. nnlcr 2))
         (do (tset nlcr 3 (. nnlcr 1))
@@ -148,14 +148,14 @@
 (defn move-sexp [next-sexp-fn ?win-id]
   (let [w (or ?win-id 0)
         bufnr (nvim.win_get_buf w)
-        util.cursor-node (-> w 
+        cursor-node (-> w 
                         ts.get_node_at_cursor
                         util.smallest-movable-node)
-        next-node (-> util.cursor-node
+        next-node (-> cursor-node
                       next-sexp-fn
                       util.smallest-movable-node)]
     (when next-node
-      (ts.swap_nodes next-node util.cursor-node bufnr true)
+      (ts.swap_nodes next-node cursor-node bufnr true)
       (ts.goto_node next-node))))
 
 (defn move-sexp-backward [?win-id]
@@ -167,7 +167,7 @@
 ;; TODO remove soon
 (defn default-opening-delimiter-range
   [node]
-  [(-?> node first-child (: :range))])
+  [(-?> node util.first-child (: :range))])
 
 (defn include-parent-opening-delimiter
   [node]
@@ -225,7 +225,7 @@
         plc (: lc :prev_named_sibling)
         plcr [(: plc :range)]
         pplcr [(-?> plc (: :prev_named_sibling) (: :range))]]
-    (if (first pplcr)
+    (if (util.first pplcr)
       (if (= (. plcr 1) (. pplcr 3))
         (tset plcr 2 (. pplcr 4))
         (do (tset plcr 1 (. pplcr 3))
