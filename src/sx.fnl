@@ -141,14 +141,16 @@
 
 (defn clojure-first-node-of-opening-delimiter
   [node]
-  (match (node:type)
-    :anon_fn_lit (first-child node)
-    :tagged_or_ctor_lit (first-child node)
-    _ (if (= :tagged_or_ctor_lit (-?> (node:parent) (: :type)))
-        (clojure-first-node-of-opening-delimiter (node:parent))
-        (= :meta_lit (-?> (first-child node) (: :type)))
-        (first-child node)
-        (first-child node))))
+  (if (= :tagged_or_ctor_lit (-?> (node:parent) (: :type)))
+    (clojure-first-node-of-opening-delimiter (node:parent))
+    (match (node:type)
+      :anon_fn_lit (first-child node)
+      :tagged_or_ctor_lit (first-child node)
+      _ (if (= :tagged_or_ctor_lit (-?> (node:parent) (: :type)))
+          (clojure-first-node-of-opening-delimiter (node:parent))
+          (= :meta_lit (-?> (first-child node) (: :type)))
+          (first-child node)
+          (first-child node)))))
 
 (defn clojure-last-node-of-opening-delimiter
   [node]
@@ -177,7 +179,7 @@
   [node]
   (match (filetype)
     :fennel (fennel-last-node-of-opening-delimiter node)
-      :clojure (clojure-last-node-of-opening-delimiter node)
+    :clojure (clojure-last-node-of-opening-delimiter node)
     _ (first-child node)))
 
 (defn sort-node-pair
@@ -196,32 +198,44 @@
   (let [nr1 [(node1:range)] nr2 [(node2:range)]]
     [(. nr1 1) (. nr1 2) (. nr2 3) (. nr2 4)]))
 
-(defn get-range
-  [[sl sc el ec]]
-  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ el 1) true)]
-    (string.sub l (+ sc 1) ec)))
+;; (defn get-range
+;;   [[sl sc el ec]]
+;;   (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ el 1) true)]
+;;     (string.sub l (+ sc 1) ec)))
+;; 
+;; (defn set-range
+;;   [[sl sc el ec] s]
+;;   (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ el 1) true)]
+;;     (vim.api.nvim_buf_set_lines 
+;;       (vim.fn.bufnr)
+;;       sl (+ el 1) true
+;;       [(.. (string.sub l 1 sc)
+;;            s
+;;            (string.sub l (+ ec 1)))])))
 
-(defn set-range
-  [[sl sc el ec] s]
-  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ el 1) true)]
-    (vim.api.nvim_buf_set_lines 
-      (vim.fn.bufnr)
-      sl (+ el 1) true
-      [(.. (string.sub l 1 sc)
-           s
-           (string.sub l (+ ec 1)))])))
-
-(defn prepend-with
-  [[sl sc el ec] s]
-  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
-    (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
-      [(.. s l)])))
-
-(defn subtend-from
-  [[sl sc el ec] s]
-  (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
-    (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
-      [(string.sub l (+ (length s) 1))])))
+;; (defn prepend-with
+;;   [[sl sc el ec] s]
+;;   (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
+;;     (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
+;;       [(.. s l)])))
+;; 
+;; (defn subtend-from
+;;   [[sl sc el ec] s]
+;;   (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
+;;     (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
+;;       [(string.sub l (+ (length s) 1))])))
+;; 
+;; (defn insert-in-range
+;;   [[sl sc] s]
+;;   (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
+;;     (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
+;;       [(.. (string.sub l 1 sc) s (string.sub l (+ sc 1)))])))
+;; 
+;; (defn exise-from-range
+;;   [sl [sc ec]]
+;;   (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
+;;     (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
+;;       [(.. (string.sub l 1 sc) (string.sub l (+ ec 1)))])))
 
 (defn slurp-back-2
   []
@@ -231,13 +245,13 @@
         lcd (last-node-of-opening-delimiter node)
         fcr (-> [fcd lcd] sort-node-pair node-pair->range)
         sib (slurp-prev-sibing node)
-        sibr [(: sib :range)]]
+        sibr [(: sib :range)]
+        s (get-range fcr)]
     (if (= (. sibr 3) (. fcr 1))
       (tset sibr 4 (. fcr 2))
       (do (tset sibr 3 (. fcr 1))
         (tset sibr 4 (. fcr 2))))
-    (prepend-with sibr (get-range fcr))
-    (subtend-from fcr (get-range fcr))))
+    (ts.swap_nodes fcr sibr (get-bufnr) false)))
 
 (vim.keymap.set :n :<M-t> slurp-back-2
                ; (fn [] (let [n (-> (cursor-node)
