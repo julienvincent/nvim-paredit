@@ -132,3 +132,12 @@
   (let [[l] (vim.api.nvim_buf_get_lines (vim.fn.bufnr) sl (+ sl 1) true)]
     (vim.api.nvim_buf_set_lines (vim.fn.bufnr) sl (+ sl 1) true
       (split-lines (.. (string.sub l 1 sc) s (string.sub l (+ ec 1)))))))
+
+;; TODO: :program is top level for `fennel`
+;;       :source is top level for `clojure`
+;;       extract this...
+(defn not-top-level
+  [node]
+  (when (and (not= (: (node:parent) :type) :program)
+             (not= (: (node:parent) :type) :source)) 
+    node))

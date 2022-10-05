@@ -157,12 +157,13 @@
   (move-sexp (fn [n] (n:next_named_sibling)) ?win-id))
 
 (defn raise-node [node]
-  (let [nodep (node:parent)]
-    (when nodep
-      (util.insert-in-range [(nodep:range)] 
-                            (vim.treesitter.get_node_text
-                              node
-                              (util.get-bufnr))))))
+  (let [nodep (node:parent)
+        nodepr (ts.node_to_lsp_range nodep)
+        nodet (vim.treesitter.get_node_text node (util.get-bufnr))]
+    (vim.lsp.util.apply_text_edits 
+      [{:range nodepr :newText nodet}]
+      (util.get-bufnr)
+      "utf-8")))
 
 (defn raise-element []
   (raise-node (util.smallest-movable-node (util.cursor-node))))
@@ -171,6 +172,7 @@
   (-?> (util.cursor-node)
        util.find-nearest-seq-node
        util.smallest-movable-node
+       util.not-top-level
        raise-node))
 
 ;; TODO remove soon
