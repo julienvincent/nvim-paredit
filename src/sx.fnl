@@ -16,7 +16,8 @@
                        :table true
                        :quoted_list true
                        :sequential_table true}
-              :clojure {:set_lit true 
+              :clojure {:tagged_or_ctor_lit true
+                        :set_lit true 
                         :list_lit true 
                         :str_lit true
                         :map_lit true
@@ -112,10 +113,10 @@
 (defn clojure-slurp-prev-sibling
   [node]
   (if (= :tagged_or_ctor_lit (-> (node:parent) (: :type)))
-    (rec_prev_named_sibling (node:parent))
+    (clojure-slurp-prev-sibling (node:parent))
     (rec_prev_named_sibling node)))
 
-(defn slurp-prev-sibing
+(defn slurp-prev-sibling
   [node]
   (match (filetype)
     :clojure (clojure-slurp-prev-sibling node)
@@ -144,6 +145,7 @@
   (if (= :tagged_or_ctor_lit (-?> (node:parent) (: :type)))
     (clojure-first-node-of-opening-delimiter (node:parent))
     (match (node:type)
+      :str_lit (clojure-first-node-of-opening-delimiter (node:parent))
       :anon_fn_lit (first-child node)
       :tagged_or_ctor_lit (first-child node)
       _ (if (= :tagged_or_ctor_lit (-?> (node:parent) (: :type)))
@@ -155,6 +157,8 @@
 (defn clojure-last-node-of-opening-delimiter
   [node]
   (match (node:type)
+    :tagged_or_ctor_lit (-?> node last-child (: :prev_sibling))
+    :str_lit (-?> (node:parent) last-child (: :prev_sibling))
     :anon_fn_lit (-?> (first-child node) (: :next_sibling))
     :meta_lit (if (= :meta_lit (-?> (node:next_sibling) (: :type)))
                 (clojure-last-node-of-opening-delimiter 
@@ -249,7 +253,6 @@
         fcr [(fc:range)]]
     (insert-in-range [(. fcr 1) (. fcr 2) (. fcr 4)] "")))
 
-(vim.keymap.set :n :<M-t> dedisexpress-node)
 ;; 
 ;; (defn exise-from-range
 ;;   [sl [sc ec]]
@@ -263,21 +266,25 @@
         fcd (first-node-of-opening-delimiter node)
         lcd (last-node-of-opening-delimiter node)
         fcr (-> [fcd lcd] sort-node-pair node-pair->range)
-        sib (slurp-prev-sibing node)
-        sibr [(: sib :range)]
-        s (get-range fcr)]
+        sib (slurp-prev-sibling node)
+        sibr [(: sib :range)]]
     (if (= (. sibr 3) (. fcr 1))
       (tset sibr 4 (. fcr 2))
       (do (tset sibr 3 (. fcr 1))
         (tset sibr 4 (. fcr 2))))
     (ts.swap_nodes fcr sibr (get-bufnr) false)))
 
+(defn itbl [...]
+  [...])
+
+(vim.keymap.set :n :<M-t> slurp-back-2)
+
 (defn barf-back-2
   []
   (let [node (find-nearest-seq-node (cursor-node))
         fcd (first-node-of-opening-delimiter node)
         lcd (last-node-of-opening-delimiter node)
-        fcr (-> [fcd lcd] sort-node-pair node-pair->range)
+        fcr (-> [fcd lcd] node-pair->range)
         nlc (: lcd :next_named_sibling)
         nlcr [(: nlc :range)]
         nnlcr [(-?> nlc (: :next_named_sibling) (: :range))]]
@@ -287,8 +294,6 @@
         (do (tset nlcr 3 (. nnlcr 1))
           (tset nlcr 4 (. nnlcr 2)))))
     (ts.swap_nodes fcr nlcr (get-bufnr) false)))
-
-(vim.keymap.set :n :<M-t> comment-node)
 
 (defn default-opening-delimiter-range
   [node]
