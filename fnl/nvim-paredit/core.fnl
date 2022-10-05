@@ -159,7 +159,7 @@
           (tset nnsr 2 (. lcdr 4))
           (do (tset nnsr 1 (. lcdr 3))
             (tset nnsr 2 (. lcdr 4))))
-        (ts.swap_nodes lcdr nnsr (util.get-bufnr) false))))
+        (ts.swap_nodes lcdr nnsr (util.get-bufnr) false)))))
 
 (defn barf-forward
   []
@@ -247,44 +247,4 @@
        elide-node
        (: :parent)
        util.has-parent
-       util.remove-empty-lines))
-
-;; TODO remove soon
-(defn default-opening-delimiter-range
-  [node]
-  [(-?> node util.first-child (: :range))])
-
-(defn include-parent-opening-delimiter
-  [node]
-  (let [p (node:parent)
-        pfcr [(: (util.first-child (node:parent)) :range)]
-        fcr [(: (util.first-child node) :range)]]
-    [(. pfcr 1) (. pfcr 2) (. fcr 3) (. fcr 4)]))
-
-(defn fennel-opening-delimiter-range
-  [node]
-  (match (node:type)
-    :quoted_list (include-parent-opening-delimiter node)
-    :list (if (= (: (node:parent) :type) :hashfn)
-            (include-parent-opening-delimiter node)
-            (default-opening-delimiter-range node))
-    _ (default-opening-delimiter-range node)))
-
-(defn clojure-opening-delimiter-range
-  [node]
-  (match (node:type)
-    :anon_fn_lit (let [fc (util.first-child node)
-                       fcr [(fc:range)]
-                       scr [(: (fc:next_sibling node) :range)]]
-                   [(. fcr 1) (. fcr 2) (. scr 3) (. scr 4)])
-    :list_lit (if (= :quoting_lit (-?> (node:parent) (: :type)))
-                (include-parent-opening-delimiter node)
-                (default-opening-delimiter-range node))
-    _ (default-opening-delimiter-range node)))
-
-(defn opening-delimiter-range
-  [node]
-  (match (util.file-type)
-    :fennel (fennel-opening-delimiter-range node)
-    :clojure (clojure-opening-delimiter-range node)
-    _ (default-opening-delimiter-range node)))
+       utilrremove-empty-lines))
