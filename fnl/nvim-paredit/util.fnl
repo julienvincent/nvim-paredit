@@ -141,3 +141,33 @@
   (when (and (not= (: (node:parent) :type) :program)
              (not= (: (node:parent) :type) :source)) 
     node))
+
+(defn has-parent
+  [node]
+  (when (node:parent)
+    node))
+
+(defn has-grandparent
+  [node]
+  (when (-?> (node:parent) (: :parent))
+    node))
+
+(defn cursor-to-prev-sibling
+  [node ?end ?no-jump]
+  (ts.goto_node (node:prev_sibling) ?end ?no-jump)
+  node)
+
+(defn apply-text-edits
+  [edits]
+  (vim.lsp.util.util.apply-text-edits
+    edits (get-bufnr) "utf-8"))
+
+(defn remove-empty-lines
+  [node]
+  (let [noder [(node:range)]
+        lines (vim.api.nvim_buf_get_lines (vim.fn.bufnr) (. noder 1) (+ (. noder 3) 1) true)
+        without-empty-lines (icollect [_ k (ipairs lines)] (when (not= k "") k))]
+    (vim.api.nvim_buf_set_lines (vim.fn.bufnr) (. noder 1) (+ (. noder 3) 1) true
+      without-empty-lines)))
+
+

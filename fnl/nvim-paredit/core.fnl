@@ -160,10 +160,8 @@
   (let [nodep (node:parent)
         nodepr (ts.node_to_lsp_range nodep)
         nodet (vim.treesitter.get_node_text node (util.get-bufnr))]
-    (vim.lsp.util.apply_text_edits 
-      [{:range nodepr :newText nodet}]
-      (util.get-bufnr)
-      "utf-8")))
+    (util.apply-text-edits 
+      [{:range nodepr :newText nodet}])))
 
 (defn raise-element []
   (raise-node (util.smallest-movable-node (util.cursor-node))))
@@ -174,6 +172,42 @@
        util.smallest-movable-node
        util.not-top-level
        raise-node))
+
+(defn elide-node [node]
+  (let [pnode (-> node (: :prev_named_sibling))
+        nnode (node:next_named_sibling)
+        noder [(node:range)]
+        pnoder [(-?> pnode (: :range))]
+        nnoder [(-?> nnode (: :range))]
+        totr (ts.node_to_lsp_range
+               [(if pnode (. pnoder 3) (. noder 1))
+                (if pnode (. pnoder 4) (. noder 2))
+                (. noder 3)
+                (. noder 4)])]
+    (util.apply-text-edits 
+      [{:range totr :newText ""}])
+    pnode))
+
+(defn elide-element [node]
+  (-?> (util.cursor-node)
+       util.has-parent
+       util.smallest-movable-node
+       (util.cursor-to-prev-sibling :end :no-jump)
+       elide-node
+       (: :parent)
+       util.has-parent
+       util.remove-empty-lines))
+
+(defn elide-form [node]
+  (-?> (util.cursor-node)
+       util.has-parent
+       util.find-nearest-seq-node
+       util.smallest-movable-node
+       (util.cursor-to-prev-sibling :end :no-jump)
+       elide-node
+       (: :parent)
+       util.has-parent
+       util.remove-empty-lines))
 
 ;; TODO remove soon
 (defn default-opening-delimiter-range
