@@ -143,18 +143,18 @@
         cursor-node (-> w 
                         ts.get_node_at_cursor
                         util.smallest-movable-node)
-        next-node (-> cursor-node
-                      next-sexp-fn
-                      util.smallest-movable-node)]
+        next-node (-?> cursor-node
+                       next-sexp-fn
+                       util.smallest-movable-node)]
     (when next-node
       (ts.swap_nodes next-node cursor-node bufnr true)
       (ts.goto_node next-node))))
 
 (defn move-sexp-backward [?win-id]
-  (move-sexp (fn [n] (-?> n (: :prev_named_sibling))) ?win-id))
+  (move-sexp (fn [n] (n:prev_named_sibling)) ?win-id))
 
 (defn move-sexp-forward [?win-id]
-  (move-sexp (fn [n] (-?> n (: :next_named_sibling))) ?win-id))
+  (move-sexp (fn [n] (n:next_named_sibling)) ?win-id))
 
 (defn raise-node [node]
   (let [nodep (node:parent)
