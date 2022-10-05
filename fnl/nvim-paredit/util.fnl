@@ -114,3 +114,5 @@
   (or (node:next_named_sibling)
       (when (node:parent)
         (rec-next-named-sibling (node:parent)))))
+
+(defn itbl [...] [...])

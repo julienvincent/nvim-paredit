@@ -127,8 +127,6 @@
         (tset sibr 4 (. fcr 2))))
     (ts.swap_nodes fcr sibr (util.get-bufnr) false)))
 
-(defn itbl [...] [...])
-
 (defn barf-back-2
   []
   (let [node (util.find-nearest-seq-node (util.cursor-node))
