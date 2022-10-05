@@ -170,4 +170,10 @@
     (vim.api.nvim_buf_set_lines (vim.fn.bufnr) (. noder 1) (+ (. noder 3) 1) true
       without-empty-lines)))
 
+(defn get-cursor-pos
+  []
+  (vim.api.nvim_win_get_cursor 0))
 
+(defn set-cursor-pos
+  [pos]
+  (vim.api.nvim_win_set_cursor 0 pos))

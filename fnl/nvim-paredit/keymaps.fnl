@@ -21,3 +21,14 @@
 ;; (vim.keymap.set :n "<S-M-k>" sx.barf-forward {:desc "Barf forward"})
 ;; (vim.keymap.set :n "<M-p>" sx.move-sexp-backward {:desc "Move sexp backward"})
 ;; (vim.keymap.set :n "<M-f>" sx.move-sexp-forward {:desc "Move sexp forward"})
+
+; TODO:
+;; - split form
+;; - move pairs
+;; - make binding forms unelidable
+;; - refactor slurp-forward and barf-forward
+;; - autoformat node utility function...
+;; - thread once / all
+;; - unwind once / all
+;; - move root form -forward/-back
+;; - move form -forward/-back
