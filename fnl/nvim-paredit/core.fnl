@@ -307,7 +307,7 @@
   (match (node:type)
     :vec_lit node
     :list_lit node
-    :set_lit node
+    :map_lit node
     _ (when-let [p (-?> (node:parent) util.has-parent)]
         (clojure-find-nearest-data-node p))))
 
@@ -340,3 +340,22 @@
            {:range (ts.node_to_lsp_range nse)
             :newText (.. openingt
                          (util.get-node-text nse (util.get-bufnr)))}])))))
+
+(defn nstring? [node]
+  (let [t (node:type)]
+    (or (= t :str_lit)
+        (= t :string))))
+
+(defn split-string []
+  (let [l (vim.api.nvim_get_current_line)
+        pos (p.get-cursor-pos)]
+    (vim.api.nvim_set_current_line
+      (.. (string.sub l 1 (+ (. pos 2) 1))
+          "\" \""
+          (string.sub l (+ (. pos 2) 2))))
+    (p.set-cursor-pos (p.pos+ pos [0 2]))))
+
+(defn split
+  (if (nstring? (util.cursor-node))
+    (split-string)
+    (split-form)))
