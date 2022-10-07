@@ -183,8 +183,7 @@
                        next-sexp-fn
                        util.smallest-movable-node)]
     (when next-node
-      (ts.swap_nodes next-node cursor-node bufnr true)
-      (ts.goto_node next-node))))
+      (ts.swap_nodes cursor-node next-node bufnr true))))
 
 (defn move-sexp-backward [?win-id]
   (move-sexp (fn [n] (n:prev_named_sibling)) ?win-id))
