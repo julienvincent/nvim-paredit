@@ -205,13 +205,16 @@
     (p.set-cursor-pos (p.pos+ pos offset))))
 
 (defn raise-element []
-  (raise-node (util.smallest-movable-node (util.cursor-node))))
+  (-?> (util.cursor-node)
+       util.smallest-movable-node
+       util.has-grandparent
+       raise-node))
 
 (defn raise-form []
   (-?> (util.cursor-node)
        util.find-nearest-seq-node
        util.smallest-movable-node
-       util.not-top-level
+       util.has-grandparent
        raise-node))
 
 (defn elide-node [node]
