@@ -159,7 +159,7 @@
 
 (defn apply-text-edits
   [edits]
-  (vim.lsp.util.util.apply-text-edits
+  (vim.lsp.util.apply-text-edits
     edits (get-bufnr) "utf-8"))
 
 (defn remove-empty-lines
