@@ -102,17 +102,57 @@
     (when node (dis_expr-node (node:parent)))))
 
 (defn disexpress-node
+  [node]
+  (util.apply-text-edits
+    [{:range (ts.node_to_lsp_range node)
+      :newText (.. "#_ " (util.get-node-text 
+                           node 
+                           (util.get-bufnr)))}]))
+
+(defn disexpress-element
   []
-  (let [node (util.smallest-movable-node (util.cursor-node))
-        noder [(node:range)]]
-    (util.insert-in-range [(. noder 1) (. noder 2)] "#_")))
+  (-?> (util.cursor-node)
+       util.smallest-movable-node
+       util.has-parent
+       disexpress-node))
+
+(defn disexpress-form
+  []
+  (-?> (util.cursor-node)
+       util.find-nearest-seq-node
+       util.smallest-movable-node
+       util.has-parent
+       disexpress-node))
 
 (defn dedisexpress-node
-  []
-  (let [node (dis_expr-node (util.cursor-node))
+  [node]
+  (let [node (dis_expr-node node)
         fc (util.first-child node)
-        fcr [(fc:range)]]
-    (util.insert-in-range [(. fcr 1) (. fcr 2) (. fcr 4)] "")))
+        ns (fc:next_sibling)]
+    (if ns
+      (let [[nsr nsc] [(ns:start)]
+            [fcr fcc] [(fc:start)]]
+        (util.apply-text-edits
+          [{:range (ts.node_to_lsp_range [fcr fcc nsr nsc])
+            :newText ""}]))
+      (util.apply-text-edits
+        [{:range (ts.node_to_lsp_range fc)
+          :newText ""}]))))
+
+(defn dedisexpress-element
+  []
+  (-?> (util.cursor-node)
+       util.smallest-movable-node
+       util.has-parent
+       dedisexpress-node))
+
+(defn dedisexpress-form
+  []
+  (-?> (util.cursor-node)
+       util.find-nearest-seq-node
+       util.smallest-movable-node
+       util.has-parent
+       dedisexpress-node))
 
 (defn slurp-backward
   []
