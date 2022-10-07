@@ -24,9 +24,7 @@
                         :anon_fn_lit true}})
 
 (defn file-type []
-  (if (not= WIN_ID 0)
-    FILE_TYPE
-    vim.bo.filetype))
+  vim.bo.filetype)
 
 (defn get-bufnr 
   []
