@@ -356,6 +356,18 @@
     (p.set-cursor-pos (p.pos+ pos [0 2]))))
 
 (defn split
+  []
   (if (nstring? (util.cursor-node))
     (split-string)
     (split-form)))
+
+(defn wrap-node-in [node prefix suffix]
+  (let [nt (util.get-node-text node (util.get-bufnr))]
+    [{:range (ts.node_to_lsp_range node)
+      :newText (.. prefix nt suffix)}]))
+
+(defn wrap-in-fn-call []
+  (wrap-node-in (util.cursor-node) "( " ")"))
+
+(defn wrap-in-form []
+  (wrap-in-form (util.cursor-node) "(" ")"))
