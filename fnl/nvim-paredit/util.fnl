@@ -1,5 +1,6 @@
 (module nvim-paredit.util
   {autoload {ts nvim-treesitter.ts_utils
+             p nvim-paredit.position
              nvim aniseed.nvim
              core aniseed.core}})
 
@@ -131,6 +132,24 @@
   (or (node:next_named_sibling)
       (when (node:parent)
         (rec-next-named-sibling (node:parent)))))
+
+(defn nearest-preceding-element
+  [pos]
+  (when-let [c (first-child (cursor-node))]
+    (when (p.pos<= (p.nend c) pos)
+      (var npc c)
+      (while (-?> (npc:next_sibling) p.nend (p.pos<= pos))
+        (set npc (npc:next_sibling)))
+      npc)))
+
+(defn nearest-succeeding-element
+  [pos]
+  (when-let [c (last-child (cursor-node))]
+    (when (p.pos> (p.nstart c) pos)
+      (var npc c)
+      (while (-?> (npc:prev_sibling) p.nend (p.pos> pos))
+        (set npc (npc:prev_sibling)))
+      npc)))
 
 (defn itbl [...] [...])
 

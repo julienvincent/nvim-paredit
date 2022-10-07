@@ -307,6 +307,7 @@
   (match (node:type)
     :vec_lit node
     :list_lit node
+    :set_lit node
     _ (when-let [p (-?> (node:parent) util.has-parent)]
         (clojure-find-nearest-data-node p))))
 
@@ -327,11 +328,15 @@
           openingt (util.get-node-text opening (util.get-bufnr))
           closingt (util.get-node-text closing (util.get-bufnr))
           spos (p.nstart opening)
-          lpos (p.nend closing)]
+          lpos (p.nend closing)
+          npe (util.nearest-preceding-element pos)
+          nse (util.nearest-succeeding-element pos)]
       (when (and (p.pos< spos pos) (p.pos< pos lpos)
                  (= node (util.cursor-node)))
-        (vim.api.nvim_set_current_line
-          (.. (string.sub l 1 (+ (. pos 2) 1))
-              closingt
-              openingt
-              (string.sub l (+ (. pos 2) 2))))))))
+        (util.apply-text-edits
+          [{:range (ts.node_to_lsp_range npe)
+            :newText (.. (util.get-node-text npe (util.get-bufnr))
+                         closingt)}
+           {:range (ts.node_to_lsp_range nse)
+            :newText (.. openingt
+                         (util.get-node-text nse (util.get-bufnr)))}])))))
