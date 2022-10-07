@@ -173,17 +173,32 @@
           (tset plcr 2 (. pplcr 4)))))
     (ts.swap_nodes plcr lcr (util.get-bufnr) false)))
 
+(defn pos+ [[a b] [c d]]
+  [(+ a c) (+ b d)])
+
+(defn pos- [[a b] [c d]]
+  [(- a c) (- b d)])
+
+(defn cursor-offset-from-start
+  [node]
+  (let [start-pos [(node:start)]
+        current-pos (util.get-cursor-pos)]
+    (tset start-pos 1 (+ (. start-pos 1) 1))
+    (pos- current-pos start-pos)))
+
 (defn move-sexp [next-sexp-fn ?win-id]
   (let [w (or ?win-id 0)
         bufnr (nvim.win_get_buf w)
         cursor-node (-> w 
                         ts.get_node_at_cursor
                         util.smallest-movable-node)
+        offset (cursor-offset-from-start cursor-node)
         next-node (-?> cursor-node
                        next-sexp-fn
                        util.smallest-movable-node)]
     (when next-node
-      (ts.swap_nodes cursor-node next-node bufnr true))))
+      (ts.swap_nodes cursor-node next-node bufnr true)
+      (util.set-cursor-pos (pos+ (util.get-cursor-pos) offset)))))
 
 (defn move-sexp-backward [?win-id]
   (move-sexp (fn [n] (n:prev_named_sibling)) ?win-id))
