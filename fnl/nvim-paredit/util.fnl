@@ -23,7 +23,7 @@
                         :vec_lit true
                         :anon_fn_lit true}})
 
-(defn filetype []
+(defn file-type []
   (if (not= WIN_ID 0)
     FILE_TYPE
     vim.bo.filetype))
@@ -36,7 +36,7 @@
 
 (defn find-nearest-seq-node
   [node]
-  (if (. lists (filetype) (node:type))
+  (if (. lists (file-type) (node:type))
     node
     (when-let [parent (node:parent)]
       (find-nearest-seq-node parent))))
@@ -65,7 +65,7 @@
 
 (defn smallest-movable-node
   [node]
-  (let [ft (filetype)]
+  (let [ft (file-type)]
     (if (= ft :clojure)
       (clojure-smallest-movable-node node)
       (= ft :fennel)
@@ -152,11 +152,6 @@
   (when (-?> (node:parent) (: :parent))
     node))
 
-(defn cursor-to-prev-sibling
-  [node ?end ?no-jump]
-  (ts.goto_node (node:prev_sibling) ?end ?no-jump)
-  node)
-
 (defn apply-text-edits
   [edits]
   (vim.lsp.util.apply_text_edits
@@ -170,10 +165,3 @@
     (vim.api.nvim_buf_set_lines (vim.fn.bufnr) (. noder 1) (+ (. noder 3) 1) true
       without-empty-lines)))
 
-(defn get-cursor-pos
-  []
-  (vim.api.nvim_win_get_cursor 0))
-
-(defn set-cursor-pos
-  [pos]
-  (vim.api.nvim_win_set_cursor 0 pos))

@@ -1,6 +1,7 @@
 (module nvim-paredit.core
   {autoload {ts nvim-treesitter.ts_utils
              util nvim-paredit.util
+             p nvim-paredit.position
              nvim aniseed.nvim
              core aniseed.core}})
 
@@ -173,35 +174,19 @@
           (tset plcr 2 (. pplcr 4)))))
     (ts.swap_nodes plcr lcr (util.get-bufnr) false)))
 
-(defn pos+ [[a b] [c d]]
-  [(+ a c) (+ b d)])
-
-(defn pos- [[a b] [c d]]
-  [(- a c) (- b d)])
-
-(defn nstart [node]
-  (let [[r c] [(node:start)]]
-    [(+ r 1) c]))
-
-(defn cursor-offset-from-start
-  [node]
-  (let [start-pos (nstart node)
-        current-pos (util.get-cursor-pos)]
-    (pos- current-pos start-pos)))
-
 (defn move-sexp [next-sexp-fn ?win-id]
   (let [w (or ?win-id 0)
         bufnr (nvim.win_get_buf w)
         cursor-node (-> w 
                         ts.get_node_at_cursor
                         util.smallest-movable-node)
-        offset (cursor-offset-from-start cursor-node)
+        offset (p.cursor-offset-from-start cursor-node)
         next-node (-?> cursor-node
                        next-sexp-fn
                        util.smallest-movable-node)]
     (when next-node
       (ts.swap_nodes cursor-node next-node bufnr true)
-      (util.set-cursor-pos (pos+ (util.get-cursor-pos) offset)))))
+      (p.set-cursor-pos (p.pos+ (p.get-cursor-pos) offset)))))
 
 (defn move-sexp-backward [?win-id]
   (move-sexp (fn [n] (n:prev_named_sibling)) ?win-id))
@@ -210,14 +195,14 @@
   (move-sexp (fn [n] (n:next_named_sibling)) ?win-id))
 
 (defn raise-node [node]
-  (let [offset (cursor-offset-from-start node)
+  (let [offset (p.cursor-offset-from-start node)
         nodep (node:parent)
-        pos (nstart nodep)
+        pos (p.nstart nodep)
         nodepr (ts.node_to_lsp_range nodep)
         nodet (vim.treesitter.get_node_text node (util.get-bufnr))]
     (util.apply-text-edits 
       [{:range nodepr :newText nodet}])
-    (util.set-cursor-pos (pos+ pos offset))))
+    (p.set-cursor-pos (p.pos+ pos offset))))
 
 (defn raise-element []
   (raise-node (util.smallest-movable-node (util.cursor-node))))
@@ -248,7 +233,7 @@
   (-?> (util.cursor-node)
        util.has-parent
        util.smallest-movable-node
-       (util.cursor-to-prev-sibling :end :no-jump)
+       (p.cursor-to-prev-sibling :end :no-jump)
        elide-node
        (: :parent)
        util.has-parent
@@ -259,7 +244,7 @@
        util.has-parent
        util.find-nearest-seq-node
        util.smallest-movable-node
-       (util.cursor-to-prev-sibling :end :no-jump)
+       (p.cursor-to-prev-sibling :end :no-jump)
        elide-node
        (: :parent)
        util.has-parent
