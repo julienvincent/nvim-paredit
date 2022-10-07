@@ -113,7 +113,7 @@
         fcr [(fc:range)]]
     (util.insert-in-range [(. fcr 1) (. fcr 2) (. fcr 4)] "")))
 
-(defn slurp-back
+(defn slurp-backward
   []
   (let [node (util.find-nearest-seq-node (util.cursor-node))
         fcd (first-node-of-opening-delimiter node)
@@ -127,7 +127,7 @@
         (tset sibr 4 (. fcr 2))))
     (ts.swap_nodes fcr sibr (util.get-bufnr) false)))
 
-(defn barf-back
+(defn barf-backward
   []
   (let [node (util.find-nearest-seq-node (util.cursor-node))
         fcd (first-node-of-opening-delimiter node)
