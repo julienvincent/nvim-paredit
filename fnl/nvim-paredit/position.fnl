@@ -33,6 +33,9 @@
   (or (< a c)
       (and (= a c) (<= b d))))
 
+(defn pos= [[a b] [c d]]
+  (and (= a c) (= b d)))
+
 (defn pos> [pos1 pos2]
   (pos< pos2 pos1))
 

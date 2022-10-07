@@ -363,11 +363,27 @@
 
 (defn wrap-node-in [node prefix suffix]
   (let [nt (util.get-node-text node (util.get-bufnr))]
-    [{:range (ts.node_to_lsp_range node)
-      :newText (.. prefix nt suffix)}]))
+    (util.apply-text-edits
+      [{:range (ts.node_to_lsp_range node)
+        :newText (.. prefix nt suffix)}])))
 
 (defn wrap-in-fn-call []
-  (wrap-node-in (util.cursor-node) "( " ")"))
+  (let [node (-> (util.cursor-node)
+                 util.smallest-movable-node)]
+    (wrap-node-in node "( " ")")
+    (let [pos (p.get-cursor-pos)
+          n (-> (util.cursor-node)
+                 util.smallest-movable-node)
+          ns (-?> n p.nstart)]
+      (p.set-cursor-pos (p.pos+ ns [0 1])))))
 
 (defn wrap-in-form []
-  (wrap-in-form (util.cursor-node) "(" ")"))
+  (let [node (-> (util.cursor-node)
+                 util.smallest-movable-node)]
+    (wrap-node-in node "(" ")")
+    (let [pos (p.get-cursor-pos)]
+      (-?> (util.cursor-node)
+           util.smallest-movable-node
+           p.nend
+           (p.pos+ [0 -1])
+           p.set-cursor-pos))))
