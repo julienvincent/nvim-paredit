@@ -9,8 +9,8 @@
 
 ; cursor looses it's original position on the moving form if form's height 
 ; more than 1 line
-(vim.keymap.set :n :<M-l> sx.move-sexp-forward {:desc "Move sexp forward"})
-(vim.keymap.set :n :<M-h> sx.move-sexp-backward {:desc "Move sexp backward"})
+(vim.keymap.set :n :<M-l> sx.move-element-forward {:desc "Move sexp forward"})
+(vim.keymap.set :n :<M-h> sx.move-element-backward {:desc "Move sexp backward"})
 
 ; TODO
 ; check boundarires (nil pointer error) for slurps and barfs

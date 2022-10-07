@@ -5,11 +5,11 @@
              nvim aniseed.nvim
              core aniseed.core}})
 
-;(macro with-fixed-cursor-pos
-;  [...]
-;  `(let [pos# (util.get-cursor-pos)]
-;     ,...
-;     (util.set-cursor-pos pos#)))
+(macro with-fixed-cursor-pos
+  [...]
+  `(let [pos# (p.get-cursor-pos)]
+     ,...
+     (p.set-cursor-pos pos#)))
 
 (defn clojure-slurp-prev-sibling
   [node]
@@ -116,33 +116,35 @@
 
 (defn slurp-backward
   []
-  (let [node (util.find-nearest-seq-node (util.cursor-node))
-        fcd (first-node-of-opening-delimiter node)
-        lcd (last-node-of-opening-delimiter node)
-        fcr (-> [fcd lcd] sort-node-pair node-pair->range)
-        sib (slurp-prev-sibling node)
-        sibr [(: sib :range)]]
-    (if (= (. sibr 3) (. fcr 1))
-      (tset sibr 4 (. fcr 2))
-      (do (tset sibr 3 (. fcr 1))
-        (tset sibr 4 (. fcr 2))))
-    (ts.swap_nodes fcr sibr (util.get-bufnr) false)))
+  (with-fixed-cursor-pos
+    (let [node (util.find-nearest-seq-node (util.cursor-node))
+          fcd (first-node-of-opening-delimiter node)
+          lcd (last-node-of-opening-delimiter node)
+          fcr (-> [fcd lcd] sort-node-pair node-pair->range)
+          sib (slurp-prev-sibling node)
+          sibr [(: sib :range)]]
+      (if (= (. sibr 3) (. fcr 1))
+        (tset sibr 4 (. fcr 2))
+        (do (tset sibr 3 (. fcr 1))
+          (tset sibr 4 (. fcr 2))))
+      (ts.swap_nodes fcr sibr (util.get-bufnr) false))))
 
 (defn barf-backward
   []
-  (let [node (util.find-nearest-seq-node (util.cursor-node))
-        fcd (first-node-of-opening-delimiter node)
-        lcd (last-node-of-opening-delimiter node)
-        fcr (-> [fcd lcd] node-pair->range)
-        nlc (: lcd :next_named_sibling)
-        nlcr [(: nlc :range)]
-        nnlcr [(-?> nlc (: :next_named_sibling) (: :range))]]
-    (if (util.first nnlcr)
-      (if (= (. nnlcr 1) (. nlcr 3))
-        (tset nlcr 4 (. nnlcr 2))
-        (do (tset nlcr 3 (. nnlcr 1))
-          (tset nlcr 4 (. nnlcr 2)))))
-    (ts.swap_nodes fcr nlcr (util.get-bufnr) false)))
+  (with-fixed-cursor-pos
+    (let [node (util.find-nearest-seq-node (util.cursor-node))
+          fcd (first-node-of-opening-delimiter node)
+          lcd (last-node-of-opening-delimiter node)
+          fcr (-> [fcd lcd] node-pair->range)
+          nlc (: lcd :next_named_sibling)
+          nlcr [(: nlc :range)]
+          nnlcr [(-?> nlc (: :next_named_sibling) (: :range))]]
+      (if (util.first nnlcr)
+        (if (= (. nnlcr 1) (. nlcr 3))
+          (tset nlcr 4 (. nnlcr 2))
+          (do (tset nlcr 3 (. nnlcr 1))
+            (tset nlcr 4 (. nnlcr 2)))))
+      (ts.swap_nodes fcr nlcr (util.get-bufnr) false))))
 
 (defn find-slurp-forward-node
   [node]
@@ -154,18 +156,19 @@
 
 (defn slurp-forward
   []
-  (when-let [node (find-slurp-forward-node (util.cursor-node))]
-    (let [lcd (util.last-child node)
-          nns (-> (util.smallest-movable-node node)
-                  (: :next_named_sibling))
-          lcdr [(lcd:range)]
-          nnsr [(nns:range)]]
-      (when nns
-        (if (= (. lcdr 3) (. nnsr 1))
-          (tset nnsr 2 (. lcdr 4))
-          (do (tset nnsr 1 (. lcdr 3))
-            (tset nnsr 2 (. lcdr 4))))
-        (ts.swap_nodes lcdr nnsr (util.get-bufnr) false)))))
+  (with-fixed-cursor-pos
+    (when-let [node (find-slurp-forward-node (util.cursor-node))]
+      (let [lcd (util.last-child node)
+            nns (-> (util.smallest-movable-node node)
+                    (: :next_named_sibling))
+            lcdr [(lcd:range)]
+            nnsr [(nns:range)]]
+        (when nns
+          (if (= (. lcdr 3) (. nnsr 1))
+            (tset nnsr 2 (. lcdr 4))
+            (do (tset nnsr 1 (. lcdr 3))
+              (tset nnsr 2 (. lcdr 4))))
+          (ts.swap_nodes lcdr nnsr (util.get-bufnr) false))))))
 
 (defn find-barf-forward-node
   [node]
@@ -177,38 +180,59 @@
 
 (defn barf-forward
   []
-  (when-let [node (find-barf-forward-node (util.cursor-node))]
-    (let [lc (util.last-child node)
-          lcr [(: lc :range)]
-          plc (: lc :prev_named_sibling)
-          plcr [(: plc :range)]
-          pplcr [(-?> plc (: :prev_named_sibling) (: :range))]]
-      (if (util.first pplcr)
-        (if (= (. plcr 1) (. pplcr 3))
-          (tset plcr 2 (. pplcr 4))
-          (do (tset plcr 1 (. pplcr 3))
-            (tset plcr 2 (. pplcr 4)))))
-      (ts.swap_nodes plcr lcr (util.get-bufnr) false))))
+  (with-fixed-cursor-pos
+    (when-let [node (find-barf-forward-node (util.cursor-node))]
+      (let [lc (util.last-child node)
+            lcr [(: lc :range)]
+            plc (: lc :prev_named_sibling)
+            plcr [(: plc :range)]
+            pplcr [(-?> plc (: :prev_named_sibling) (: :range))]]
+        (if (util.first pplcr)
+          (if (= (. plcr 1) (. pplcr 3))
+            (tset plcr 2 (. pplcr 4))
+            (do (tset plcr 1 (. pplcr 3))
+              (tset plcr 2 (. pplcr 4)))))
+        (ts.swap_nodes plcr lcr (util.get-bufnr) false)))))
 
-(defn move-sexp [next-sexp-fn ?win-id]
+(defn move-sexp [node next-sexp-fn ?win-id]
   (let [w (or ?win-id 0)
         bufnr (nvim.win_get_buf w)
-        cursor-node (-> w 
-                        ts.get_node_at_cursor
-                        util.smallest-movable-node)
-        offset (p.cursor-offset-from-start cursor-node)
-        next-node (-?> cursor-node
-                       next-sexp-fn
-                       util.smallest-movable-node)]
+        offset (p.cursor-offset-from-start node)
+        next-node (-?> node
+                       next-sexp-fn)]
     (when next-node
-      (ts.swap_nodes cursor-node next-node bufnr true)
+      (ts.swap_nodes node next-node bufnr true)
       (p.set-cursor-pos (p.pos+ (p.get-cursor-pos) offset)))))
 
-(defn move-sexp-backward [?win-id]
-  (move-sexp (fn [n] (n:prev_named_sibling)) ?win-id))
+(defn move-element-backward [?win-id]
+  (-?> (util.cursor-node)
+       util.smallest-movable-node
+       util.has-parent
+       (move-sexp (fn [n] (n:prev_named_sibling))
+                  ?win-id)))
 
-(defn move-sexp-forward [?win-id]
-  (move-sexp (fn [n] (n:next_named_sibling)) ?win-id))
+(defn move-element-forward [?win-id]
+  (-?> (util.cursor-node)
+       util.smallest-movable-node
+       util.has-parent
+       (move-sexp (fn [n] (n:next_named_sibling))
+                  ?win-id)))
+
+(defn move-form-forward [?win-id]
+  (-?> (util.cursor-node)
+       util.find-nearest-seq-node
+       util.smallest-movable-node
+       util.has-parent
+       (move-sexp (fn [n] (n:next_named_sibling))
+                  ?win-id)))
+
+(defn move-form-backward [?win-id]
+  (-?> (util.cursor-node)
+       util.find-nearest-seq-node
+       util.smallest-movable-node
+       util.has-parent
+       (move-sexp (fn [n] (n:prev_named_sibling))
+                  ?win-id)))
 
 (defn raise-node [node]
   (let [offset (p.cursor-offset-from-start node)
