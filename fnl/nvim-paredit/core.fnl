@@ -179,11 +179,14 @@
 (defn pos- [[a b] [c d]]
   [(- a c) (- b d)])
 
+(defn nstart [node]
+  (let [[r c] [(node:start)]]
+    [(+ r 1) c]))
+
 (defn cursor-offset-from-start
   [node]
-  (let [start-pos [(node:start)]
+  (let [start-pos (nstart node)
         current-pos (util.get-cursor-pos)]
-    (tset start-pos 1 (+ (. start-pos 1) 1))
     (pos- current-pos start-pos)))
 
 (defn move-sexp [next-sexp-fn ?win-id]
@@ -207,11 +210,14 @@
   (move-sexp (fn [n] (n:next_named_sibling)) ?win-id))
 
 (defn raise-node [node]
-  (let [nodep (node:parent)
+  (let [offset (cursor-offset-from-start node)
+        nodep (node:parent)
+        pos (nstart nodep)
         nodepr (ts.node_to_lsp_range nodep)
         nodet (vim.treesitter.get_node_text node (util.get-bufnr))]
     (util.apply-text-edits 
-      [{:range nodepr :newText nodet}])))
+      [{:range nodepr :newText nodet}])
+    (util.set-cursor-pos (pos+ pos offset))))
 
 (defn raise-element []
   (raise-node (util.smallest-movable-node (util.cursor-node))))
