@@ -21,6 +21,14 @@
   (let [[r c] [(node:start)]]
     [(+ r 1) c]))
 
+(defn nend [node]
+  (let [[r c] [(node:end_)]]
+    [(+ r 1) c]))
+
+(defn pos< [[a b] [c d]]
+  (or (< a c)
+      (and (= a c) (< b d))))
+
 (defn cursor-offset-from-start
   [node]
   (let [start-pos (nstart node)

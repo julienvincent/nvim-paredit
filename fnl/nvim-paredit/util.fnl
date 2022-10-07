@@ -9,7 +9,7 @@
 
 (defn first [itbl] (. itbl 1))
 ;; lua print(vim.fn.win_getid()) 
-(local get-node-text vim.treesitter.query.get_node_text)
+(def get-node-text vim.treesitter.query.get_node_text)
 
 (local lists {:fennel {:list true
                        :table true
@@ -100,6 +100,25 @@
   (let [child-count (node:named_child_count)]
     (when (> child-count 0)
       (node:named_child (- child-count 1)))))
+
+(defn last-unnamed-child [node]
+  (let [child-count (node:child_count)]
+    (when (> child-count 0)
+      (var unnamed-child (last-child node))
+      (while (and (not= nil unnamed-child)
+                  (unnamed-child:named))
+        (print unnamed-child)
+        (set unnamed-child (unnamed-child:prev_sibling)))
+      unnamed-child)))
+
+(defn first-unnamed-child [node]
+  (let [child-count (node:child_count)]
+    (when (> child-count 0)
+      (var unnamed-child (first-child node))
+      (while (and (not= nil unnamed-child)
+                  (unnamed-child:named))
+        (set unnamed-child (unnamed-child:next_sibling)))
+      unnamed-child)))
 
 (defn rec-prev-named-sibling
   [node]

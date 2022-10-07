@@ -292,3 +292,46 @@
        (: :parent)
        util.has-parent
        util.remove-empty-lines))
+
+(defn fennel-find-nearest-data-node
+  [node]
+  (match (node:type)
+    :list node
+    :binding node
+    :sequential_table node
+    _ (when-let [p (-?> (node:parent) util.has-parent)]
+        (fennel-find-nearest-data-node p))))
+
+(defn clojure-find-nearest-data-node
+  [node]
+  (match (node:type)
+    :vec_lit node
+    :list_lit node
+    _ (when-let [p (-?> (node:parent) util.has-parent)]
+        (clojure-find-nearest-data-node p))))
+
+(defn find-nearest-data-node
+  [node]
+  (match (util.file-type)
+    :fennel (fennel-find-nearest-data-node node)
+    :clojure (clojure-find-nearest-data-node node)
+    _ nil))
+
+(defn split-form []
+  (when-let [node (-?> (util.cursor-node)
+                       find-nearest-data-node)]
+    (let [l (vim.api.nvim_get_current_line)
+          pos (p.get-cursor-pos)
+          opening (util.first-unnamed-child node)
+          closing (util.last-unnamed-child node)
+          openingt (util.get-node-text opening (util.get-bufnr))
+          closingt (util.get-node-text closing (util.get-bufnr))
+          spos (p.nstart opening)
+          lpos (p.nend closing)]
+      (when (and (p.pos< spos pos) (p.pos< pos lpos)
+                 (= node (util.cursor-node)))
+        (vim.api.nvim_set_current_line
+          (.. (string.sub l 1 (+ (. pos 2) 1))
+              closingt
+              openingt
+              (string.sub l (+ (. pos 2) 2))))))))
