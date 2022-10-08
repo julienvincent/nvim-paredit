@@ -1,6 +1,7 @@
 (module nvim-paredit.bindings
   {autoload {core nvim-paredit.core
-             insertion nvim-paredit.insertion}})
+             insertion nvim-paredit.insertion
+             p nvim-paredit.position}})
 
 (vim.keymap.set :n ">)" core.slurp-forward)
 (vim.keymap.set :n "<)" core.barf-forward)
@@ -26,4 +27,16 @@
 (vim.keymap.set :i "[" (fn [] (insertion.insert-at-cursor "[]" 1)))
 (vim.keymap.set :i "{" (fn [] (insertion.insert-at-cursor "{}" 1)))
 (vim.keymap.set :i "\"" (fn [] (insertion.insert-at-cursor "\"\"" 1)))
-(vim.keymap.set :i "\\\"" (fn [] (insertion.insert-at-cursor "\\\"\\\"" 2)))
+
+(vim.keymap.set :i ")" (fn [] (if (= (insertion.next-char) ")")
+                                (p.set-cursor-pos (p.pos+ (p.get-cursor-pos)
+                                                          [0 1]))
+                                (insertion.insert-at-cursor ")" 1))))
+(vim.keymap.set :i "]" (fn [] (if (= (insertion.next-char) "]")
+                                (p.set-cursor-pos (p.pos+ (p.get-cursor-pos)
+                                                          [0 1]))
+                                (insertion.insert-at-cursor "]" 1))))
+(vim.keymap.set :i "}" (fn [] (if (= (insertion.next-char) "}")
+                                (p.set-cursor-pos (p.pos+ (p.get-cursor-pos)
+                                                          [0 1]))
+                                (insertion.insert-at-cursor "}" 1))))
