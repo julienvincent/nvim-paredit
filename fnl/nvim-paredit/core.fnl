@@ -233,10 +233,10 @@
 (defn find-barf-forward-node
   [node]
   (when-let [n (and node (util.find-nearest-seq-node node))]
-    (if (> (n:named_child_count) 0)
+    (if (and (> (n:named_child_count) 0) (prev-non-comment-named-node (util.last-named-child n)))
       n
       (when-let [p (-?> (n:parent) util.has-parent)]
-        (find-barf-forward-node p)))))
+        (find-barf-forward-node p))))
 
 (defn barf-forward
   []
@@ -245,7 +245,7 @@
       (let [lc (util.last-child node)
             lcr [(: lc :range)]
             plc (-?> (: lc :prev_named_sibling)
-                     prev-non-comment-named-node))
+                     prev-non-comment-named-node)
             plcr [(: plc :range)]
             pplcr [(-?> plc (: :prev_named_sibling) (: :range))]]
         (if (util.first pplcr)
@@ -253,7 +253,9 @@
             (tset plcr 2 (. pplcr 4))
             (do (tset plcr 1 (. pplcr 3))
               (tset plcr 2 (. pplcr 4)))))
-        (ts.swap_nodes plcr lcr (util.get-bufnr) false)))))
+        (ts.swap_nodes [(. plcr 1) (. plcr 2)
+                        (. lcr 1) (. lcr 2)]
+                       lcr (util.get-bufnr) false)))))
 
 (defn move-sexp [node next-sexp-fn ?win-id]
   (let [w (or ?win-id 0)
