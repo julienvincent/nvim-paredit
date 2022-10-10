@@ -126,18 +126,18 @@
 
 (defn dedisexpress-node
   [node]
-  (let [node (dis_expr-node node)
-        fc (util.first-child node)
-        ns (fc:next_sibling)]
-    (if ns
-      (let [[nsr nsc] [(ns:start)]
-            [fcr fcc] [(fc:start)]]
+  (when-let [node (dis_expr-node node)]
+    (let [fc (util.first-child node)
+          ns (fc:next_sibling)]
+      (if ns
+        (let [[nsr nsc] [(ns:start)]
+              [fcr fcc] [(fc:start)]]
+          (util.apply-text-edits
+            [{:range (ts.node_to_lsp_range [fcr fcc nsr nsc])
+              :newText ""}]))
         (util.apply-text-edits
-          [{:range (ts.node_to_lsp_range [fcr fcc nsr nsc])
-            :newText ""}]))
-      (util.apply-text-edits
-        [{:range (ts.node_to_lsp_range fc)
-          :newText ""}]))))
+          [{:range (ts.node_to_lsp_range fc)
+            :newText ""}])))))
 
 (defn dedisexpress-element
   []
