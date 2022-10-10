@@ -19,7 +19,6 @@
               :clojure {:tagged_or_ctor_lit true
                         :set_lit true 
                         :list_lit true 
-                        :str_lit true
                         :map_lit true
                         :vec_lit true
                         :anon_fn_lit true}})

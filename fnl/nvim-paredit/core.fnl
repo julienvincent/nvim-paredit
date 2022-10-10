@@ -58,6 +58,7 @@
                 (clojure-last-node-of-opening-delimiter 
                   (node:next_sibling))
                 (node:next_sibling))
+    :set_lit (: (util.first-unnamed-child node) :next_sibling)
     _ (if (= :meta_lit (-?> (util.first-child node) (: :type)))
         (clojure-last-node-of-opening-delimiter (util.first-child node))
         (util.first-child node))))
