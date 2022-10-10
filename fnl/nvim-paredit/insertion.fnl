@@ -15,4 +15,5 @@
   []
   (let [pos (p.get-cursor-pos)
         l (vim.api.nvim_get_current_line)]
-    (string.sub l (+ (. pos 2) 1) (+ (. pos 2) 1))))
+    (when (> (length l) (+ (. pos 2) 1))
+      (string.sub l (+ (. pos 2) 1) (+ (. pos 2) 1)))))

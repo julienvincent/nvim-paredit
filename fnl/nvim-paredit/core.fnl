@@ -186,10 +186,29 @@
             (tset nlcr 4 (. nnlcr 2)))))
       (ts.swap_nodes fcr nlcr (util.get-bufnr) false))))
 
+(defn next-non-comment-named-node
+  [node]
+  (when node
+    (if (and (node:named) (= (node:type) :comment))
+      (next-non-comment-named-node (node:next_named_sibling))
+      (node:named)
+      node
+      nil)))
+
+(defn prev-non-comment-named-node
+  [node]
+  (when node
+    (if (and (node:named) (= (node:type) :comment))
+      (prev-non-comment-named-node (node:prev_named_sibling))
+      (node:named)
+      node
+      nil)))
+
 (defn find-slurp-forward-node
   [node]
   (let [n (util.find-nearest-seq-node node)]
-    (if (and n (n:next_named_sibling))
+    (if (and n (-?> (n:next_named_sibling)
+                    next-non-comment-named-node))
       n
       (when-let [p (-?> (n:parent) util.has-grandparent)]
         (find-slurp-forward-node p)))))
@@ -200,7 +219,8 @@
     (when-let [node (find-slurp-forward-node (util.cursor-node))]
       (let [lcd (util.last-child node)
             nns (-> (util.smallest-movable-node node)
-                    (: :next_named_sibling))
+                    (: :next_named_sibling)
+                    next-non-comment-named-node)
             lcdr [(lcd:range)]
             nnsr [(nns:range)]]
         (when nns
@@ -224,7 +244,8 @@
     (when-let [node (find-barf-forward-node (util.cursor-node))]
       (let [lc (util.last-child node)
             lcr [(: lc :range)]
-            plc (: lc :prev_named_sibling)
+            plc (-?> (: lc :prev_named_sibling)
+                     prev-non-comment-named-node))
             plcr [(: plc :range)]
             pplcr [(-?> plc (: :prev_named_sibling) (: :range))]]
         (if (util.first pplcr)

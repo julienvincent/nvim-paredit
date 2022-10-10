@@ -26,7 +26,6 @@
 (vim.keymap.set :i "(" (fn [] (insertion.insert-at-cursor "()" 1)))
 (vim.keymap.set :i "[" (fn [] (insertion.insert-at-cursor "[]" 1)))
 (vim.keymap.set :i "{" (fn [] (insertion.insert-at-cursor "{}" 1)))
-(vim.keymap.set :i "\"" (fn [] (insertion.insert-at-cursor "\"\"" 1)))
 
 (vim.keymap.set :i ")" (fn [] (if (= (insertion.next-char) ")")
                                 (p.set-cursor-pos (p.pos+ (p.get-cursor-pos)
@@ -40,3 +39,10 @@
                                 (p.set-cursor-pos (p.pos+ (p.get-cursor-pos)
                                                           [0 1]))
                                 (insertion.insert-at-cursor "}" 1))))
+
+(vim.keymap.set :i "\"" (fn [] (let [nc (insertion.next-char)]
+                                 (if (= nc "\"")
+                                   (p.set-cursor-pos (p.pos+ (p.get-cursor-pos)
+                                                             [0 1]))
+                                   (insertion.insert-at-cursor "\"\"" 1)))))
+
