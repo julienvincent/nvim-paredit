@@ -104,11 +104,15 @@
 
 (defn disexpress-node
   [node]
-  (util.apply-text-edits
-    [{:range (ts.node_to_lsp_range node)
-      :newText (.. "#_ " (util.get-node-text 
-                           node 
-                           (util.get-bufnr)))}]))
+  (let [npos (p.nstart node)
+        cpos (p.get-cursor-pos)]
+    (util.apply-text-edits
+      [{:range (ts.node_to_lsp_range node)
+        :newText (.. "#_ " (util.get-node-text 
+                             node 
+                             (util.get-bufnr)))}])
+    (when (= (. npos 1) (. cpos 1))
+      (p.set-cursor-pos (p.pos+ cpos [0 3])))))
 
 (defn disexpress-element
   []
