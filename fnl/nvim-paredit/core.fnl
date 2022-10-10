@@ -236,7 +236,7 @@
     (if (and (> (n:named_child_count) 0) (prev-non-comment-named-node (util.last-named-child n)))
       n
       (when-let [p (-?> (n:parent) util.has-parent)]
-        (find-barf-forward-node p))))
+        (find-barf-forward-node p)))))
 
 (defn barf-forward
   []
