@@ -25,12 +25,11 @@
 ;; (vim.keymap.set :n "<M-f>" sx.move-sexp-forward {:desc "Move sexp forward"})
 
 ; TODO:
-;; - split form
 ;; - move pairs
 ;; - make binding forms unelidable
-;; - refactor slurp-forward and barf-forward
 ;; - autoformat node utility function...
 ;; - thread once / all (fennel)
 ;; - unwind once / all (fennel)
 ;; - move root form -forward/-back
-;; - move form -forward/-back
+;; - split when on start of form and end of form delimiter
+;; - use treesitter for jumping to matching parens with fallback to default
