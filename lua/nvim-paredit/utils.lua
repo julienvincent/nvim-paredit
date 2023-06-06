@@ -14,7 +14,4 @@ function M.getBufferNr()
   return vim.fn.bufnr()
 end
 
--- M.fileType()
-A = {M.getNodeAtCursor():end_()}
-
 return M
