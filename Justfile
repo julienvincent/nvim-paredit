@@ -1,16 +1,22 @@
-set shell := ["bash", "-uc"]
-
-temp_file := ".test_output.tmp"
-
 prepare:
   #!/usr/bin/env bash
   test -d .build/nvim || {
     mkdir -p ./.build/nvim
-    curl -L https://github.com/neovim/neovim/releases/download/stable/nvim-macos.tar.gz > ./.build/nvim-macos.tar.gz
 
-    xattr -c ./.build/nvim-macos.tar.gz
-    tar xzf ./.build/nvim-macos.tar.gz -C ./.build/nvim --strip-components=1
-    rm ./.build/nvim-macos.tar.gz
+    os=$(uname)
+    if [[ "$os" == "Darwin" ]]; then
+      curl -L https://github.com/neovim/neovim/releases/download/stable/nvim-macos.tar.gz > ./.build/nvim-macos.tar.gz
+      xattr -c ./.build/nvim-macos.tar.gz
+      tar xzf ./.build/nvim-macos.tar.gz -C ./.build/nvim --strip-components=1
+      rm ./.build/nvim-macos.tar.gz
+    elif [[ "$os" == "Linux" ]]; then
+      curl -L https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz > ./.build/nvim-linux64.tar.gz
+      tar xzf ./.build/nvim-linux64.tar.gz -C ./.build/nvim --strip-components=1
+      rm ./.build/nvim-linux64.tar.gz
+    else
+      echo "Unsupported operating system: $os"
+      exit 1
+    fi
   }
 
   test -d .build/dependencies || {
