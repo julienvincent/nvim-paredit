@@ -21,4 +21,20 @@ function M.barfForwards()
   return call("barfForwards")
 end
 
+function M.dragFormForwards()
+  return call("dragFormForwards")
+end
+
+function M.dragFormBackwards()
+  return call("dragFormBackwards")
+end
+
+function M.dragElementForwards()
+  return call("dragElementForwards")
+end
+
+function M.dragElementBackwards()
+  return call("dragElementBackwards")
+end
+
 return M

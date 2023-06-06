@@ -154,4 +154,75 @@ function M.barfBackwards()
 
 end
 
+function M.dragFormForwards()
+  local current_form = findNearestForm(utils.getNodeAtCursor())
+  if not current_form then
+    return
+  end
+
+  local sibling = current_form:next_named_sibling()
+  if not sibling then
+    return
+  end
+
+  ts.swap_nodes(current_form, sibling, 0, true)
+end
+
+function M.dragFormBackwards()
+  local current_form = findNearestForm(utils.getNodeAtCursor())
+  if not current_form then
+    return
+  end
+
+  local sibling = current_form:prev_named_sibling()
+  if not sibling then
+    return
+  end
+
+  ts.swap_nodes(current_form, sibling, 0, true)
+end
+
+local function getOuterChildOfNode(root, child)
+  local parent = child:parent()
+  if not parent then
+    return child
+  end
+  if root:equal(parent) then
+    return child
+  end
+  return getOuterChildOfNode(root, parent)
+end
+
+function M.dragElementForwards()
+  local current_node = utils.getNodeAtCursor()
+  local root = findNearestForm(current_node)
+  local current_element = getOuterChildOfNode(root, current_node)
+  if not current_element then
+    return
+  end
+
+  local sibling = current_element:next_named_sibling()
+  if not sibling then
+    return
+  end
+
+  ts.swap_nodes(current_element, sibling, 0, true)
+end
+
+function M.dragElementBackwards()
+  local current_node = utils.getNodeAtCursor()
+  local root = findNearestForm(current_node)
+  local current_element = getOuterChildOfNode(root, current_node)
+  if not current_element then
+    return
+  end
+
+  local sibling = current_element:prev_named_sibling()
+  if not sibling then
+    return
+  end
+
+  ts.swap_nodes(current_element, sibling, 0, true)
+end
+
 return M
