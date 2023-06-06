@@ -225,4 +225,43 @@ function M.dragElementBackwards()
   ts.swap_nodes(current_element, sibling, 0, true)
 end
 
+function M.raiseForm()
+  local current_form = findNearestForm(utils.getNodeAtCursor())
+  if not current_form then
+    return
+  end
+
+  local parent = current_form:parent()
+  if not parent then
+    return
+  end
+
+  local replace_text = vim.treesitter.get_node_text(current_form, 0)
+
+  local parent_range = { parent:range() }
+  vim.api.nvim_buf_set_text(0,
+    parent_range[1], parent_range[2],
+    parent_range[3], parent_range[4],
+    { replace_text }
+  )
+end
+
+function M.raiseElement()
+  local current_node = utils.getNodeAtCursor()
+  local root = findNearestForm(current_node)
+  local element = getOuterChildOfNode(root, current_node)
+  if not element then
+    return
+  end
+
+  local replace_text = vim.treesitter.get_node_text(element, 0)
+
+  local parent_range = { root:range() }
+  vim.api.nvim_buf_set_text(0,
+    parent_range[1], parent_range[2],
+    parent_range[3], parent_range[4],
+    { replace_text }
+  )
+end
+
 return M

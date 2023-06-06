@@ -37,4 +37,12 @@ function M.dragElementBackwards()
   return call("dragElementBackwards")
 end
 
+function M.raiseForm()
+  return call("raiseForm")
+end
+
+function M.raiseElement()
+  return call("raiseElement")
+end
+
 return M
