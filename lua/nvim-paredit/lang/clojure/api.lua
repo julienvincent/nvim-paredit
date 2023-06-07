@@ -21,15 +21,22 @@ local function includedInTable(table, item)
   return false
 end
 
-local function findNearestForm(current_node)
+local function findNearestForm(current_node, opts)
+  opts = opts or {}
+
   if includedInTable(form_types, current_node:type()) then
-    return current_node
+    if not (opts.exclude_node and opts.exclude_node:equal(current_node)) then
+      return current_node
+    end
   end
 
   local parent = current_node:parent()
   if parent then
-    return findNearestForm(parent)
+    return findNearestForm(parent, opts)
   end
+
+  -- We are in the root document, which we can consider a form. TODO: Find a better name for this function
+  return current_node
 end
 
 local function findNextClosestSibling(current_node)
@@ -195,7 +202,9 @@ end
 
 function M.dragElementForwards()
   local current_node = utils.getNodeAtCursor()
-  local root = findNearestForm(current_node)
+  local root = findNearestForm(current_node, {
+    exclude_node = current_node
+  })
   local current_element = getOuterChildOfNode(root, current_node)
   if not current_element then
     return
@@ -211,7 +220,9 @@ end
 
 function M.dragElementBackwards()
   local current_node = utils.getNodeAtCursor()
-  local root = findNearestForm(current_node)
+  local root = findNearestForm(current_node, {
+    exclude_node = current_node
+  })
   local current_element = getOuterChildOfNode(root, current_node)
   if not current_element then
     return
@@ -242,13 +253,16 @@ function M.raiseForm()
   vim.api.nvim_buf_set_text(0,
     parent_range[1], parent_range[2],
     parent_range[3], parent_range[4],
-    { replace_text }
+    vim.fn.split(replace_text, "\n")
   )
+  vim.api.nvim_win_set_cursor(0, { parent_range[1] + 1, parent_range[2] })
 end
 
 function M.raiseElement()
   local current_node = utils.getNodeAtCursor()
-  local root = findNearestForm(current_node)
+  local root = findNearestForm(current_node, {
+    exclude_node = current_node
+  })
   local element = getOuterChildOfNode(root, current_node)
   if not element then
     return
@@ -260,8 +274,9 @@ function M.raiseElement()
   vim.api.nvim_buf_set_text(0,
     parent_range[1], parent_range[2],
     parent_range[3], parent_range[4],
-    { replace_text }
+    vim.fn.split(replace_text, "\n")
   )
+  vim.api.nvim_win_set_cursor(0, { parent_range[1] + 1, parent_range[2] })
 end
 
 return M

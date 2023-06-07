@@ -1,7 +1,8 @@
-local M = {}
+local M = {
+  api = require("nvim-paredit.api")
+}
 
 function M.setup ()
-  print("NVIM-PAREDIT LOADED.")
 end
 
 return M
