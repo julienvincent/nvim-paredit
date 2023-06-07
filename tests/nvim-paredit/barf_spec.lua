@@ -3,56 +3,56 @@ local paredit = require("nvim-paredit.api")
 local prepareBuffer = require("tests.nvim-paredit.utils").prepareBuffer
 local expect = require("tests.nvim-paredit.utils").expect
 
-describe('slurping', function()
+describe('barfing', function()
   vim.api.nvim_buf_set_option(0, 'filetype', 'clojure')
   local parser = vim.treesitter.get_parser(0)
 
-  it('should slurp the next sibling', function()
+  it('should barf the next sibling', function()
     prepareBuffer({
-      content = "() a",
+      content = "(a)",
       cursor = { 1, 1 }
     })
 
-    paredit.slurpForwards()
+    paredit.barfForwards()
     expect({
-      content = '( a)',
+      content = '()a',
       cursor = { 1, 1 }
     })
   end)
 
-  it('should recursively slurp the next sibling', function()
+  it('should recursively barf the next sibling', function()
     prepareBuffer({
-      content = "(()) 1 2",
+      content = "((a b))",
       cursor = { 1, 2 }
     })
 
-    paredit.slurpForwards()
+    paredit.barfForwards()
     expect({
-      content = '(() 1) 2',
-      cursor = { 1, 2 }
-    })
-
-    parser:parse()
-
-    paredit.slurpForwards()
-    expect({
-      content = '(( 1)) 2',
+      content = '((a) b)',
       cursor = { 1, 2 }
     })
 
     parser:parse()
 
-    paredit.slurpForwards()
+    paredit.barfForwards()
     expect({
-      content = '(( 1) 2)',
+      content = '(()a b)',
       cursor = { 1, 2 }
     })
 
     parser:parse()
 
-    paredit.slurpForwards()
+    paredit.barfForwards()
     expect({
-      content = '(( 1 2))',
+      content = '(()a) b',
+      cursor = { 1, 2 }
+    })
+
+    parser:parse()
+
+    paredit.barfForwards()
+    expect({
+      content = '(())a b',
       cursor = { 1, 2 }
     })
   end)
