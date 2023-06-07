@@ -104,6 +104,36 @@ describe('element-dragging', function()
     })
 
     prepareBuffer({
+      content = "(a :keyword)",
+      cursor = { 1, 3 }
+    })
+    paredit.dragElementBackwards()
+    expect({
+      content = "(:keyword a)",
+      cursor = { 1, 1 }
+    })
+
+    prepareBuffer({
+      content = "(a ::keyword)",
+      cursor = { 1, 3 }
+    })
+    paredit.dragElementBackwards()
+    expect({
+      content = "(::keyword a)",
+      cursor = { 1, 1 }
+    })
+
+    prepareBuffer({
+      content = "(a ::keyword)",
+      cursor = { 1, 5 }
+    })
+    paredit.dragElementBackwards()
+    expect({
+      content = "(::keyword a)",
+      cursor = { 1, 1 }
+    })
+
+    prepareBuffer({
       content = "(a #{})",
       cursor = { 1, 3 }
     })

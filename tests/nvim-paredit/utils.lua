@@ -8,7 +8,12 @@ function M.prepareBuffer(params)
 end
 
 function M.expect(params)
-  assert.are.same(params.content, vim.api.nvim_buf_get_lines(0, 0, -1, false)[1])
+  if type(params.content) == "table" then
+    assert.are.same(params.content, vim.api.nvim_buf_get_lines(0, 0, -1, false))
+  else
+    assert.are.same(params.content, vim.api.nvim_buf_get_lines(0, 0, -1, false)[1])
+  end
+
   assert.are.same(params.cursor, vim.api.nvim_win_get_cursor(0))
 end
 
