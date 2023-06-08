@@ -19,8 +19,10 @@ function M.findNearestForm(current_node, opts)
     return M.findNearestForm(parent, opts)
   end
 
-  -- We are in the root document, which we can consider a form. TODO: Find a better name for this function
-  return current_node
+  -- We are in the root of the document, which we can consider a form.
+  if type(opts.use_source) ~= "boolean" or opts.use_source then
+    return current_node
+  end
 end
 
 function M.getLastChildIgnoringComment(node, opts)

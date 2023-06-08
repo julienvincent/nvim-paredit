@@ -31,4 +31,28 @@ describe('form raising', function()
       cursor = { 1, 0 }
     })
   end)
+
+  it('should do nothing if it is a direct child of the document root', function()
+    prepareBuffer({
+      content = {"(a)", "b"},
+      cursor = { 1, 1 }
+    })
+    paredit.raiseForm()
+    expect({
+      content = {'(a)', 'b'},
+      cursor = { 1, 1 }
+    })
+  end)
+
+  it('should do nothing if it is outside of a form', function()
+    prepareBuffer({
+      content = {"a", "b"},
+      cursor = { 1, 0 }
+    })
+    paredit.raiseForm()
+    expect({
+      content = {"a", "b"},
+      cursor = { 1, 0 }
+    })
+  end)
 end)

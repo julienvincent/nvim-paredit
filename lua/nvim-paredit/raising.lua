@@ -7,14 +7,15 @@ local M = {}
 function M.raiseForm()
   local lang = langs.getLanguageApi()
   local current_form = utils.findNearestForm(ts.get_node_at_cursor(), {
-    lang = lang
+    lang = lang,
+    use_source = false
   })
   if not current_form then
     return
   end
 
   local parent = current_form:parent()
-  if not parent then
+  if not parent or parent:type() == "source" then
     return
   end
 
@@ -39,8 +40,13 @@ function M.raiseElement()
   end
 
   local root = utils.findNearestForm(search_point, {
-    lang = lang
+    lang = lang,
+    use_source = false
   })
+  if not root then
+    return
+  end
+
   local element = utils.findElementRoot(root, current_node)
   if not element then
     return
