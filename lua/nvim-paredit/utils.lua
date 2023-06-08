@@ -23,12 +23,22 @@ function M.findNearestForm(current_node, opts)
   return current_node
 end
 
-function M.getLastChild(node)
-  local index = node:named_child_count() - 1
-  if index < 0 then
-    return
+function M.getLastChildIgnoringComment(node, opts)
+  local function findFromIndex(index)
+    if index < 0 then
+      return
+    end
+    local child = node:named_child(index)
+    if not child then
+      return
+    end
+    if child:extra() or opts.lang.nodeIsComment(child) then
+      return findFromIndex(index - 1)
+    end
+    return child
   end
-  return node:named_child(index)
+
+  return findFromIndex(node:named_child_count() - 1)
 end
 
 function M.findClosestFormWithChildren(current_node)
@@ -50,6 +60,32 @@ function M.findClosestFormWithSiblings(current_node)
   if parent then
     return M.findClosestFormWithSiblings(parent)
   end
+end
+
+function M.getNextSiblingIgnoringComments(node, opts)
+  local sibling = node:next_named_sibling()
+  if not sibling then
+    return
+  end
+
+  if sibling:extra() or opts.lang.nodeIsComment(sibling) then
+    return M.getNextSiblingIgnoringComments(sibling, opts)
+  end
+
+  return sibling
+end
+
+function M.getPreviousSiblingIgnoringComments(node, opts)
+  local sibling = node:prev_named_sibling()
+  if not sibling then
+    return
+  end
+
+  if sibling:extra() or opts.lang.nodeIsComment(sibling) then
+    return M.getPreviousSiblingIgnoringComments(sibling, opts)
+  end
+
+  return sibling
 end
 
 -- Find the root most parent of the given `child` node which is still contained within

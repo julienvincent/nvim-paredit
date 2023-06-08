@@ -21,7 +21,7 @@ describe('form raising', function()
 
   it('should raise a multi-line form', function()
     prepareBuffer({
-      content = "(a (b \nc))",
+      content = {"(a (b ", "c))"},
       cursor = { 1, 4 }
     })
 

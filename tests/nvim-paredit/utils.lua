@@ -2,7 +2,13 @@ local M = {}
 
 function M.prepareBuffer(params)
   vim.api.nvim_buf_set_option(0, 'filetype', 'clojure')
-  vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(params.content, '\n'))
+
+  local content = params.content
+  if type(content) == "string" then
+    content = { content }
+  end
+
+  vim.api.nvim_buf_set_lines(0, 0, -1, true, content)
   vim.api.nvim_win_set_cursor(0, params.cursor)
   vim.treesitter.get_parser(0):parse()
 end

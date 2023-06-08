@@ -20,6 +20,28 @@ describe('barfing', function()
     })
   end)
 
+  it('should skip comments', function()
+    prepareBuffer({
+      content = {"(", ";; comment", "a)"},
+      cursor = { 1, 1 }
+    })
+    paredit.barfForwards()
+    expect({
+      content = {'()', ";; comment", "a"},
+      cursor = { 1, 0 }
+    })
+
+    prepareBuffer({
+      content = {"(a ;; comment", ")"},
+      cursor = { 1, 1 }
+    })
+    paredit.barfForwards()
+    expect({
+      content = '()a ;; comment',
+      cursor = { 1, 1 }
+    })
+  end)
+
   it('should recursively barf the next sibling', function()
     prepareBuffer({
       content = "((a b))",

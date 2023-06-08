@@ -15,6 +15,10 @@ function M.nodeIsForm(node)
   return utils.includedInTable(form_types, node:type())
 end
 
+function M.nodeIsComment(node)
+  return node:type() == "comment"
+end
+
 function M.getNodeEdges(node)
   local left_bracket_node = node:field("open")[1]
   local left_bracket_text = left_bracket_node:type()

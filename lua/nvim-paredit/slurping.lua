@@ -18,7 +18,9 @@ function M.slurpForwards()
     return
   end
 
-  local sibling = form:next_named_sibling()
+  local sibling = utils.getNextSiblingIgnoringComments(form, {
+    lang = lang
+  })
   if not sibling then
     return
   end

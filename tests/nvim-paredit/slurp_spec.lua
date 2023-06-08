@@ -20,6 +20,19 @@ describe('slurping', function()
     })
   end)
 
+  it('should skip comments', function()
+    prepareBuffer({
+      content = {"()", ";; comment", "a"},
+      cursor = { 1, 1 }
+    })
+
+    paredit.slurpForwards()
+    expect({
+      content = {'(', ";; comment", "a)"},
+      cursor = { 1, 0 }
+    })
+  end)
+
   it('should recursively slurp the next sibling', function()
     prepareBuffer({
       content = "(()) 1 2",

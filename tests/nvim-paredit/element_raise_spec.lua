@@ -75,7 +75,7 @@ describe('element raising', function()
 
   it('should raise a multi-line element', function()
     prepareBuffer({
-      content = "(a (b\n c))",
+      content = {"(a (b", " c))"},
       cursor = { 1, 3 }
     })
 

@@ -18,7 +18,9 @@ function M.barfForwards()
     return
   end
 
-  local last_child = utils.getLastChild(form)
+  local last_child = utils.getLastChildIgnoringComment(form, {
+    lang = lang
+  })
   if not last_child then
     return
   end
@@ -26,7 +28,9 @@ function M.barfForwards()
   local edges = lang.getNodeEdges(form)
 
   local end_pos = {}
-  local sibling = last_child:prev_named_sibling()
+  local sibling = utils.getPreviousSiblingIgnoringComments(last_child, {
+    lang = lang
+  })
   if sibling then
     end_pos = { sibling:end_() }
   else
