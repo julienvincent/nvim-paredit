@@ -7,7 +7,7 @@ local langs = {
 local M = {}
 
 function call(api)
-  local fn = langs[utils.fileType()]
+  local fn = langs[vim.bo.filetype]
   if fn and fn[api] then
     return fn[api]()
   end

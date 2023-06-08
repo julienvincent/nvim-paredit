@@ -12,52 +12,15 @@ local form_types = {
   "anon_fn_lit",
 }
 
-local function includedInTable(table, item)
-  for _, value in pairs(table) do
-    if value == item then
-      return true
-    end
-  end
-  return false
-end
-
-local function findNearestForm(current_node, opts)
-  opts = opts or {}
-
-  if includedInTable(form_types, current_node:type()) then
-    if not (opts.exclude_node and opts.exclude_node:equal(current_node)) then
-      return current_node
-    end
-  end
-
-  local parent = current_node:parent()
-  if parent then
-    return findNearestForm(parent, opts)
-  end
-
-  -- We are in the root document, which we can consider a form. TODO: Find a better name for this function
-  return current_node
-end
-
-local function findNextClosestSibling(current_node)
-  local sibling = current_node:next_named_sibling()
-  if sibling then
-    return current_node, sibling
-  end
-
-  local parent = current_node:parent()
-  if parent then
-    return findNextClosestSibling(parent)
-  end
-end
-
 function M.slurpForwards()
-  local current_form = findNearestForm(utils.getNodeAtCursor())
+  local current_form = utils.findNearestForm(ts.get_node_at_cursor(), {
+    form_types = form_types
+  })
   if not current_form then
     return
   end
 
-  local left, right = findNextClosestSibling(current_form)
+  local left, right = utils.findNextClosestSibling(current_form)
   if not left or not right then
     return
   end
@@ -92,34 +55,15 @@ function M.slurpBackwards()
 
 end
 
-local function getLastChild(node)
-  local index = node:named_child_count() - 1
-  if index < 0 then
-    return
-  end
-
-  return node:named_child(index)
-end
-
-local function findNextFurthestSibling(current_node)
-  local last_child = getLastChild(current_node)
-  if last_child then
-    return current_node, last_child
-  end
-
-  local parent = current_node:parent()
-  if parent then
-    return findNextFurthestSibling(parent)
-  end
-end
-
 function M.barfForwards()
-  local current_form = findNearestForm(utils.getNodeAtCursor())
+  local current_form = utils.findNearestForm(ts.get_node_at_cursor(), {
+    form_types = form_types
+  })
   if not current_form then
     return
   end
 
-  local left, right = findNextFurthestSibling(current_form)
+  local left, right = utils.findNextFurthestSibling(current_form)
   if not left or not right then
     return
   end
@@ -162,7 +106,9 @@ function M.barfBackwards()
 end
 
 function M.dragFormForwards()
-  local current_form = findNearestForm(utils.getNodeAtCursor())
+  local current_form = utils.findNearestForm(ts.get_node_at_cursor(), {
+    form_types = form_types
+  })
   if not current_form then
     return
   end
@@ -176,7 +122,9 @@ function M.dragFormForwards()
 end
 
 function M.dragFormBackwards()
-  local current_form = findNearestForm(utils.getNodeAtCursor())
+  local current_form = utils.findNearestForm(ts.get_node_at_cursor(), {
+    form_types = form_types
+  })
   if not current_form then
     return
   end
@@ -189,23 +137,13 @@ function M.dragFormBackwards()
   ts.swap_nodes(current_form, sibling, 0, true)
 end
 
-local function getOuterChildOfNode(root, child)
-  local parent = child:parent()
-  if not parent then
-    return child
-  end
-  if root:equal(parent) then
-    return child
-  end
-  return getOuterChildOfNode(root, parent)
-end
-
 function M.dragElementForwards()
-  local current_node = utils.getNodeAtCursor()
-  local root = findNearestForm(current_node, {
+  local current_node = ts.get_node_at_cursor()
+  local root = utils.findNearestForm(current_node, {
+    form_types = form_types,
     exclude_node = current_node
   })
-  local current_element = getOuterChildOfNode(root, current_node)
+  local current_element = utils.getOuterChildOfNode(root, current_node)
   if not current_element then
     return
   end
@@ -219,11 +157,12 @@ function M.dragElementForwards()
 end
 
 function M.dragElementBackwards()
-  local current_node = utils.getNodeAtCursor()
-  local root = findNearestForm(current_node, {
+  local current_node = ts.get_node_at_cursor()
+  local root = utils.findNearestForm(current_node, {
+    form_types = form_types,
     exclude_node = current_node
   })
-  local current_element = getOuterChildOfNode(root, current_node)
+  local current_element = utils.getOuterChildOfNode(root, current_node)
   if not current_element then
     return
   end
@@ -237,7 +176,9 @@ function M.dragElementBackwards()
 end
 
 function M.raiseForm()
-  local current_form = findNearestForm(utils.getNodeAtCursor())
+  local current_form = utils.findNearestForm(ts.get_node_at_cursor(), {
+    form_types = form_types
+  })
   if not current_form then
     return
   end
@@ -259,11 +200,12 @@ function M.raiseForm()
 end
 
 function M.raiseElement()
-  local current_node = utils.getNodeAtCursor()
-  local root = findNearestForm(current_node, {
+  local current_node = ts.get_node_at_cursor()
+  local root = utils.findNearestForm(current_node, {
+    form_types = form_types,
     exclude_node = current_node
   })
-  local element = getOuterChildOfNode(root, current_node)
+  local element = utils.getOuterChildOfNode(root, current_node)
   if not element then
     return
   end
