@@ -3,7 +3,10 @@ local langs = {
 }
 
 return {
-  getDefinitions = function()
+  getLanguageApi = function()
     return langs[vim.bo.filetype]
+  end,
+  addLanguageExtension = function(filetype, api)
+    langs[filetype] = api
   end
 }

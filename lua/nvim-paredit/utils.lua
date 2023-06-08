@@ -10,10 +10,8 @@ function M.includedInTable(table, item)
 end
 
 function M.findNearestForm(current_node, opts)
-  if M.includedInTable(opts.form_types, current_node:type()) then
-    if not (opts.exclude_node and opts.exclude_node:equal(current_node)) then
-      return current_node
-    end
+  if opts.lang.nodeIsForm(current_node) then
+    return current_node
   end
 
   local parent = current_node:parent()
@@ -25,40 +23,47 @@ function M.findNearestForm(current_node, opts)
   return current_node
 end
 
-function M.findNextClosestSibling(current_node)
-  local sibling = current_node:next_named_sibling()
-  if sibling then
-    return current_node, sibling
-  end
-
-  local parent = current_node:parent()
-  if parent then
-    return M.findNextClosestSibling(parent)
-  end
-end
-
 function M.getLastChild(node)
   local index = node:named_child_count() - 1
   if index < 0 then
     return
   end
-
   return node:named_child(index)
 end
 
-function M.findNextFurthestSibling(current_node)
-  local last_child = M.getLastChild(current_node)
-  if last_child then
-    return current_node, last_child
+function M.findClosestFormWithChildren(current_node)
+  if current_node:named_child_count() > 0 then
+    return current_node
   end
 
   local parent = current_node:parent()
   if parent then
-    return M.findNextFurthestSibling(parent)
+    return M.findClosestFormWithChildren(parent)
   end
 end
 
-function M.getOuterChildOfNode(root, child)
+function M.findClosestFormWithSiblings(current_node)
+  if current_node:next_named_sibling() then
+    return current_node
+  end
+  local parent = current_node:parent()
+  if parent then
+    return M.findClosestFormWithSiblings(parent)
+  end
+end
+
+-- Find the root most parent of the given `child` node which is still contained within
+-- the given `root` node.
+--
+-- This is useful to discover the element that we need to operate on within an enclosing
+-- form. As an example, take the following senario with the cursor indicated with `|`:
+--
+-- (:keyword '|(a))
+--
+-- The enclosing `(` `)` brackets would be given as `root` while the inner list would be
+-- given as `child`. The inner list may be wrapped in a `quoting` node, which is the
+-- actual node we are wanting to operate on.
+function M.findElementRoot(root, child)
   local parent = child:parent()
   if not parent then
     return child
@@ -66,7 +71,7 @@ function M.getOuterChildOfNode(root, child)
   if root:equal(parent) then
     return child
   end
-  return M.getOuterChildOfNode(root, parent)
+  return M.findElementRoot(root, parent)
 end
 
 return M
