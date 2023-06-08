@@ -19,10 +19,28 @@ The goal of `nvim-paredit` is to provide a comparable s-expression editing exper
   "julienvincent/nvim-paredit",
   config = function()
     local paredit = require("nvim-paredit")
+    paredit.setup({
+      use_default_keys = true,
+      keys = {
+        [">)"] = { paredit.api.slurpForwards, "Slurp forwards" },
+        [">("] = { paredit.api.slurpBackwards, "Slurp backwards" },
 
-    paredit.setup()
+        ["<)"] = { paredit.api.slurpForwards, "Barf forwards" },
+        ["<("] = { paredit.api.slurpBackwards, "Barf backwards" },
 
-    vim.keymap.set("n", ">)", paredit.api.slurpForwards, { desc = "Slurp forwards" })
+        [">e"] = { paredit.api.dragElementForwards, "Drag element right" },
+        ["<e"] = { paredit.api.dragElementBackwards, "Drag element left" },
+
+        [">f"] = { paredit.api.dragFormForwards, "Drag form right" },
+        ["<f"] = { paredit.api.dragFormBackwards, "Drag form left" },
+
+        ["<localleader>o"] = { paredit.api.raiseForm, "Raise form" },
+        ["<localleader>O"] = { paredit.api.raiseElement, "Raise element" },
+
+        ["E"] = { paredit.api.moveToNextElement, "Jump to next element tail" },
+        ["B"] = { paredit.api.moveToPrevElement, "Jump to previous element head" },
+      }
+    })
   end
 }
 ```
