@@ -1,5 +1,3 @@
-local ts = require("nvim-treesitter.ts_utils")
-
 local M = {}
 
 function M.includedInTable(table, item)

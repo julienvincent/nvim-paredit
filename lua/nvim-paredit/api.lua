@@ -1,48 +1,21 @@
-local utils = require("nvim-paredit.utils")
+local slurping = require("nvim-paredit.slurping")
+local barfing = require("nvim-paredit.barfing")
+local dragging = require("nvim-paredit.dragging")
+local raising = require("nvim-paredit.raising")
 
-local langs = {
-  clojure = require("nvim-paredit.lang.clojure.api")
+local M = {
+  slurpForwards = slurping.slurpForwards,
+  slurpBackwards = slurping.slurpBackwards,
+  barfForwards = barfing.barfForwards,
+  barfBackwards = barfing.barfBackwards,
+
+  dragElementForwards = dragging.dragElementForwards,
+  dragElementBackwards = dragging.dragElementBackwards,
+  dragFormForwards = dragging.dragFormForwards,
+  dragFormBackwards = dragging.dragFormBackwards,
+
+  raiseForm = raising.raiseForm,
+  raiseElement = raising.raiseElement,
 }
-
-local M = {}
-
-function call(api)
-  local fn = langs[vim.bo.filetype]
-  if fn and fn[api] then
-    return fn[api]()
-  end
-end
-
-function M.slurpForwards()
-  return call("slurpForwards")
-end
-
-function M.barfForwards()
-  return call("barfForwards")
-end
-
-function M.dragFormForwards()
-  return call("dragFormForwards")
-end
-
-function M.dragFormBackwards()
-  return call("dragFormBackwards")
-end
-
-function M.dragElementForwards()
-  return call("dragElementForwards")
-end
-
-function M.dragElementBackwards()
-  return call("dragElementBackwards")
-end
-
-function M.raiseForm()
-  return call("raiseForm")
-end
-
-function M.raiseElement()
-  return call("raiseElement")
-end
 
 return M
