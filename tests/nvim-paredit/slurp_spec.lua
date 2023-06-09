@@ -20,6 +20,38 @@ describe('slurping', function()
     })
   end)
 
+  it('should slurp from different form types', function()
+    prepareBuffer({
+      content = "`() a",
+      cursor = { 1, 2 }
+    })
+    paredit.slurpForwards()
+    expect({
+      content = '`( a)',
+      cursor = { 1, 2 }
+    })
+
+    prepareBuffer({
+      content = "'() a",
+      cursor = { 1, 2 }
+    })
+    paredit.slurpForwards()
+    expect({
+      content = "'( a)",
+      cursor = { 1, 2 }
+    })
+
+    prepareBuffer({
+      content = "#{} a",
+      cursor = { 1, 2 }
+    })
+    paredit.slurpForwards()
+    expect({
+      content = '#{ a}',
+      cursor = { 1, 2 }
+    })
+  end)
+
   it('should skip comments', function()
     prepareBuffer({
       content = {"()", ";; comment", "a"},

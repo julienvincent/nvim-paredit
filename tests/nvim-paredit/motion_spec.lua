@@ -11,14 +11,13 @@ describe('motions', function()
       content = "(aa bb)",
       cursor = { 1, 1 }
     })
+
     paredit.moveToNextElement()
     expect({
-      content = '(aa bb)',
       cursor = { 1, 5 }
     })
     paredit.moveToNextElement()
     expect({
-      content = '(aa bb)',
       cursor = { 1, 5 }
     })
   end)
@@ -28,14 +27,13 @@ describe('motions', function()
       content = "(aa bb)",
       cursor = { 1, 5 }
     })
+
     paredit.moveToPrevElement()
     expect({
-      content = '(aa bb)',
       cursor = { 1, 1 }
     })
     paredit.moveToPrevElement()
     expect({
-      content = '(aa bb)',
       cursor = { 1, 1 }
     })
   end)
