@@ -15,6 +15,17 @@ The goal of `nvim-paredit` is to provide a comparable s-expression editing exper
 ### Using [folke/lazy.vim](https://github.com/folke/lazy.nvim)
 
 ```lua
+{ 
+  "julienvincent/nvim-paredit",
+  config = function()
+    require("nvim-paredit").setup()
+  end
+}
+```
+
+## Configuration
+
+```lua
 {
   "julienvincent/nvim-paredit",
   config = function()
