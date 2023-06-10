@@ -8,7 +8,6 @@ function M.raiseForm()
   local lang = langs.getLanguageApi()
   local current_form = utils.findNearestForm(ts.get_node_at_cursor(), {
     lang = lang,
-    use_source = false
   })
   if not current_form then
     return
@@ -32,29 +31,16 @@ end
 
 function M.raiseElement()
   local lang = langs.getLanguageApi()
-  local current_node = ts.get_node_at_cursor()
+  local current_node = lang.getNodeRoot(ts.get_node_at_cursor())
 
-  local search_point = current_node
-  if lang.nodeIsForm(current_node) then
-    search_point = current_node:parent()
-  end
-
-  local root = utils.findNearestForm(search_point, {
-    lang = lang,
-    use_source = false
-  })
-  if not root then
+  local parent = current_node:parent()
+  if not parent or parent:type() == "source" then
     return
   end
 
-  local element = utils.findElementRoot(root, current_node)
-  if not element then
-    return
-  end
+  local replace_text = vim.treesitter.get_node_text(current_node, 0)
 
-  local replace_text = vim.treesitter.get_node_text(element, 0)
-
-  local parent_range = { root:range() }
+  local parent_range = { parent:range() }
   vim.api.nvim_buf_set_text(0,
     parent_range[1], parent_range[2],
     parent_range[3], parent_range[4],

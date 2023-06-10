@@ -25,7 +25,7 @@ function M.findNearestForm(current_node, opts)
   end
 end
 
-function M.getLastChildIgnoringComment(node, opts)
+function M.getLastChildIgnoringComments(node, opts)
   local function findFromIndex(index)
     if index < 0 then
       return
@@ -43,14 +43,15 @@ function M.getLastChildIgnoringComment(node, opts)
   return findFromIndex(node:named_child_count() - 1)
 end
 
-function M.findClosestFormWithChildren(current_node)
-  if current_node:named_child_count() > 0 then
-    return current_node
+function M.findClosestFormWithChildren(current_node, opts)
+  local form = opts.lang.unwrapForm(current_node)
+  if form:named_child_count() > 0 then
+    return form
   end
 
   local parent = current_node:parent()
   if parent then
-    return M.findClosestFormWithChildren(parent)
+    return M.findClosestFormWithChildren(parent, opts)
   end
 end
 
@@ -77,14 +78,14 @@ function M.getNextSiblingIgnoringComments(node, opts)
   return sibling
 end
 
-function M.getPreviousSiblingIgnoringComments(node, opts)
+function M.getPrevSiblingIgnoringComments(node, opts)
   local sibling = node:prev_named_sibling()
   if not sibling then
     return
   end
 
   if sibling:extra() or opts.lang.nodeIsComment(sibling) then
-    return M.getPreviousSiblingIgnoringComments(sibling, opts)
+    return M.getPrevSiblingIgnoringComments(sibling, opts)
   end
 
   return sibling
@@ -101,7 +102,7 @@ end
 -- The enclosing `(` `)` brackets would be given as `root` while the inner list would be
 -- given as `child`. The inner list may be wrapped in a `quoting` node, which is the
 -- actual node we are wanting to operate on.
-function M.findElementRoot(root, child)
+function M.findRootElementRelativeTo(root, child)
   local parent = child:parent()
   if not parent then
     return child
@@ -109,7 +110,7 @@ function M.findElementRoot(root, child)
   if root:equal(parent) then
     return child
   end
-  return M.findElementRoot(root, parent)
+  return M.findRootElementRelativeTo(root, parent)
 end
 
 return M

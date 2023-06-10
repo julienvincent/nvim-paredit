@@ -7,18 +7,21 @@ local M = {}
 function M.barfForwards()
   local lang = langs.getLanguageApi()
   local current_form = utils.findNearestForm(ts.get_node_at_cursor(), {
+    use_source = false,
     lang = lang
   })
   if not current_form then
     return
   end
 
-  local form = utils.findClosestFormWithChildren(current_form)
-  if not form then
+  local form = utils.findClosestFormWithChildren(current_form, {
+    lang = lang
+  })
+  if not form or form:type() == "source" then
     return
   end
 
-  local last_child = utils.getLastChildIgnoringComment(form, {
+  local last_child = utils.getLastChildIgnoringComments(form, {
     lang = lang
   })
   if not last_child then
@@ -28,7 +31,7 @@ function M.barfForwards()
   local edges = lang.getNodeEdges(form)
 
   local end_pos = {}
-  local sibling = utils.getPreviousSiblingIgnoringComments(last_child, {
+  local sibling = utils.getPrevSiblingIgnoringComments(last_child, {
     lang = lang
   })
   if sibling then

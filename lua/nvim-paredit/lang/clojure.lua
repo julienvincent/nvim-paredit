@@ -2,17 +2,58 @@ local utils = require("nvim-paredit.utils")
 
 local M = {}
 
+local markers = {
+  "quoting_lit",     -- '()
+  "syn_quoting_lit", -- `()
+  -- "dis_expr"         -- #_()
+}
+
 local form_types = {
-  "tagged_or_ctor_litw",
-  "set_lit",
   "list_lit",
-  "map_lit",
   "vec_lit",
+  "map_lit",
+  "set_lit",
   "anon_fn_lit",
 }
 
+function M.getNodeRoot(node)
+  local is_form = M.nodeIsForm(node)
+  if is_form then
+    local parent = node:parent()
+    if utils.includedInTable(markers, parent:type()) then
+      return parent
+    end
+    return node
+  end
+
+  local root = utils.findNearestForm(node, {
+    lang = M
+  })
+
+  return utils.findRootElementRelativeTo(root, node)
+end
+
+function M.unwrapForm(node)
+  if utils.includedInTable(form_types, node:type()) then
+    return node
+  end
+  local child = node:named_child(0)
+  if not child then
+    return
+  end
+  return M.unwrapForm(child)
+end
+
 function M.nodeIsForm(node)
-  return utils.includedInTable(form_types, node:type())
+  local type = node:type()
+  if utils.includedInTable(form_types, type) then
+    return true
+  end
+  if utils.includedInTable(markers, type) then
+    local child = node:named_child(0)
+    return child and utils.includedInTable(form_types, child:type())
+  end
+  return false
 end
 
 function M.nodeIsComment(node)
