@@ -1,6 +1,7 @@
 local paredit = require("nvim-paredit.api")
 
 local prepareBuffer = require("tests.nvim-paredit.utils").prepareBuffer
+local expectAll = require("tests.nvim-paredit.utils").expectAll
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe('form-dragging', function()
@@ -8,23 +9,54 @@ describe('form-dragging', function()
   local parser = vim.treesitter.get_parser(0)
 
   it('should drag the form forwards', function()
+    expectAll(paredit.dragFormForwards, {
+      {
+        "list",
+        before_content = "((a) (b))",
+        before_cursor = { 1, 2 },
+        after_content = '((b) (a))',
+        after_cursor = { 1, 5 }
+      },
+      {
+        "quoted list",
+        before_content = "('(a) '(b))",
+        before_cursor = { 1, 3 },
+        after_content = "('(b) '(a))",
+        after_cursor = { 1, 6 }
+      },
+      {
+        "syn quoted list",
+        before_content = "(`(a) `(b))",
+        before_cursor = { 1, 3 },
+        after_content = "(`(b) `(a))",
+        after_cursor = { 1, 6 }
+      },
+      {
+        "anon fn",
+        before_content = "(#(a) #(b))",
+        before_cursor = { 1, 3 },
+        after_content = "(#(b) #(a))",
+        after_cursor = { 1, 6 }
+      },
+      {
+        "within quoted set",
+        before_content = "'(`(a) `(b))",
+        before_cursor = { 1, 3 },
+        after_content = "'(`(b) `(a))",
+        after_cursor = { 1, 7 }
+      },
+    })
+  end)
+
+  it('should do nothing if at the end of the parent form', function()
     prepareBuffer({
       content = "((a) (b))",
-      cursor = { 1, 2 }
+      cursor = { 1, 6 }
     })
-
     paredit.dragFormForwards()
     expect({
-      content = '((b) (a))',
-      cursor = { 1, 5 }
-    })
-
-    parser:parse()
-
-    paredit.dragFormForwards()
-    expect({
-      content = '((b) (a))',
-      cursor = { 1, 5 }
+      content = '((a) (b))',
+      cursor = { 1, 6 }
     })
   end)
 

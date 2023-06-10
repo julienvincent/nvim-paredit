@@ -1,38 +1,72 @@
 local paredit = require("nvim-paredit.api")
 
 local prepareBuffer = require("tests.nvim-paredit.utils").prepareBuffer
+local expectAll = require("tests.nvim-paredit.utils").expectAll
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe('barfing', function()
   vim.api.nvim_buf_set_option(0, 'filetype', 'clojure')
-  local parser = vim.treesitter.get_parser(0)
 
-  it('should barf the next sibling', function()
-    prepareBuffer({
-      content = "(a)",
-      cursor = { 1, 1 }
-    })
-
-    paredit.barfForwards()
-    expect({
-      content = '()a',
-      cursor = { 1, 1 }
+  it("should barf different form types", function()
+    expectAll(paredit.barfForwards, {
+      {
+        "list",
+        before_content = "(a)",
+        before_cursor = { 1, 1 },
+        after_content = '()a',
+        after_cursor = { 1, 1 }
+      },
+      {
+        "vector",
+        before_content = "[a]",
+        before_cursor = { 1, 1 },
+        after_content = '[]a',
+        after_cursor = { 1, 1 }
+      },
+      {
+        "quoted list",
+        before_content = "`(a)",
+        before_cursor = { 1, 2 },
+        after_content = '`()a',
+        after_cursor = { 1, 2 }
+      },
+      {
+        "quoted list",
+        before_content = "'(a)",
+        before_cursor = { 1, 2 },
+        after_content = "'()a",
+        after_cursor = { 1, 2 }
+      },
+      {
+        "anon fn",
+        before_content = "#(a)",
+        before_cursor = { 1, 2 },
+        after_content = "#()a",
+        after_cursor = { 1, 2 }
+      },
+      {
+        "set",
+        before_content = "#{a}",
+        before_cursor = { 1, 2 },
+        after_content = "#{}a",
+        after_cursor = { 1, 2 }
+      },
     })
   end)
 
   it('should skip comments', function()
     prepareBuffer({
-      content = {"(", ";; comment", "a)"},
+      content = { "(", ";; comment", "a)" },
       cursor = { 1, 1 }
     })
     paredit.barfForwards()
     expect({
-      content = {'()', ";; comment", "a"},
+      content = { '()', ";; comment", "a" },
       cursor = { 1, 0 }
     })
 
     prepareBuffer({
-      content = {"(a ;; comment", ")"},
+      content = { "(a ;; comment", ")" },
       cursor = { 1, 1 }
     })
     paredit.barfForwards()
@@ -42,40 +76,34 @@ describe('barfing', function()
     })
   end)
 
-  it('should recursively barf the next sibling', function()
+  it('should do nothing in an empty form', function()
     prepareBuffer({
-      content = "((a b))",
-      cursor = { 1, 2 }
+      content = "()",
+      cursor = { 1, 1 }
     })
-
     paredit.barfForwards()
     expect({
-      content = '((a) b)',
-      cursor = { 1, 2 }
+      content = '()',
+      cursor = { 1, 1 }
     })
+  end)
 
-    parser:parse()
-
-    paredit.barfForwards()
-    expect({
-      content = '(()a b)',
-      cursor = { 1, 2 }
-    })
-
-    parser:parse()
-
-    paredit.barfForwards()
-    expect({
-      content = '(()a) b',
-      cursor = { 1, 2 }
-    })
-
-    parser:parse()
-
-    paredit.barfForwards()
-    expect({
-      content = '(())a b',
-      cursor = { 1, 2 }
+  it('should recursively barf the next sibling', function()
+    expectAll(paredit.barfForwards, {
+      {
+        "double nested list",
+        before_content = "(() a)",
+        before_cursor = { 1, 2 },
+        after_content = "(()) a",
+        after_cursor = { 1, 2 },
+      },
+      {
+        "list with quoted list",
+        before_content = "('())",
+        before_cursor = { 1, 3 },
+        after_content = "()'()",
+        after_cursor = { 1, 4 },
+      },
     })
   end)
 end)

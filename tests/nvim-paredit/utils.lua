@@ -27,4 +27,27 @@ function M.expect(params)
   end
 end
 
+function M.expectAll(action, expectations)
+  for _, fixture in pairs(expectations) do
+    it(fixture[1], function()
+      M.prepareBuffer({
+        content = fixture.before_content,
+        cursor = fixture.before_cursor
+      })
+      if fixture.action then
+        fixture.action()
+      else
+        action()
+      end
+
+      M.expect({
+        content = fixture.after_content,
+        cursor = fixture.after_cursor
+      })
+
+      vim.treesitter.get_parser(0):parse()
+    end)
+  end
+end
+
 return M
