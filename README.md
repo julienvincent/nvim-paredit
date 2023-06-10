@@ -10,6 +10,12 @@
 
 The goal of `nvim-paredit` is to provide a comparable s-expression editing experience in Neovim to that provided by Emacs.
 
+## Project Status
+
+This is currently **alpha software**.
+
+You will experience bugs and there are still several unimplemented operations. The fundamental operations are mostly complete and probably work as expected in 90% of cases. You can probably switch to using this full time if you can tollerate some oddities and don't need the unimplemented operations.
+
 ## Installation
 
 ### Using [folke/lazy.vim](https://github.com/folke/lazy.nvim)
@@ -70,10 +76,25 @@ To add support for another language you can either open a PR against this repo o
 paredit.setup({
   extensions = {
     fennel = {
+      -- Should return the 'root' of the given treesitter node. For example:
+      -- The node at cursor in the below example is `()` or 'list_lit': 
+      --   '(|)
+      -- But the node root is `'()` or 'quoting_lit'
+      getNodeRoot = function(node)
+      end,
+      -- This is the inverse of `getNodeRoot` for forms and should find the inner node for which
+      -- the forms elements are direct children.
+      --
+      -- For example given the node `'()` or 'quoting_lit', this function should return `()` or 'list_lit'.
+      unwrapForm = function(node)
+      end,
       -- Accepts a Treesitter node and should return true or false depending on wether the given node
       -- can be considered a 'form'
       nodeIsForm = function(node)
-        ...
+      end,
+      -- Accepts a Treesitter node and should return true or false depending on wether the given node
+      -- can be considered a 'comment'
+      nodeIsComment = function(node)
       end,
       -- Accepts a Treesitter node representing a form and should return the 'edges' of the node. This
       -- includes the node text and the range covered by the node
@@ -112,3 +133,6 @@ Currently there are no automatic keybindings that get setup, so this is left up 
 
 ### **`raiseElement`**
 ### **`raiseForm`**
+
+### **`moveToNextElement`**
+### **`moveToPrevElement`**
