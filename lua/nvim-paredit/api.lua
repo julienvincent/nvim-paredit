@@ -7,8 +7,8 @@ local motions = require("nvim-paredit.motions")
 local M = {
   slurp_forwards = slurping.slurp_forwards,
   slurp_backwards = slurping.slurp_backwards,
-  barf_forwards = barfing.barfForwards,
-  barfBackwards = barfing.barfBackwards,
+  barf_forwards = barfing.barf_forwards,
+  barf_backwards = barfing.barf_backwards,
 
   drag_element_forwards = dragging.drag_element_forwards,
   drag_element_backwards = dragging.drag_element_backwards,

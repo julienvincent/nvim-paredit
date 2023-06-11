@@ -17,8 +17,8 @@ local default_keys = {
   [">)"] = { api.slurp_forwards, "Slurp forwards" },
   [">("] = { api.slurp_backwards, "Slurp backwards" },
 
-  ["<)"] = { api.slurp_forwards, "Barf forwards" },
-  ["<("] = { api.slurp_backwards, "Barf backwards" },
+  ["<)"] = { api.barf_forwards, "Barf forwards" },
+  ["<("] = { api.barf_backwards, "Barf backwards" },
 
   [">e"] = { api.drag_element_forwards, "Drag element right" },
   ["<e"] = { api.drag_element_backwards, "Drag element left" },
