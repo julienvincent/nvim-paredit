@@ -55,14 +55,28 @@ function M.find_closest_form_with_children(current_node, opts)
   end
 end
 
-function M.find_closest_form_with_siblings(current_node)
-  if current_node:next_named_sibling() then
-    return current_node
+local function find_closest_form_with_siblings(current_node, is_next)
+  if is_next then
+    if current_node:next_named_sibling() then
+      return current_node
+    end
+  else
+    if current_node:prev_named_sibling() then
+      return current_node
+    end
   end
   local parent = current_node:parent()
   if parent then
-    return M.find_closest_form_with_siblings(parent)
+    return find_closest_form_with_siblings(parent, is_next)
   end
+end
+
+function M.find_closest_form_with_next_siblings(current_form)
+  return find_closest_form_with_siblings(current_form, true)
+end
+
+function M.find_closest_form_with_prev_siblings(current_form)
+  return find_closest_form_with_siblings(current_form, false)
 end
 
 function M.get_next_sibling_ignoring_comments(node, opts)
