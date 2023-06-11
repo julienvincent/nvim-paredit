@@ -3,7 +3,7 @@ local utils = require("nvim-paredit.utils")
 local M = {}
 
 local markers = {
-  "quoting_lit",     -- '()
+  "quoting_lit", -- '()
   "syn_quoting_lit", -- `()
   -- "dis_expr"         -- #_()
 }
@@ -16,51 +16,51 @@ local form_types = {
   "anon_fn_lit",
 }
 
-function M.getNodeRoot(node)
-  local is_form = M.nodeIsForm(node)
+function M.get_node_root(node)
+  local is_form = M.node_is_form(node)
   if is_form then
     local parent = node:parent()
-    if utils.includedInTable(markers, parent:type()) then
+    if utils.included_in_table(markers, parent:type()) then
       return parent
     end
     return node
   end
 
-  local root = utils.findNearestForm(node, {
-    lang = M
+  local root = utils.find_nearest_form(node, {
+    lang = M,
   })
 
-  return utils.findRootElementRelativeTo(root, node)
+  return utils.find_root_element_relative_to(root, node)
 end
 
-function M.unwrapForm(node)
-  if utils.includedInTable(form_types, node:type()) then
+function M.unwrap_form(node)
+  if utils.included_in_table(form_types, node:type()) then
     return node
   end
   local child = node:named_child(0)
   if not child then
     return
   end
-  return M.unwrapForm(child)
+  return M.unwrap_form(child)
 end
 
-function M.nodeIsForm(node)
+function M.node_is_form(node)
   local type = node:type()
-  if utils.includedInTable(form_types, type) then
+  if utils.included_in_table(form_types, type) then
     return true
   end
-  if utils.includedInTable(markers, type) then
+  if utils.included_in_table(markers, type) then
     local child = node:named_child(0)
-    return child and utils.includedInTable(form_types, child:type())
+    return child and utils.included_in_table(form_types, child:type())
   end
   return false
 end
 
-function M.nodeIsComment(node)
+function M.node_is_comment(node)
   return node:type() == "comment"
 end
 
-function M.getNodeEdges(node)
+function M.get_node_edges(node)
   local marker = node:field("marker")[1]
 
   local left_bracket = node:field("open")[1]
@@ -80,8 +80,10 @@ function M.getNodeEdges(node)
     left_text = marker:type() .. left_text
     local marker_start, marker_end = marker:range()
     left_range = {
-      marker_start, marker_end,
-      left_range[3], left_range[4]
+      marker_start,
+      marker_end,
+      left_range[3],
+      left_range[4],
     }
   end
 
@@ -95,8 +97,8 @@ function M.getNodeEdges(node)
     },
     right = {
       text = right_text,
-      range = right_range
-    }
+      range = right_range,
+    },
   }
 end
 

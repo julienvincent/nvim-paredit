@@ -1,6 +1,6 @@
 local M = {}
 
-function M.includedInTable(table, item)
+function M.included_in_table(table, item)
   for _, value in pairs(table) do
     if value == item then
       return true
@@ -9,14 +9,14 @@ function M.includedInTable(table, item)
   return false
 end
 
-function M.findNearestForm(current_node, opts)
-  if opts.lang.nodeIsForm(current_node) then
+function M.find_nearest_form(current_node, opts)
+  if opts.lang.node_is_form(current_node) then
     return current_node
   end
 
   local parent = current_node:parent()
   if parent then
-    return M.findNearestForm(parent, opts)
+    return M.find_nearest_form(parent, opts)
   end
 
   -- We are in the root of the document, which we can consider a form.
@@ -25,8 +25,8 @@ function M.findNearestForm(current_node, opts)
   end
 end
 
-function M.getLastChildIgnoringComments(node, opts)
-  local function findFromIndex(index)
+function M.get_last_child_ignoring_comments(node, opts)
+  local function find_from_index(index)
     if index < 0 then
       return
     end
@@ -34,58 +34,58 @@ function M.getLastChildIgnoringComments(node, opts)
     if not child then
       return
     end
-    if child:extra() or opts.lang.nodeIsComment(child) then
-      return findFromIndex(index - 1)
+    if child:extra() or opts.lang.node_is_comment(child) then
+      return find_from_index(index - 1)
     end
     return child
   end
 
-  return findFromIndex(node:named_child_count() - 1)
+  return find_from_index(node:named_child_count() - 1)
 end
 
-function M.findClosestFormWithChildren(current_node, opts)
-  local form = opts.lang.unwrapForm(current_node)
+function M.find_closest_form_with_children(current_node, opts)
+  local form = opts.lang.unwrap_form(current_node)
   if form:named_child_count() > 0 and current_node:type() ~= "source" then
     return form
   end
 
   local parent = current_node:parent()
   if parent then
-    return M.findClosestFormWithChildren(parent, opts)
+    return M.find_closest_form_with_children(parent, opts)
   end
 end
 
-function M.findClosestFormWithSiblings(current_node)
+function M.find_closest_form_with_siblings(current_node)
   if current_node:next_named_sibling() then
     return current_node
   end
   local parent = current_node:parent()
   if parent then
-    return M.findClosestFormWithSiblings(parent)
+    return M.find_closest_form_with_siblings(parent)
   end
 end
 
-function M.getNextSiblingIgnoringComments(node, opts)
+function M.get_next_sibling_ignoring_comments(node, opts)
   local sibling = node:next_named_sibling()
   if not sibling then
     return
   end
 
-  if sibling:extra() or opts.lang.nodeIsComment(sibling) then
-    return M.getNextSiblingIgnoringComments(sibling, opts)
+  if sibling:extra() or opts.lang.node_is_comment(sibling) then
+    return M.get_next_sibling_ignoring_comments(sibling, opts)
   end
 
   return sibling
 end
 
-function M.getPrevSiblingIgnoringComments(node, opts)
+function M.get_prev_sibling_ignoring_comments(node, opts)
   local sibling = node:prev_named_sibling()
   if not sibling then
     return
   end
 
-  if sibling:extra() or opts.lang.nodeIsComment(sibling) then
-    return M.getPrevSiblingIgnoringComments(sibling, opts)
+  if sibling:extra() or opts.lang.node_is_comment(sibling) then
+    return M.get_prev_sibling_ignoring_comments(sibling, opts)
   end
 
   return sibling
@@ -102,7 +102,7 @@ end
 -- The enclosing `(` `)` brackets would be given as `root` while the inner list would be
 -- given as `child`. The inner list may be wrapped in a `quoting` node, which is the
 -- actual node we are wanting to operate on.
-function M.findRootElementRelativeTo(root, child)
+function M.find_root_element_relative_to(root, child)
   local parent = child:parent()
   if not parent then
     return child
@@ -110,7 +110,7 @@ function M.findRootElementRelativeTo(root, child)
   if root:equal(parent) then
     return child
   end
-  return M.findRootElementRelativeTo(root, parent)
+  return M.find_root_element_relative_to(root, parent)
 end
 
 return M

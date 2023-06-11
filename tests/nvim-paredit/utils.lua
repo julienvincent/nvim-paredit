@@ -1,7 +1,7 @@
 local M = {}
 
-function M.prepareBuffer(params)
-  vim.api.nvim_buf_set_option(0, 'filetype', 'clojure')
+function M.prepare_buffer(params)
+  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
 
   local content = params.content
   if type(content) == "string" then
@@ -27,12 +27,12 @@ function M.expect(params)
   end
 end
 
-function M.expectAll(action, expectations)
+function M.expect_all(action, expectations)
   for _, fixture in pairs(expectations) do
     it(fixture[1], function()
-      M.prepareBuffer({
+      M.prepare_buffer({
         content = fixture.before_content,
-        cursor = fixture.before_cursor
+        cursor = fixture.before_cursor,
       })
       if fixture.action then
         fixture.action()
@@ -42,7 +42,7 @@ function M.expectAll(action, expectations)
 
       M.expect({
         content = fixture.after_content,
-        cursor = fixture.after_cursor
+        cursor = fixture.after_cursor,
       })
 
       vim.treesitter.get_parser(0):parse()

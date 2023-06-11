@@ -3,9 +3,9 @@ local langs = require("nvim-paredit.lang")
 
 local M = {}
 
-function M.moveToNextElement()
-  local lang = langs.getLanguageApi()
-  local current_node = lang.getNodeRoot(ts.get_node_at_cursor())
+function M.move_to_next_element()
+  local lang = langs.get_language_api()
+  local current_node = lang.get_node_root(ts.get_node_at_cursor())
 
   local sibling = current_node:next_named_sibling()
   if not sibling then
@@ -16,9 +16,9 @@ function M.moveToNextElement()
   vim.api.nvim_win_set_cursor(0, { pos[1] + 1, pos[2] - 1 })
 end
 
-function M.moveToPrevElement()
-  local lang = langs.getLanguageApi()
-  local current_node = lang.getNodeRoot(ts.get_node_at_cursor())
+function M.move_to_prev_element()
+  local lang = langs.get_language_api()
+  local current_node = lang.get_node_root(ts.get_node_at_cursor())
 
   local sibling = current_node:prev_named_sibling()
   if not sibling then

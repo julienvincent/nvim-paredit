@@ -14,7 +14,7 @@ The goal of `nvim-paredit` is to provide a comparable s-expression editing exper
 
 This is currently **alpha software**.
 
-You will experience bugs and there are still several unimplemented operations. The fundamental operations are mostly complete and probably work as expected in 90% of cases. You can probably switch to using this full time if you can tollerate some oddities and don't need the unimplemented operations.
+You will experience bugs and there are still several unimplemented operations. The fundamental operations are mostly complete and probably work as expected in 90% of cases. You can probably switch to using this full time if you can tolerate some oddities and don't need the unimplemented operations.
 
 ## Installation
 
@@ -39,23 +39,23 @@ You will experience bugs and there are still several unimplemented operations. T
     paredit.setup({
       use_default_keys = true,
       keys = {
-        [">)"] = { paredit.api.slurpForwards, "Slurp forwards" },
-        [">("] = { paredit.api.slurpBackwards, "Slurp backwards" },
+        [">)"] = { paredit.api.slurp_forwards, "Slurp forwards" },
+        [">("] = { paredit.api.slurp_backwards, "Slurp backwards" },
 
-        ["<)"] = { paredit.api.slurpForwards, "Barf forwards" },
-        ["<("] = { paredit.api.slurpBackwards, "Barf backwards" },
+        ["<)"] = { paredit.api.slurp_forwards, "Barf forwards" },
+        ["<("] = { paredit.api.slurp_backwards, "Barf backwards" },
 
-        [">e"] = { paredit.api.dragElementForwards, "Drag element right" },
-        ["<e"] = { paredit.api.dragElementBackwards, "Drag element left" },
+        [">e"] = { paredit.api.drag_element_forwards, "Drag element right" },
+        ["<e"] = { paredit.api.drag_element_backwards, "Drag element left" },
 
-        [">f"] = { paredit.api.dragFormForwards, "Drag form right" },
-        ["<f"] = { paredit.api.dragFormBackwards, "Drag form left" },
+        [">f"] = { paredit.api.drag_form_forwards, "Drag form right" },
+        ["<f"] = { paredit.api.drag_form_backwards, "Drag form left" },
 
-        ["<localleader>o"] = { paredit.api.raiseForm, "Raise form" },
-        ["<localleader>O"] = { paredit.api.raiseElement, "Raise element" },
+        ["<localleader>o"] = { paredit.api.raise_form, "Raise form" },
+        ["<localleader>O"] = { paredit.api.raise_element, "Raise element" },
 
-        ["E"] = { paredit.api.moveToNextElement, "Jump to next element tail" },
-        ["B"] = { paredit.api.moveToPrevElement, "Jump to previous element head" },
+        ["E"] = { paredit.api.move_to_next_element, "Jump to next element tail" },
+        ["B"] = { paredit.api.move_to_prev_element, "Jump to previous element head" },
       }
     })
   end
@@ -70,35 +70,35 @@ Right now `nvim-paredit` has built in support for the following languages:
 
 + `clojure`
 
-To add support for another language you can either open a PR against this repo or you can use the extention API:
+To add support for another language you can either open a PR against this repo or you can use the extension API:
 
 ```lua
 paredit.setup({
   extensions = {
     fennel = {
-      -- Should return the 'root' of the given treesitter node. For example:
+      -- Should return the 'root' of the given Treesitter node. For example:
       -- The node at cursor in the below example is `()` or 'list_lit': 
       --   '(|)
       -- But the node root is `'()` or 'quoting_lit'
-      getNodeRoot = function(node)
+      get_node_root = function(node)
       end,
-      -- This is the inverse of `getNodeRoot` for forms and should find the inner node for which
+      -- This is the inverse of `get_node_root` for forms and should find the inner node for which
       -- the forms elements are direct children.
       --
       -- For example given the node `'()` or 'quoting_lit', this function should return `()` or 'list_lit'.
-      unwrapForm = function(node)
+      unwrap_form = function(node)
       end,
-      -- Accepts a Treesitter node and should return true or false depending on wether the given node
+      -- Accepts a Treesitter node and should return true or false depending on whether the given node
       -- can be considered a 'form'
-      nodeIsForm = function(node)
+      node_is_form = function(node)
       end,
-      -- Accepts a Treesitter node and should return true or false depending on wether the given node
+      -- Accepts a Treesitter node and should return true or false depending on whether the given node
       -- can be considered a 'comment'
-      nodeIsComment = function(node)
+      node_is_comment = function(node)
       end,
       -- Accepts a Treesitter node representing a form and should return the 'edges' of the node. This
       -- includes the node text and the range covered by the node
-      getNodeEdges = function(node)
+      get_node_edges = function(node)
         return {
           left = { text = "#{", range = { 0, 0, 0, 2 } },
           right = { text = "}", range = { 0, 5, 0, 6 } },
@@ -115,24 +115,24 @@ The api is exposed as `paredit.api`:
 
 ```lua
 local paredit = require("nvim-paredit")
-paredit.api.slurpForwards()
+paredit.api.slurp_forwards()
 ```
 
 Currently there are no automatic keybindings that get setup, so this is left up to the user to configure.
 
-### **`slurpForwards`**
-### **`slurpBackwards`** [TODO]
-### **`barfForwards`**
-### **`barfBackwards`** [TODO]
+### **`slurp_forwards`**
+### **`slurp_backwards`** [TODO]
+### **`barf_forwards`**
+### **`barf_backwards`** [TODO]
 
-### **`dragElementForwards`**
-### **`dragElementBackwards`**
+### **`drag_element_forwards`**
+### **`drag_element_backwards`**
 
-### **`dragFormForwards`**
-### **`dragFormBackwards`**
+### **`drag_form_forwards`**
+### **`drag_form_backwards`**
 
-### **`raiseElement`**
-### **`raiseForm`**
+### **`raise_element`**
+### **`raise_form`**
 
-### **`moveToNextElement`**
-### **`moveToPrevElement`**
+### **`move_to_next_element`**
+### **`move_to_prev_element`**
