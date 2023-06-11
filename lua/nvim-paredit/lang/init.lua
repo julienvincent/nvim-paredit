@@ -1,5 +1,5 @@
 local langs = {
-  clojure = require("nvim-paredit.lang.clojure")
+  clojure = require("nvim-paredit.lang.clojure"),
 }
 
 local function keys(tbl)
@@ -21,5 +21,5 @@ return {
 
   filetypes = function()
     return keys(langs)
-  end
+  end,
 }

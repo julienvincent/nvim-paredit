@@ -7,7 +7,7 @@ local M = {}
 function M.slurp_forwards()
   local lang = langs.get_language_api()
   local current_form = utils.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang
+    lang = lang,
   })
   if not current_form then
     return
@@ -19,7 +19,7 @@ function M.slurp_forwards()
   end
 
   local sibling = utils.get_next_sibling_ignoring_comments(form, {
-    lang = lang
+    lang = lang,
   })
   if not sibling then
     return
@@ -31,21 +31,18 @@ function M.slurp_forwards()
   local right_end = { sibling:end_() }
   local right_row = right_end[1]
   local right_col = right_end[2]
-  vim.api.nvim_buf_set_text(buf,
-    right_row, right_col,
-    right_row, right_col,
-    { edges.right.text }
-  )
+  vim.api.nvim_buf_set_text(buf, right_row, right_col, right_row, right_col, { edges.right.text })
 
-  vim.api.nvim_buf_set_text(buf,
-    edges.right.range[1], edges.right.range[2],
-    edges.right.range[3], edges.right.range[4],
+  vim.api.nvim_buf_set_text(
+    buf,
+    edges.right.range[1],
+    edges.right.range[2],
+    edges.right.range[3],
+    edges.right.range[4],
     {}
   )
 end
 
-function M.slurp_backwards()
-
-end
+function M.slurp_backwards() end
 
 return M

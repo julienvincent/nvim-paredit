@@ -7,7 +7,7 @@ local M = {}
 function M.drag_form_forwards()
   local lang = langs.get_language_api()
   local current_form = utils.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang
+    lang = lang,
   })
   if not current_form then
     return
@@ -26,7 +26,7 @@ end
 function M.drag_form_backwards()
   local lang = langs.get_language_api()
   local current_form = utils.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang
+    lang = lang,
   })
   if not current_form then
     return

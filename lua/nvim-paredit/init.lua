@@ -2,7 +2,7 @@ local keybindings = require("nvim-paredit.keybindings")
 local lang = require("nvim-paredit.lang")
 
 local M = {
-  api = require("nvim-paredit.api")
+  api = require("nvim-paredit.api"),
 }
 
 function M.setup(config)
@@ -23,7 +23,7 @@ function M.setup(config)
     callback = function()
       keybindings.setup_keybindings({
         overrides = config.keys or {},
-        use_defaults = use_default_keys
+        use_defaults = use_default_keys,
       })
     end,
   })

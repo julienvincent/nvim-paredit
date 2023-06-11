@@ -3,7 +3,7 @@ local utils = require("nvim-paredit.utils")
 local M = {}
 
 local markers = {
-  "quoting_lit",     -- '()
+  "quoting_lit", -- '()
   "syn_quoting_lit", -- `()
   -- "dis_expr"         -- #_()
 }
@@ -27,7 +27,7 @@ function M.get_node_root(node)
   end
 
   local root = utils.find_nearest_form(node, {
-    lang = M
+    lang = M,
   })
 
   return utils.find_root_element_relative_to(root, node)
@@ -80,8 +80,10 @@ function M.get_node_edges(node)
     left_text = marker:type() .. left_text
     local marker_start, marker_end = marker:range()
     left_range = {
-      marker_start, marker_end,
-      left_range[3], left_range[4]
+      marker_start,
+      marker_end,
+      left_range[3],
+      left_range[4],
     }
   end
 
@@ -95,8 +97,8 @@ function M.get_node_edges(node)
     },
     right = {
       text = right_text,
-      range = right_range
-    }
+      range = right_range,
+    },
   }
 end
 
