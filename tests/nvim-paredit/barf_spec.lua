@@ -88,6 +88,25 @@ describe('barfing', function()
     })
   end)
 
+  it('should do nothing in the document root', function()
+    expectAll(paredit.barfForwards, {
+      {
+        "from root",
+        before_content = {"(a)", ""},
+        before_cursor = { 2, 0 },
+        after_content = {"(a)", ""},
+        after_cursor = { 2, 0 },
+      },
+      {
+        "from another list",
+        before_content = {"(a)", "()"},
+        before_cursor = { 2, 1 },
+        after_content = {"(a)", "()"},
+        after_cursor = { 2, 1 },
+      },
+    })
+  end)
+
   it('should recursively barf the next sibling', function()
     expectAll(paredit.barfForwards, {
       {

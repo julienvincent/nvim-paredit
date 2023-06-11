@@ -45,7 +45,7 @@ end
 
 function M.findClosestFormWithChildren(current_node, opts)
   local form = opts.lang.unwrapForm(current_node)
-  if form:named_child_count() > 0 then
+  if form:named_child_count() > 0 and current_node:type() ~= "source" then
     return form
   end
 
