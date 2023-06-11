@@ -4,7 +4,7 @@ local langs = require("nvim-paredit.lang")
 
 local M = {}
 
-function M.barfForwards()
+function M.barf_forwards()
   local lang = langs.get_language_api()
   local current_form = utils.find_nearest_form(ts.get_node_at_cursor(), {
     use_source = false,
@@ -56,6 +56,6 @@ function M.barfForwards()
   vim.api.nvim_buf_set_text(buf, right_row, right_col, right_row, right_col, { edges.right.text })
 end
 
-function M.barfBackwards() end
+function M.barf_backwards() end
 
 return M
