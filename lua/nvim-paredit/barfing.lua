@@ -5,8 +5,8 @@ local langs = require("nvim-paredit.lang")
 local M = {}
 
 function M.barfForwards()
-  local lang = langs.getLanguageApi()
-  local current_form = utils.findNearestForm(ts.get_node_at_cursor(), {
+  local lang = langs.get_language_api()
+  local current_form = utils.find_nearest_form(ts.get_node_at_cursor(), {
     use_source = false,
     lang = lang
   })
@@ -14,24 +14,24 @@ function M.barfForwards()
     return
   end
 
-  local form = utils.findClosestFormWithChildren(current_form, {
+  local form = utils.find_closest_form_with_children(current_form, {
     lang = lang
   })
   if not form or form:type() == "source" then
     return
   end
 
-  local last_child = utils.getLastChildIgnoringComments(form, {
+  local last_child = utils.get_last_child_ignoring_comments(form, {
     lang = lang
   })
   if not last_child then
     return
   end
 
-  local edges = lang.getNodeEdges(form)
+  local edges = lang.get_node_edges(form)
 
   local end_pos = {}
-  local sibling = utils.getPrevSiblingIgnoringComments(last_child, {
+  local sibling = utils.get_prev_sibling_ignoring_comments(last_child, {
     lang = lang
   })
   if sibling then

@@ -1,7 +1,7 @@
 local paredit = require("nvim-paredit.api")
 
-local prepareBuffer = require("tests.nvim-paredit.utils").prepareBuffer
-local expectAll = require("tests.nvim-paredit.utils").expectAll
+local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
+local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe('element-dragging', function()
@@ -9,12 +9,12 @@ describe('element-dragging', function()
   local parser = vim.treesitter.get_parser(0)
 
   it('should drag the element forwards', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "(a b)",
       cursor = { 1, 1 }
     })
 
-    paredit.dragElementForwards()
+    paredit.drag_element_forwards()
     expect({
       content = '(b a)',
       cursor = { 1, 3 }
@@ -22,7 +22,7 @@ describe('element-dragging', function()
 
     parser:parse()
 
-    paredit.dragElementForwards()
+    paredit.drag_element_forwards()
     expect({
       content = '(b a)',
       cursor = { 1, 3 }
@@ -30,12 +30,12 @@ describe('element-dragging', function()
   end)
 
   it('should drag the element backwards', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "(a b)",
       cursor = { 1, 3 }
     })
 
-    paredit.dragElementBackwards()
+    paredit.drag_element_backwards()
     expect({
       content = '(b a)',
       cursor = { 1, 1 }
@@ -43,7 +43,7 @@ describe('element-dragging', function()
 
     parser:parse()
 
-    paredit.dragElementBackwards()
+    paredit.drag_element_backwards()
     expect({
       content = '(b a)',
       cursor = { 1, 1 }
@@ -51,12 +51,12 @@ describe('element-dragging', function()
   end)
 
   it('should drag the element in the root document', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "a b",
       cursor = { 1, 0 }
     })
 
-    paredit.dragElementForwards()
+    paredit.drag_element_forwards()
     expect({
       content = 'b a',
       cursor = { 1, 2 }
@@ -64,7 +64,7 @@ describe('element-dragging', function()
   end)
 
   it('should drag any element type', function()
-    expectAll(paredit.dragElementBackwards, {
+    expect_all(paredit.drag_element_backwards, {
       {
         "symbol",
         before_content = "(a b)",

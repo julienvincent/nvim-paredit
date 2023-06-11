@@ -1,7 +1,7 @@
 local paredit = require("nvim-paredit.api")
 
-local prepareBuffer = require("tests.nvim-paredit.utils").prepareBuffer
-local expectAll = require("tests.nvim-paredit.utils").expectAll
+local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
+local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe('form-dragging', function()
@@ -9,7 +9,7 @@ describe('form-dragging', function()
   local parser = vim.treesitter.get_parser(0)
 
   it('should drag the form forwards', function()
-    expectAll(paredit.dragFormForwards, {
+    expect_all(paredit.drag_form_forwards, {
       {
         "list",
         before_content = "((a) (b))",
@@ -49,11 +49,11 @@ describe('form-dragging', function()
   end)
 
   it('should do nothing if at the end of the parent form', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "((a) (b))",
       cursor = { 1, 6 }
     })
-    paredit.dragFormForwards()
+    paredit.drag_form_forwards()
     expect({
       content = '((a) (b))',
       cursor = { 1, 6 }
@@ -61,12 +61,12 @@ describe('form-dragging', function()
   end)
 
   it('should drag the form backwards', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "((a) (b))",
       cursor = { 1, 5 }
     })
 
-    paredit.dragFormBackwards()
+    paredit.drag_form_backwards()
     expect({
       content = '((b) (a))',
       cursor = { 1, 1 }
@@ -74,7 +74,7 @@ describe('form-dragging', function()
 
     parser:parse()
 
-    paredit.dragFormBackwards()
+    paredit.drag_form_backwards()
     expect({
       content = '((b) (a))',
       cursor = { 1, 1 }
@@ -82,12 +82,12 @@ describe('form-dragging', function()
   end)
 
   it('should drag the form in the root document', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "(a) (b)",
       cursor = { 1, 4 }
     })
 
-    paredit.dragFormBackwards()
+    paredit.drag_form_backwards()
     expect({
       content = '(b) (a)',
       cursor = { 1, 0 }

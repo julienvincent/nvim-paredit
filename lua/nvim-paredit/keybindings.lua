@@ -2,7 +2,7 @@ local api = require("nvim-paredit.api")
 
 local M = {}
 
-function merge(a, b)
+local function merge(a, b)
   local result = {}
   for k, v in pairs(a) do
     result[k] = v
@@ -14,26 +14,26 @@ function merge(a, b)
 end
 
 local default_keys = {
-  [">)"] = { api.slurpForwards, "Slurp forwards" },
-  [">("] = { api.slurpBackwards, "Slurp backwards" },
+  [">)"] = { api.slurp_forwards, "Slurp forwards" },
+  [">("] = { api.slurp_backwards, "Slurp backwards" },
 
-  ["<)"] = { api.slurpForwards, "Barf forwards" },
-  ["<("] = { api.slurpBackwards, "Barf backwards" },
+  ["<)"] = { api.slurp_forwards, "Barf forwards" },
+  ["<("] = { api.slurp_backwards, "Barf backwards" },
 
-  [">e"] = { api.dragElementForwards, "Drag element right" },
-  ["<e"] = { api.dragElementBackwards, "Drag element left" },
+  [">e"] = { api.drag_element_forwards, "Drag element right" },
+  ["<e"] = { api.drag_element_backwards, "Drag element left" },
 
-  [">f"] = { api.dragFormForwards, "Drag form right" },
-  ["<f"] = { api.dragFormBackwards, "Drag form left" },
+  [">f"] = { api.drag_form_forwards, "Drag form right" },
+  ["<f"] = { api.drag_form_backwards, "Drag form left" },
 
-  ["<localleader>o"] = { api.raiseForm, "Raise form" },
-  ["<localleader>O"] = { api.raiseElement, "Raise element" },
+  ["<localleader>o"] = { api.raise_form, "Raise form" },
+  ["<localleader>O"] = { api.raise_element, "Raise element" },
 
-  ["E"] = { api.moveToNextElement, "Jump to next element tail" },
-  ["B"] = { api.moveToPrevElement, "Jump to previous element head" },
+  ["E"] = { api.move_to_next_element, "Jump to next element tail" },
+  ["B"] = { api.move_to_prev_element, "Jump to previous element head" },
 }
 
-function M.setupKeybindings(opts)
+function M.setup_keybindings(opts)
   local keys = opts.overrides
   if opts.use_defaults then
     keys = merge(default_keys, opts.overrides)

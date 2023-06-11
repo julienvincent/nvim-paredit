@@ -1,7 +1,7 @@
 local paredit = require("nvim-paredit.api")
 
-local prepareBuffer = require("tests.nvim-paredit.utils").prepareBuffer
-local expectAll = require("tests.nvim-paredit.utils").expectAll
+local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
+local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe('slurping', function()
@@ -9,7 +9,7 @@ describe('slurping', function()
   local parser = vim.treesitter.get_parser(0)
 
   it("should slurp different form types", function()
-    expectAll(paredit.slurpForwards, {
+    expect_all(paredit.slurp_forwards, {
       {
         "list",
         before_content = "() a",
@@ -56,11 +56,11 @@ describe('slurping', function()
   end)
 
   it('should skip comments', function()
-    prepareBuffer({
+    prepare_buffer({
       content = { "()", ";; comment", "a" },
       cursor = { 1, 1 }
     })
-    paredit.slurpForwards()
+    paredit.slurp_forwards()
     expect({
       content = { '(', ";; comment", "a)" },
       cursor = { 1, 0 }
@@ -68,12 +68,12 @@ describe('slurping', function()
   end)
 
   it('should recursively slurp the next sibling', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "(()) 1 2",
       cursor = { 1, 2 }
     })
 
-    paredit.slurpForwards()
+    paredit.slurp_forwards()
     expect({
       content = '(() 1) 2',
       cursor = { 1, 2 }
@@ -81,7 +81,7 @@ describe('slurping', function()
 
     parser:parse()
 
-    paredit.slurpForwards()
+    paredit.slurp_forwards()
     expect({
       content = '(( 1)) 2',
       cursor = { 1, 2 }
@@ -89,7 +89,7 @@ describe('slurping', function()
 
     parser:parse()
 
-    paredit.slurpForwards()
+    paredit.slurp_forwards()
     expect({
       content = '(( 1) 2)',
       cursor = { 1, 2 }
@@ -97,7 +97,7 @@ describe('slurping', function()
 
     parser:parse()
 
-    paredit.slurpForwards()
+    paredit.slurp_forwards()
     expect({
       content = '(( 1 2))',
       cursor = { 1, 2 }

@@ -1,14 +1,14 @@
 local paredit = require("nvim-paredit.api")
 
-local prepareBuffer = require("tests.nvim-paredit.utils").prepareBuffer
-local expectAll = require("tests.nvim-paredit.utils").expectAll
+local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
+local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe('barfing', function()
   vim.api.nvim_buf_set_option(0, 'filetype', 'clojure')
 
   it("should barf different form types", function()
-    expectAll(paredit.barfForwards, {
+    expect_all(paredit.barf_forwards, {
       {
         "list",
         before_content = "(a)",
@@ -55,21 +55,21 @@ describe('barfing', function()
   end)
 
   it('should skip comments', function()
-    prepareBuffer({
+    prepare_buffer({
       content = { "(", ";; comment", "a)" },
       cursor = { 1, 1 }
     })
-    paredit.barfForwards()
+    paredit.barf_forwards()
     expect({
       content = { '()', ";; comment", "a" },
       cursor = { 1, 0 }
     })
 
-    prepareBuffer({
+    prepare_buffer({
       content = { "(a ;; comment", ")" },
       cursor = { 1, 1 }
     })
-    paredit.barfForwards()
+    paredit.barf_forwards()
     expect({
       content = '()a ;; comment',
       cursor = { 1, 1 }
@@ -77,11 +77,11 @@ describe('barfing', function()
   end)
 
   it('should do nothing in an empty form', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "()",
       cursor = { 1, 1 }
     })
-    paredit.barfForwards()
+    paredit.barf_forwards()
     expect({
       content = '()',
       cursor = { 1, 1 }
@@ -89,7 +89,7 @@ describe('barfing', function()
   end)
 
   it('should do nothing in the document root', function()
-    expectAll(paredit.barfForwards, {
+    expect_all(paredit.barf_forwards, {
       {
         "from root",
         before_content = {"(a)", ""},
@@ -108,7 +108,7 @@ describe('barfing', function()
   end)
 
   it('should recursively barf the next sibling', function()
-    expectAll(paredit.barfForwards, {
+    expect_all(paredit.barf_forwards, {
       {
         "double nested list",
         before_content = "(() a)",

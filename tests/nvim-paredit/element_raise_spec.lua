@@ -1,37 +1,37 @@
 local paredit = require("nvim-paredit.api")
 
-local prepareBuffer = require("tests.nvim-paredit.utils").prepareBuffer
+local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe('element raising', function()
   vim.api.nvim_buf_set_option(0, 'filetype', 'clojure')
 
   it('should raise the element', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "(a (b))",
       cursor = { 1, 4 }
     })
-    paredit.raiseElement()
+    paredit.raise_element()
     expect({
       content = '(a b)',
       cursor = { 1, 3 }
     })
 
-    prepareBuffer({
+    prepare_buffer({
       content = "(:keyword)",
       cursor = { 1, 1 }
     })
-    paredit.raiseElement()
+    paredit.raise_element()
     expect({
       content = ':keyword',
       cursor = { 1, 0 }
     })
 
-    prepareBuffer({
+    prepare_buffer({
       content = "(::keyword)",
       cursor = { 1, 1 }
     })
-    paredit.raiseElement()
+    paredit.raise_element()
     expect({
       content = '::keyword',
       cursor = { 1, 0 }
@@ -39,34 +39,34 @@ describe('element raising', function()
   end)
 
   it('should raise form elements when cursor is placed on edge', function()
-    prepareBuffer({
+    prepare_buffer({
       content = "(a (b))",
       cursor = { 1, 3 }
     })
 
-    paredit.raiseElement()
+    paredit.raise_element()
     expect({
       content = '(b)',
       cursor = { 1, 0 }
     })
 
-    prepareBuffer({
+    prepare_buffer({
       content = "(a '(b))",
       cursor = { 1, 3 }
     })
 
-    paredit.raiseElement()
+    paredit.raise_element()
     expect({
       content = '\'(b)',
       cursor = { 1, 0 }
     })
 
-    prepareBuffer({
+    prepare_buffer({
       content = "(a #{b})",
       cursor = { 1, 4 }
     })
 
-    paredit.raiseElement()
+    paredit.raise_element()
     expect({
       content = '#{b}',
       cursor = { 1, 0 }
@@ -74,12 +74,12 @@ describe('element raising', function()
   end)
 
   it('should raise a multi-line element', function()
-    prepareBuffer({
+    prepare_buffer({
       content = {"(a (b", " c))"},
       cursor = { 1, 3 }
     })
 
-    paredit.raiseElement()
+    paredit.raise_element()
     expect({
       content = {'(b', ' c)'},
       cursor = { 1, 0 }
@@ -87,11 +87,11 @@ describe('element raising', function()
   end)
 
   it('should do nothing if it is a direct child of the document root', function()
-    prepareBuffer({
+    prepare_buffer({
       content = {"a", "b"},
       cursor = { 1, 0 }
     })
-    paredit.raiseForm()
+    paredit.raise_form()
     expect({
       content = {'a', 'b'},
       cursor = { 1, 0 }

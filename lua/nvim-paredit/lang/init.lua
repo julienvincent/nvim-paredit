@@ -11,11 +11,11 @@ local function keys(tbl)
 end
 
 return {
-  getLanguageApi = function()
+  get_language_api = function()
     return langs[vim.bo.filetype]
   end,
 
-  addLanguageExtension = function(filetype, api)
+  add_language_extension = function(filetype, api)
     langs[filetype] = api
   end,
 

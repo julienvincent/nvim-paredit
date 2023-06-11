@@ -5,21 +5,21 @@ local raising = require("nvim-paredit.raising")
 local motions = require("nvim-paredit.motions")
 
 local M = {
-  slurpForwards = slurping.slurpForwards,
-  slurpBackwards = slurping.slurpBackwards,
-  barfForwards = barfing.barfForwards,
+  slurp_forwards = slurping.slurp_forwards,
+  slurp_backwards = slurping.slurp_backwards,
+  barf_forwards = barfing.barfForwards,
   barfBackwards = barfing.barfBackwards,
 
-  dragElementForwards = dragging.dragElementForwards,
-  dragElementBackwards = dragging.dragElementBackwards,
-  dragFormForwards = dragging.dragFormForwards,
-  dragFormBackwards = dragging.dragFormBackwards,
+  drag_element_forwards = dragging.drag_element_forwards,
+  drag_element_backwards = dragging.drag_element_backwards,
+  drag_form_forwards = dragging.drag_form_forwards,
+  drag_form_backwards = dragging.drag_form_backwards,
 
-  raiseForm = raising.raiseForm,
-  raiseElement = raising.raiseElement,
+  raise_form = raising.raise_form,
+  raise_element = raising.raise_element,
 
-  moveToNextElement = motions.moveToNextElement,
-  moveToPrevElement = motions.moveToPrevElement,
+  move_to_next_element = motions.move_to_next_element,
+  move_to_prev_element = motions.move_to_prev_element,
 }
 
 return M
