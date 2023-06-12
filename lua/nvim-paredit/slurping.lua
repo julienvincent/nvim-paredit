@@ -56,9 +56,6 @@ local function slurp(is_forward)
   local row = start_or_end[1]
   local col = start_or_end[2]
 
-  -- print(vim.inspect(start_or_end))
-  -- print(vim.inspect(left_or_right_edge.range))
-
   vim.api.nvim_buf_set_text(buf, row, col, row, col, { left_or_right_edge.text })
 
   local col_offset = 0
