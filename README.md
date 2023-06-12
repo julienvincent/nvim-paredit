@@ -42,8 +42,8 @@ You will experience bugs and there are still several unimplemented operations. T
         [">)"] = { paredit.api.slurp_forwards, "Slurp forwards" },
         [">("] = { paredit.api.slurp_backwards, "Slurp backwards" },
 
-        ["<)"] = { paredit.api.slurp_forwards, "Barf forwards" },
-        ["<("] = { paredit.api.slurp_backwards, "Barf backwards" },
+        ["<)"] = { paredit.api.barf_forwards, "Barf forwards" },
+        ["<("] = { paredit.api.barf_backwards, "Barf backwards" },
 
         [">e"] = { paredit.api.drag_element_forwards, "Drag element right" },
         ["<e"] = { paredit.api.drag_element_backwards, "Drag element left" },
@@ -121,7 +121,7 @@ paredit.api.slurp_forwards()
 Currently there are no automatic keybindings that get setup, so this is left up to the user to configure.
 
 ### **`slurp_forwards`**
-### **`slurp_backwards`** [TODO]
+### **`slurp_backwards`**
 ### **`barf_forwards`**
 ### **`barf_backwards`** [TODO]
 
