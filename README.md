@@ -128,21 +128,15 @@ local paredit = require("nvim-paredit")
 paredit.api.slurp_forwards()
 ```
 
-Currently there are no automatic keybindings that get setup, so this is left up to the user to configure.
-
-### **`slurp_forwards`**
-### **`slurp_backwards`**
-### **`barf_forwards`**
-### **`barf_backwards`** [TODO]
-
-### **`drag_element_forwards`**
-### **`drag_element_backwards`**
-
-### **`drag_form_forwards`**
-### **`drag_form_backwards`**
-
-### **`raise_element`**
-### **`raise_form`**
-
-### **`move_to_next_element`**
-### **`move_to_prev_element`**
++ **`slurp_forwards`**
++ **`slurp_backwards`**
++ **`barf_forwards`**
++ **`barf_backwards`** [TODO]
++ **`drag_element_forwards`**
++ **`drag_element_backwards`**
++ **`drag_form_forwards`**
++ **`drag_form_backwards`**
++ **`raise_element`**
++ **`raise_form`**
++ **`move_to_next_element`**
++ **`move_to_prev_element`**
