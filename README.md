@@ -29,53 +29,54 @@ You will experience bugs and there are still several unimplemented operations. T
 }
 ```
 
+### Using [Packer](https://github.com/wbthomason/packer.nvim)
+
+```lua
+use {
+  "julienvincent/nvim-paredit",
+  config = function()
+    require('nvim-paredit').setup()
+  end,
+}
+```
+
 ## Configuration
 
 ```lua
-{
-  "julienvincent/nvim-paredit",
-  config = function()
-    local paredit = require("nvim-paredit")
-    paredit.setup({
-      use_default_keys = true,
-      keys = {
-        [">)"] = { paredit.api.slurp_forwards, "Slurp forwards" },
-        [">("] = { paredit.api.slurp_backwards, "Slurp backwards" },
+require("nvim-paredit").setup({
+  use_default_keys = true,
+  keys = {
+    [">)"] = { paredit.api.slurp_forwards, "Slurp forwards" },
+    [">("] = { paredit.api.slurp_backwards, "Slurp backwards" },
 
-        ["<)"] = { paredit.api.barf_forwards, "Barf forwards" },
-        ["<("] = { paredit.api.barf_backwards, "Barf backwards" },
+    ["<)"] = { paredit.api.barf_forwards, "Barf forwards" },
+    ["<("] = { paredit.api.barf_backwards, "Barf backwards" },
 
-        [">e"] = { paredit.api.drag_element_forwards, "Drag element right" },
-        ["<e"] = { paredit.api.drag_element_backwards, "Drag element left" },
+    [">e"] = { paredit.api.drag_element_forwards, "Drag element right" },
+    ["<e"] = { paredit.api.drag_element_backwards, "Drag element left" },
 
-        [">f"] = { paredit.api.drag_form_forwards, "Drag form right" },
-        ["<f"] = { paredit.api.drag_form_backwards, "Drag form left" },
+    [">f"] = { paredit.api.drag_form_forwards, "Drag form right" },
+    ["<f"] = { paredit.api.drag_form_backwards, "Drag form left" },
 
-        ["<localleader>o"] = { paredit.api.raise_form, "Raise form" },
-        ["<localleader>O"] = { paredit.api.raise_element, "Raise element" },
+    ["<localleader>o"] = { paredit.api.raise_form, "Raise form" },
+    ["<localleader>O"] = { paredit.api.raise_element, "Raise element" },
 
-        ["E"] = { paredit.api.move_to_next_element, "Jump to next element tail" },
-        ["B"] = { paredit.api.move_to_prev_element, "Jump to previous element head" },
-      }
-    })
-  end
-}
+    ["E"] = { paredit.api.move_to_next_element, "Jump to next element tail" },
+    ["B"] = { paredit.api.move_to_prev_element, "Jump to previous element head" },
+  }
+})
 ```
 
 ## Language Support
 
 As this is built using Treesitter it requires that you have the relevant Treesitter grammar installed for your language of choice. Additionally `nvim-paredit` will need explicit support for the treesitter grammar as the node names and metadata of nodes vary between languages. 
 
-Right now `nvim-paredit` has built in support for the following languages:
-
-+ `clojure`
-
-To add support for another language you can either open a PR against this repo or you can use the extension API:
+Right now `nvim-paredit` only has built in support for `clojure` but exposes an extension API for adding support for other lisp dialects. Extensions can either be added as config when calling `setup`:
 
 ```lua
-paredit.setup({
+require("nvim-paredit").setup({
   extensions = {
-    fennel = {
+    commonlisp = {
       -- Should return the 'root' of the given Treesitter node. For example:
       -- The node at cursor in the below example is `()` or 'list_lit': 
       --   '(|)
@@ -107,6 +108,12 @@ paredit.setup({
     }
   }
 })
+```
+
+Or by calling the `add_language_extension` API directly. This would be the recommended approach for extension plugin authors.
+
+```lua
+require("nvim-paredit.lang").add_language_extension("commonlisp", { ... }).
 ```
 
 ## API
