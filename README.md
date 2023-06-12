@@ -4,6 +4,9 @@
 
 <div align="center">
   <p>
+    <img src="assets/logo.png" align="center" alt="Logo" />
+  </p>
+  <p>
     A <a href="https://paredit.org/">Paredit</a> implementation for <a href="https://github.com/neovim/neovim/">Neovim</a>, built using <a href="https://github.com/tree-sitter/tree-sitter">Treesitter</a> and written in Lua.
   </p>
 </div>
