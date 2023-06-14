@@ -37,4 +37,19 @@ describe("motions", function()
       cursor = { 1, 1 },
     })
   end)
+
+  it("should skip comments", function()
+    prepare_buffer({
+      content = {"(aa", ";; comment", "bb)"},
+      cursor = { 1, 1 },
+    })
+    paredit.move_to_next_element()
+    expect({
+      cursor = { 3, 1 },
+    })
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 1, 1 },
+    })
+  end)
 end)
