@@ -42,9 +42,9 @@ local function slurp(opts)
   local buf = vim.api.nvim_get_current_buf()
   local left_or_right_edge
   if opts.reversed then
-    left_or_right_edge = lang.get_node_edges(form).left
+    left_or_right_edge = lang.get_form_edges(form).left
   else
-    left_or_right_edge = lang.get_node_edges(form).right
+    left_or_right_edge = lang.get_form_edges(form).right
   end
 
   local start_or_end

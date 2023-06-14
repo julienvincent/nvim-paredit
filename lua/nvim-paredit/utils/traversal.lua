@@ -16,22 +16,32 @@ function M.find_nearest_form(current_node, opts)
   end
 end
 
-function M.get_last_child_ignoring_comments(node, opts)
-  local function find_from_index(index)
-    if index < 0 then
-      return
-    end
-    local child = node:named_child(index)
-    if not child then
-      return
-    end
-    if child:extra() or opts.lang.node_is_comment(child) then
-      return find_from_index(index - 1)
-    end
-    return child
+local function get_child_ignoring_comments(node, index, opts)
+  if index < 0 or index >= node:named_child_count() then
+    return
   end
+  local child = node:named_child(index)
+  if not child then
+    return
+  end
+  if child:extra() or opts.lang.node_is_comment(child) then
+    return get_child_ignoring_comments(node, index + opts.direction, opts)
+  end
+  return child
+end
 
-  return find_from_index(node:named_child_count() - 1)
+function M.get_last_child_ignoring_comments(node, opts)
+  return get_child_ignoring_comments(node, node:named_child_count() - 1, {
+    direction = -1,
+    lang = opts.lang
+  })
+end
+
+function M.get_first_child_ignoring_comments(node, opts)
+  return get_child_ignoring_comments(node, 0, {
+    direction = 1,
+    lang = opts.lang
+  })
 end
 
 function M.find_closest_form_with_children(current_node, opts)

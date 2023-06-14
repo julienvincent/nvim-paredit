@@ -20,11 +20,11 @@ function M.merge(a, b)
   return result
 end
 
-function M.cursor_out_of_bounds(cursor, pos)
-  if cursor[1] > pos[1] + 1 then
+function M.pos_out_of_bounds(pos, ref)
+  if pos[1] > ref[1] then
     return true
-  elseif cursor[1] == pos[1] + 1 then
-    if cursor[2] > pos[2] then
+  elseif pos[1] == ref[1] then
+    if pos[2] > ref[2] then
       return true
     end
   end

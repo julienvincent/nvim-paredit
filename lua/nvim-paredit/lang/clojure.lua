@@ -56,43 +56,39 @@ function M.node_is_comment(node)
   return node:type() == "comment"
 end
 
-function M.get_node_edges(node)
-  local marker = node:field("marker")[1]
+function M.get_form_edges(node)
+  local outer_range = { node:range() }
 
-  local left_bracket = node:field("open")[1]
-  local right_bracket = node:field("close")[1]
+  local form = M.unwrap_form(node)
 
-  if not left_bracket or not right_bracket then
-    local child = node:named_child(0)
-    if child then
-      left_bracket = child:field("open")[1]
-      right_bracket = child:field("close")[1]
-    end
-  end
+  local left_bracket_range = { form:field("open")[1]:range() }
+  local right_bracket_range = { form:field("close")[1]:range() }
 
-  local left_text = left_bracket:type()
-  local left_range = { left_bracket:range() }
-  if marker then
-    left_text = marker:type() .. left_text
-    local marker_start, marker_end = marker:range()
-    left_range = {
-      marker_start,
-      marker_end,
-      left_range[3],
-      left_range[4],
-    }
-  end
+  local left_range = {
+    outer_range[1], outer_range[2],
+    left_bracket_range[3], left_bracket_range[4]
+  }
+  local right_range = {
+    right_bracket_range[1], right_bracket_range[2],
+    outer_range[3], outer_range[4],
+  }
 
-  local right_text = right_bracket:type()
-  local right_range = { right_bracket:range() }
+  local left_text = vim.api.nvim_buf_get_text(0,
+    left_range[1], left_range[2],
+    left_range[3], left_range[4],
+    {})
+  local right_text = vim.api.nvim_buf_get_text(0,
+    right_range[1], right_range[2],
+    right_range[3], right_range[4],
+    {})
 
   return {
     left = {
-      text = left_text,
+      text = left_text[1],
       range = left_range,
     },
     right = {
-      text = right_text,
+      text = right_text[1],
       range = right_range,
     },
   }

@@ -137,7 +137,7 @@ paredit.api.slurp_forwards()
 + **`slurp_forwards`**
 + **`slurp_backwards`**
 + **`barf_forwards`**
-+ **`barf_backwards`** [TODO]
++ **`barf_backwards`**
 + **`drag_element_forwards`**
 + **`drag_element_backwards`**
 + **`drag_form_forwards`**
