@@ -1,6 +1,7 @@
+local traversal = require("nvim-paredit.utils.traversal")
+local common = require("nvim-paredit.utils.common")
 local ts = require("nvim-treesitter.ts_utils")
 local config = require("nvim-paredit.config")
-local utils = require("nvim-paredit.utils")
 local langs = require("nvim-paredit.lang")
 
 local M = {}
@@ -8,7 +9,7 @@ local M = {}
 local function slurp(opts)
   local cursor_pos = vim.api.nvim_win_get_cursor(0)
   local lang = langs.get_language_api()
-  local current_form = utils.find_nearest_form(ts.get_node_at_cursor(), {
+  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
     lang = lang,
   })
   if not current_form then
@@ -17,9 +18,9 @@ local function slurp(opts)
 
   local form
   if opts.reversed then
-    form = utils.find_closest_form_with_prev_siblings(current_form)
+    form = traversal.find_closest_form_with_prev_siblings(current_form)
   else
-    form = utils.find_closest_form_with_next_siblings(current_form)
+    form = traversal.find_closest_form_with_next_siblings(current_form)
   end
 
   if not form then
@@ -29,9 +30,9 @@ local function slurp(opts)
   local sibling
 
   if opts.reversed then
-    sibling = utils.get_prev_sibling_ignoring_comments(form, { lang = lang })
+    sibling = traversal.get_prev_sibling_ignoring_comments(form, { lang = lang })
   else
-    sibling = utils.get_next_sibling_ignoring_comments(form, { lang = lang })
+    sibling = traversal.get_next_sibling_ignoring_comments(form, { lang = lang })
   end
 
   if not sibling then
@@ -94,7 +95,7 @@ function M.slurp_forwards(opts)
 end
 
 function M.slurp_backwards(opts)
-  slurp(utils.merge(opts or {}, {
+  slurp(common.merge(opts or {}, {
     reversed = true
   }))
 end

@@ -1,4 +1,5 @@
-local utils = require("nvim-paredit.utils")
+local traversal = require("nvim-paredit.utils.traversal")
+local common = require("nvim-paredit.utils.common")
 
 local M = {}
 
@@ -11,7 +12,7 @@ local form_types = {
 }
 
 local function find_next_parent_form(current_node)
-  if utils.included_in_table(form_types, current_node:type()) then
+  if common.included_in_table(form_types, current_node:type()) then
     return current_node
   end
 
@@ -30,11 +31,11 @@ function M.get_node_root(node)
   end
 
   local root = find_next_parent_form(search_point)
-  return utils.find_root_element_relative_to(root, node)
+  return traversal.find_root_element_relative_to(root, node)
 end
 
 function M.unwrap_form(node)
-  if utils.included_in_table(form_types, node:type()) then
+  if common.included_in_table(form_types, node:type()) then
     return node
   end
   local child = node:named_child(0)

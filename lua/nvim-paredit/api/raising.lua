@@ -1,12 +1,12 @@
+local traversal = require("nvim-paredit.utils.traversal")
 local ts = require("nvim-treesitter.ts_utils")
-local utils = require("nvim-paredit.utils")
 local langs = require("nvim-paredit.lang")
 
 local M = {}
 
 function M.raise_form()
   local lang = langs.get_language_api()
-  local current_form = utils.find_nearest_form(ts.get_node_at_cursor(), {
+  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
     lang = lang,
   })
   if not current_form then

@@ -1,5 +1,5 @@
+local keybindings = require("nvim-paredit.utils.keybindings")
 local paredit = require("nvim-paredit.api")
-local keybindings = require("nvim-paredit.keybindings")
 
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local expect = require("tests.nvim-paredit.utils").expect
