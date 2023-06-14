@@ -53,55 +53,67 @@ describe("slurping backward", function()
         after_cursor = { 1, 4 },
       },
     })
+  end)
 
-    it("should skip comments", function()
-      prepare_buffer({
-        content = { "a", ";; comment", "()" },
-        cursor = { 3, 0 },
-      })
-      paredit.slurp_backwards()
-      expect({
-        content = { "(a", ";; comment", ")" },
-        cursor = { 3, 0 },
-      })
-    end)
+  it("should skip comments", function()
+    prepare_buffer({
+      content = { "a", ";; comment", "()" },
+      cursor = { 3, 0 },
+    })
+    paredit.slurp_backwards()
+    expect({
+      content = { "(a", ";; comment", ")" },
+      cursor = { 3, 0 },
+    })
+  end)
 
-    it("should recursively slurp the next sibling", function()
-      prepare_buffer({
-        content = "1 2 (())",
-        cursor = { 1, 5 },
-      })
+  it("should recursively slurp the next sibling", function()
+    prepare_buffer({
+      content = "1 2 (())",
+      cursor = { 1, 5 },
+    })
 
-      paredit.slurp_backwards()
-      expect({
-        content = "1 (2 ())",
-        cursor = { 1, 5 },
-      })
+    paredit.slurp_backwards()
+    expect({
+      content = "1 (2 ())",
+      cursor = { 1, 5 },
+    })
 
-      parser:parse()
+    parser:parse()
 
-      paredit.slurp_backwards()
-      expect({
-        content = "1 ((2 ))",
-        cursor = { 1, 5 },
-      })
+    paredit.slurp_backwards()
+    expect({
+      content = "1 ((2 ))",
+      cursor = { 1, 5 },
+    })
 
-      parser:parse()
+    parser:parse()
 
-      paredit.slurp_backwards()
-      expect({
-        content = "(1 (2 ))",
-        cursor = { 1, 5 },
-      })
+    paredit.slurp_backwards()
+    expect({
+      content = "(1 (2 ))",
+      cursor = { 1, 5 },
+    })
 
-      parser:parse()
+    parser:parse()
 
-      paredit.slurp_backwards()
-      expect({
-        content = "((1 2 ))",
-        cursor = { 1, 5 },
-      })
-    end)
+    paredit.slurp_backwards()
+    expect({
+      content = "((1 2 ))",
+      cursor = { 1, 5 },
+    })
+  end)
+
+  it("should follow the bracket with cursor", function()
+    prepare_buffer({
+      content = "1 2 ()",
+      cursor = { 1, 4 },
+    })
+    paredit.slurp_backwards({ cursor_behaviour = "follow" })
+    expect({
+      content = "1 (2 )",
+      cursor = { 1, 2 },
+    })
   end)
 end)
 
@@ -202,6 +214,18 @@ describe("slurping forward", function()
     expect({
       content = "(( 1 2))",
       cursor = { 1, 2 },
+    })
+  end)
+
+  it("should follow the bracket with cursor", function()
+    prepare_buffer({
+      content = "() 1 2",
+      cursor = { 1, 1 },
+    })
+    paredit.slurp_forwards({ cursor_behaviour = "follow" })
+    expect({
+      content = "( 1) 2",
+      cursor = { 1, 3 },
     })
   end)
 end)

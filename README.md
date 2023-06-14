@@ -48,6 +48,7 @@ use {
 ```lua
 require("nvim-paredit").setup({
   use_default_keys = true,
+  cursor_behaviour = "auto", -- remain, follow, auto
   keys = {
     [">)"] = { paredit.api.slurp_forwards, "Slurp forwards" },
     [">("] = { paredit.api.slurp_backwards, "Slurp backwards" },

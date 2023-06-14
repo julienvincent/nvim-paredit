@@ -20,6 +20,17 @@ function M.merge(a, b)
   return result
 end
 
+function M.cursor_out_of_bounds(cursor, pos)
+  if cursor[1] > pos[1] + 1 then
+    return true
+  elseif cursor[1] == pos[1] + 1 then
+    if cursor[2] > pos[2] then
+      return true
+    end
+  end
+  return false
+end
+
 function M.find_nearest_form(current_node, opts)
   if opts.lang.node_is_form(current_node) then
     return current_node

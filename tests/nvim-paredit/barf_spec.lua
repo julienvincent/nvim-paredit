@@ -125,4 +125,50 @@ describe("barfing", function()
       },
     })
   end)
+
+  it("should move the cursor if out of bounds", function()
+    local function barf_with_behaviour()
+      paredit.barf_forwards({ cursor_behaviour = "auto" })
+    end
+
+    expect_all(barf_with_behaviour, {
+      {
+        "single line",
+        before_content = "(aa bb)",
+        before_cursor = { 1, 5 },
+        after_content = "(aa) bb",
+        after_cursor = { 1, 3 }
+      },
+      {
+        "multi line",
+        before_content = { "(aa", "bb)" },
+        before_cursor = { 2, 1 },
+        after_content = { "(aa)", "bb" },
+        after_cursor = { 1, 3 }
+      }
+    })
+  end)
+
+  it("should always move the cursor", function()
+    local function barf_with_behaviour()
+      paredit.barf_forwards({ cursor_behaviour = "follow" })
+    end
+
+    expect_all(barf_with_behaviour, {
+      {
+        "single line",
+        before_content = "(aa bb cc)",
+        before_cursor = { 1, 4 },
+        after_content = "(aa bb) cc",
+        after_cursor = { 1, 6 }
+      },
+      {
+        "multi line",
+        before_content = { "(aa", "bb", "cc)" },
+        before_cursor = { 1, 1 },
+        after_content = { "(aa", "bb)", "cc" },
+        after_cursor = { 2, 2 }
+      }
+    })
+  end)
 end)
