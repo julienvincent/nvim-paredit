@@ -69,6 +69,7 @@ function M.setup_keybindings(opts)
 
     vim.keymap.set({ "n", "x" }, keymap, fn, {
       desc = action[2],
+      buffer = opts.buf,
       expr = true,
     })
   end

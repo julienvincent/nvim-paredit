@@ -29,6 +29,7 @@ function M.setup(config)
       keybindings.setup_keybindings({
         overrides = config.keys or {},
         use_defaults = use_default_keys,
+        buf = event.buf
       })
     end,
   })
