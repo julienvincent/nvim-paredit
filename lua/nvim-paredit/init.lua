@@ -1,5 +1,6 @@
 local keybindings = require("nvim-paredit.keybindings")
 local lang = require("nvim-paredit.lang")
+local utils = require("nvim-paredit.utils")
 
 local M = {
   api = require("nvim-paredit.api"),
@@ -19,8 +20,12 @@ function M.setup(config)
 
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("Paredit", { clear = true }),
-    pattern = lang.filetypes(),
-    callback = function()
+    pattern = "*",
+    callback = function(event)
+      if not utils.included_in_table(lang.filetypes(), event.match) then
+        return
+      end
+
       keybindings.setup_keybindings({
         overrides = config.keys or {},
         use_defaults = use_default_keys,
