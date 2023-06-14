@@ -13,6 +13,23 @@ local function merge(a, b)
   return result
 end
 
+-- This is a hack to enable dot-repeat for fn keymaps.
+--
+-- For more information on how this works, see:
+-- https://gist.github.com/kylechui/a5c1258cd2d86755f97b10fc921315c3
+--
+-- For this to work in a keymap, make sure `expr = true` is defined:
+--  vim.keymap.set("n", "lhs", with_repeat(function() end), { expr = true })
+function M.with_repeat(fn)
+  return function()
+    _G.NVIM_PAREDIT_REPEAT_FN = function()
+      fn()
+    end
+    vim.go.operatorfunc = "v:lua.NVIM_PAREDIT_REPEAT_FN"
+    return "g@l"
+  end
+end
+
 local default_keys = {
   [">)"] = { api.slurp_forwards, "Slurp forwards" },
   [">("] = { api.slurp_backwards, "Slurp backwards" },
@@ -40,8 +57,20 @@ function M.setup_keybindings(opts)
   end
 
   for keymap, action in pairs(keys) do
-    vim.keymap.set("n", keymap, action[1], { desc = action[2] })
-    vim.keymap.set("x", keymap, action[1], { desc = action[2] })
+    local repeatable = true
+    if type(action.repeatable) == "boolean" then
+      repeatable = action.repeatable
+    end
+
+    local fn = action[1]
+    if repeatable then
+      fn = M.with_repeat(fn)
+    end
+
+    vim.keymap.set({ "n", "x" }, keymap, fn, {
+      desc = action[2],
+      expr = true,
+    })
   end
 end
 
