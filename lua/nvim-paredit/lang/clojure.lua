@@ -2,12 +2,6 @@ local utils = require("nvim-paredit.utils")
 
 local M = {}
 
-local markers = {
-  "quoting_lit", -- '()
-  "syn_quoting_lit", -- `()
-  -- "dis_expr"         -- #_()
-}
-
 local form_types = {
   "list_lit",
   "vec_lit",
@@ -16,20 +10,26 @@ local form_types = {
   "anon_fn_lit",
 }
 
-function M.get_node_root(node)
-  local is_form = M.node_is_form(node)
-  if is_form then
-    local parent = node:parent()
-    if utils.included_in_table(markers, parent:type()) then
-      return parent
-    end
-    return node
+local function find_next_parent_form(current_node)
+  if utils.included_in_table(form_types, current_node:type()) then
+    return current_node
   end
 
-  local root = utils.find_nearest_form(node, {
-    lang = M,
-  })
+  local parent = current_node:parent()
+  if parent then
+    return find_next_parent_form(parent)
+  end
 
+  return current_node
+end
+
+function M.get_node_root(node)
+  local search_point = node
+  if M.node_is_form(node) then
+    search_point = node:parent()
+  end
+
+  local root = find_next_parent_form(search_point)
   return utils.find_root_element_relative_to(root, node)
 end
 
@@ -38,22 +38,17 @@ function M.unwrap_form(node)
     return node
   end
   local child = node:named_child(0)
-  if not child then
-    return
+  if child then
+    return M.unwrap_form(child)
   end
-  return M.unwrap_form(child)
 end
 
 function M.node_is_form(node)
-  local type = node:type()
-  if utils.included_in_table(form_types, type) then
+  if M.unwrap_form(node) then
     return true
+  else
+    return false
   end
-  if utils.included_in_table(markers, type) then
-    local child = node:named_child(0)
-    return child and utils.included_in_table(form_types, child:type())
-  end
-  return false
 end
 
 function M.node_is_comment(node)

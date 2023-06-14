@@ -129,7 +129,7 @@ describe("element-dragging", function()
         after_cursor = { 1, 1 },
       },
       {
-        "map",
+        "quoted list",
         before_content = "(a '(a))",
         before_cursor = { 1, 3 },
         after_content = "('(a) a)",

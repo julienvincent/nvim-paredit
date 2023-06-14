@@ -8,26 +8,38 @@ describe("motions", function()
 
   it("should jump to next element in form", function()
     prepare_buffer({
-      content = "(aa bb)",
+      content = "(aa (bb) @(cc) #{1})",
       cursor = { 1, 1 },
     })
 
     paredit.move_to_next_element()
     expect({
-      cursor = { 1, 5 },
+      cursor = { 1, 7 },
     })
     paredit.move_to_next_element()
     expect({
-      cursor = { 1, 5 },
+      cursor = { 1, 13 },
+    })
+    paredit.move_to_next_element()
+    expect({
+      cursor = { 1, 18 },
+    })
+    paredit.move_to_next_element()
+    expect({
+      cursor = { 1, 18 },
     })
   end)
 
   it("should jump to previous element in form", function()
     prepare_buffer({
-      content = "(aa bb)",
-      cursor = { 1, 5 },
+      content = "(aa (bb) '(cc))",
+      cursor = { 1, 13 },
     })
 
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 1, 4 },
+    })
     paredit.move_to_prev_element()
     expect({
       cursor = { 1, 1 },

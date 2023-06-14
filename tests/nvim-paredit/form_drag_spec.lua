@@ -45,6 +45,13 @@ describe("form-dragging", function()
         after_content = "'(`(b) `(a))",
         after_cursor = { 1, 7 },
       },
+      {
+        "within elide",
+        before_content = "'(#_`(a) `(b))",
+        before_cursor = { 1, 6 },
+        after_content = "'(`(b) #_`(a))",
+        after_cursor = { 1, 7 },
+      },
     })
   end)
 
