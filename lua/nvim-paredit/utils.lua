@@ -66,54 +66,57 @@ function M.find_closest_form_with_children(current_node, opts)
   end
 end
 
-local function find_closest_form_with_siblings(current_node, is_next)
-  if is_next then
-    if current_node:next_named_sibling() then
-      return current_node
-    end
-  else
-    if current_node:prev_named_sibling() then
-      return current_node
-    end
+local function find_closest_form_with_siblings(current_node, fn)
+  if fn(current_node) then
+    return current_node
   end
   local parent = current_node:parent()
   if parent then
-    return find_closest_form_with_siblings(parent, is_next)
+    return find_closest_form_with_siblings(parent, fn)
   end
 end
 
 function M.find_closest_form_with_next_siblings(current_form)
-  return find_closest_form_with_siblings(current_form, true)
+  return find_closest_form_with_siblings(current_form, function(node)
+    return node:next_named_sibling()
+  end)
 end
 
 function M.find_closest_form_with_prev_siblings(current_form)
-  return find_closest_form_with_siblings(current_form, false)
+  return find_closest_form_with_siblings(current_form, function(node)
+    return node:prev_named_sibling()
+  end)
+end
+
+local function get_sibling_ignoring_comments(node, opts)
+  local sibling = opts.sibling_fn(node)
+  if not sibling then
+    return
+  end
+
+  if sibling:extra() or opts.lang.node_is_comment(sibling) then
+    return get_sibling_ignoring_comments(sibling, opts)
+  end
+
+  return sibling
 end
 
 function M.get_next_sibling_ignoring_comments(node, opts)
-  local sibling = node:next_named_sibling()
-  if not sibling then
-    return
-  end
-
-  if sibling:extra() or opts.lang.node_is_comment(sibling) then
-    return M.get_next_sibling_ignoring_comments(sibling, opts)
-  end
-
-  return sibling
+  return get_sibling_ignoring_comments(node, {
+    lang = opts.lang,
+    sibling_fn = function(n)
+      return n:next_named_sibling()
+    end
+  })
 end
 
 function M.get_prev_sibling_ignoring_comments(node, opts)
-  local sibling = node:prev_named_sibling()
-  if not sibling then
-    return
-  end
-
-  if sibling:extra() or opts.lang.node_is_comment(sibling) then
-    return M.get_prev_sibling_ignoring_comments(sibling, opts)
-  end
-
-  return sibling
+  return get_sibling_ignoring_comments(node, {
+    lang = opts.lang,
+    sibling_fn = function(n)
+      return n:prev_named_sibling()
+    end
+  })
 end
 
 -- Find the root most parent of the given `child` node which is still contained within
