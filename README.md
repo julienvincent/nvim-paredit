@@ -11,7 +11,12 @@
   </p>
 </div>
 
-The goal of `nvim-paredit` is to provide a comparable s-expression editing experience in Neovim to that provided by Emacs.
+The goal of `nvim-paredit` is to provide a comparable s-expression editing experience in Neovim to that provided by Emacs. This is what is provided:
+
++ Treesitter based lisp structural editing and cursor motions
++ Dot-repeatable keybindings
++ Language extensibility
++ Programmable API
 
 ## Project Status
 
