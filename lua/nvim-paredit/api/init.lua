@@ -1,8 +1,8 @@
-local slurping = require("nvim-paredit.slurping")
-local barfing = require("nvim-paredit.barfing")
-local dragging = require("nvim-paredit.dragging")
-local raising = require("nvim-paredit.raising")
-local motions = require("nvim-paredit.motions")
+local slurping = require("nvim-paredit.api.slurping")
+local barfing = require("nvim-paredit.api.barfing")
+local dragging = require("nvim-paredit.api.dragging")
+local raising = require("nvim-paredit.api.raising")
+local motions = require("nvim-paredit.api.motions")
 
 local M = {
   slurp_forwards = slurping.slurp_forwards,
