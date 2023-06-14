@@ -1,21 +1,24 @@
 local keybindings = require("nvim-paredit.keybindings")
-local lang = require("nvim-paredit.lang")
+local defaults = require("nvim-paredit.defaults")
+local config = require("nvim-paredit.config")
 local utils = require("nvim-paredit.utils")
+local lang = require("nvim-paredit.lang")
 
 local M = {
   api = require("nvim-paredit.api"),
 }
 
-function M.setup(config)
-  config = config or {}
+function M.setup(opts)
+  config.update_config(utils.merge(defaults.defaults, opts))
 
-  for filetype, api in pairs(config.extensions or {}) do
+  for filetype, api in pairs(opts.extensions or {}) do
     lang.add_language_extension(filetype, api)
   end
 
-  local use_default_keys = true
-  if type(config.use_default_keys) == "boolean" then
-    use_default_keys = config.use_default_keys
+  if type(opts.use_default_keys) ~= "boolean" or opts.use_default_keys then
+    config.update_config({
+      keys = utils.merge(defaults.default_keys, opts.keys or {})
+    })
   end
 
   vim.api.nvim_create_autocmd("FileType", {
@@ -27,8 +30,7 @@ function M.setup(config)
       end
 
       keybindings.setup_keybindings({
-        overrides = config.keys or {},
-        use_defaults = use_default_keys,
+        keys = config.config.keys or {},
         buf = event.buf
       })
     end,
