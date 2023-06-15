@@ -70,8 +70,8 @@ require("nvim-paredit").setup({
     ["<localleader>o"] = { paredit.api.raise_form, "Raise form" },
     ["<localleader>O"] = { paredit.api.raise_element, "Raise element" },
 
-    ["E"] = { paredit.api.move_to_next_element, "Jump to next element tail" },
-    ["B"] = { paredit.api.move_to_prev_element, "Jump to previous element head" },
+    ["E"] = { paredit.api.move_to_next_element, "Jump to next element tail", repeatable = false },
+    ["B"] = { paredit.api.move_to_prev_element, "Jump to previous element head", repeatable = false },
   }
 })
 ```

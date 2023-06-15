@@ -18,8 +18,8 @@ M.default_keys = {
   ["<localleader>o"] = { api.raise_form, "Raise form" },
   ["<localleader>O"] = { api.raise_element, "Raise element" },
 
-  ["E"] = { api.move_to_next_element, "Jump to next element tail" },
-  ["B"] = { api.move_to_prev_element, "Jump to previous element head" },
+  ["E"] = { api.move_to_next_element, "Jump to next element tail", repeatable = false },
+  ["B"] = { api.move_to_prev_element, "Jump to previous element head", repeatable = false },
 }
 
 M.defaults = {
