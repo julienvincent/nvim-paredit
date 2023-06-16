@@ -14,6 +14,10 @@ describe("motions", function()
 
     paredit.move_to_next_element()
     expect({
+      cursor = { 1, 2 },
+    })
+    paredit.move_to_next_element()
+    expect({
       cursor = { 1, 7 },
     })
     paredit.move_to_next_element()
@@ -38,6 +42,10 @@ describe("motions", function()
 
     paredit.move_to_prev_element()
     expect({
+      cursor = { 1, 9 },
+    })
+    paredit.move_to_prev_element()
+    expect({
       cursor = { 1, 4 },
     })
     paredit.move_to_prev_element()
@@ -52,12 +60,20 @@ describe("motions", function()
 
   it("should skip comments", function()
     prepare_buffer({
-      content = {"(aa", ";; comment", "bb)"},
+      content = { "(aa", ";; comment", "bb)" },
       cursor = { 1, 1 },
     })
     paredit.move_to_next_element()
     expect({
+      cursor = { 1, 2 },
+    })
+    paredit.move_to_next_element()
+    expect({
       cursor = { 3, 1 },
+    })
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 3, 0 },
     })
     paredit.move_to_prev_element()
     expect({
