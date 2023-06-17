@@ -9,7 +9,7 @@ describe("motions", function()
   it("should jump to next element in form", function()
     prepare_buffer({
       content = "(aa (bb) @(cc) #{1})",
-      cursor = { 1, 1 },
+      cursor = { 1, 2 },
     })
 
     paredit.move_to_next_element()
@@ -33,7 +33,7 @@ describe("motions", function()
   it("should jump to previous element in form", function()
     prepare_buffer({
       content = "(aa (bb) '(cc))",
-      cursor = { 1, 13 },
+      cursor = { 1, 9 },
     })
 
     paredit.move_to_prev_element()
@@ -52,12 +52,54 @@ describe("motions", function()
 
   it("should skip comments", function()
     prepare_buffer({
-      content = {"(aa", ";; comment", "bb)"},
-      cursor = { 1, 1 },
+      content = { "(aa", ";; comment", "bb)" },
+      cursor = { 1, 2 },
     })
     paredit.move_to_next_element()
     expect({
       cursor = { 3, 1 },
+    })
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 3, 0 },
+    })
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 1, 1 },
+    })
+  end)
+
+  it("should move to the end of the current form before jumping to next", function()
+    prepare_buffer({
+      content = { "(12345", "789)" },
+      cursor = { 1, 3 },
+    })
+    paredit.move_to_next_element()
+    expect({
+      cursor = { 1, 5 },
+    })
+    paredit.move_to_next_element()
+    expect({
+      cursor = { 2, 2 },
+    })
+    paredit.move_to_next_element()
+    expect({
+      cursor = { 2, 2 },
+    })
+  end)
+
+  it("should move to the start of the current form before jumping to previous", function()
+    prepare_buffer({
+      content = { "(12345", "789)" },
+      cursor = { 2, 1 },
+    })
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 2, 0 },
+    })
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 1, 1 },
     })
     paredit.move_to_prev_element()
     expect({
