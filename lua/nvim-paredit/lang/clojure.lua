@@ -11,6 +11,8 @@ local form_types = {
   "anon_fn_lit",
 }
 
+M.whitespace_chars = { " ", "," }
+
 local function find_next_parent_form(current_node)
   if common.included_in_table(form_types, current_node:type()) then
     return current_node

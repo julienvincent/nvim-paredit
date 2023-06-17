@@ -1,6 +1,7 @@
 local paredit = require("nvim-paredit.api")
 
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
+local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe("motions", function()
@@ -104,6 +105,25 @@ describe("motions", function()
     paredit.move_to_prev_element()
     expect({
       cursor = { 1, 1 },
+    })
+  end)
+
+  it("should move to the next element even when on whitespace", function()
+    expect_all(function() end, {
+      {
+        "forwards",
+        before_content = "( bb)",
+        before_cursor = { 1, 1 },
+        after_cursor = { 1, 3 },
+        action = paredit.move_to_next_element
+      },
+      {
+        "backwards",
+        before_content = "(aa  )",
+        before_cursor = { 1, 4 },
+        after_cursor = { 1, 1 },
+        action = paredit.move_to_prev_element
+      }
     })
   end)
 end)
