@@ -109,7 +109,8 @@ describe("motions", function()
   end)
 
   it("should move to the next element even when on whitespace", function()
-    expect_all(function() end, {
+    expect_all(function()
+    end, {
       {
         "forwards",
         before_content = "( bb)",
@@ -118,12 +119,26 @@ describe("motions", function()
         action = paredit.move_to_next_element
       },
       {
+        "forwards from no char",
+        before_content = { "(bb", "", "cc)" },
+        before_cursor = { 2, 0 },
+        after_cursor = { 3, 1 },
+        action = paredit.move_to_next_element
+      },
+      {
         "backwards",
         before_content = "(aa  )",
         before_cursor = { 1, 4 },
         after_cursor = { 1, 1 },
         action = paredit.move_to_prev_element
-      }
+      },
+      {
+        "backwards from no char",
+        before_content = { "(bb", "", "cc)" },
+        before_cursor = { 2, 0 },
+        after_cursor = { 1, 1 },
+        action = paredit.move_to_prev_element
+      },
     })
   end)
 end)

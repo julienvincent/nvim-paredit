@@ -32,7 +32,7 @@ local function get_next_node_from_cursor(lang, reversed)
   local char_is_whitespace = common.included_in_table(
     lang.whitespace_chars or default_whitespace_chars,
     char_under_cursor[1]
-  )
+  ) or char_under_cursor[1] == ""
 
   if not (lang.node_is_form(current_node) and char_is_whitespace) then
     return lang.get_node_root(current_node)
