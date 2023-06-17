@@ -17,14 +17,17 @@ describe("motions", function()
     expect({
       cursor = { 1, 7 },
     })
+
     paredit.move_to_next_element()
     expect({
       cursor = { 1, 13 },
     })
+
     paredit.move_to_next_element()
     expect({
       cursor = { 1, 18 },
     })
+
     paredit.move_to_next_element()
     expect({
       cursor = { 1, 18 },
@@ -71,40 +74,36 @@ describe("motions", function()
   end)
 
   it("should move to the end of the current form before jumping to next", function()
-    prepare_buffer({
-      content = { "(12345", "789)" },
-      cursor = { 1, 3 },
-    })
-    paredit.move_to_next_element()
-    expect({
-      cursor = { 1, 5 },
-    })
-    paredit.move_to_next_element()
-    expect({
-      cursor = { 2, 2 },
-    })
-    paredit.move_to_next_element()
-    expect({
-      cursor = { 2, 2 },
+    expect_all(paredit.move_to_next_element, {
+      {
+        "same line",
+        before_content = "(aaa bbb)",
+        before_cursor = { 1, 2 },
+        after_cursor = { 1, 3 },
+      },
+      {
+        "multi line",
+        before_content = {"((a", ") (b))"},
+        before_cursor = { 1, 1 },
+        after_cursor = { 2, 0 },
+      },
     })
   end)
 
   it("should move to the start of the current form before jumping to previous", function()
-    prepare_buffer({
-      content = { "(12345", "789)" },
-      cursor = { 2, 1 },
-    })
-    paredit.move_to_prev_element()
-    expect({
-      cursor = { 2, 0 },
-    })
-    paredit.move_to_prev_element()
-    expect({
-      cursor = { 1, 1 },
-    })
-    paredit.move_to_prev_element()
-    expect({
-      cursor = { 1, 1 },
+    expect_all(paredit.move_to_prev_element, {
+      {
+        "same line",
+        before_content = "(aaa bbb)",
+        before_cursor = { 1, 7 },
+        after_cursor = { 1, 5 },
+      },
+      {
+        "multi line",
+        before_content = {"((a) (", "b))"},
+        before_cursor = { 2, 1 },
+        after_cursor = { 1, 5 },
+      },
     })
   end)
 

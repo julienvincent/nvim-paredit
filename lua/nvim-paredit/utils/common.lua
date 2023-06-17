@@ -20,15 +20,23 @@ function M.merge(a, b)
   return result
 end
 
-function M.pos_out_of_bounds(pos, ref)
-  if pos[1] > ref[1] then
-    return true
-  elseif pos[1] == ref[1] then
-    if pos[2] > ref[2] then
-      return true
+-- Compares the two given { col, row } position tuples and returns -1/0/1 depending
+-- on whether `a` is less than, equal to or greater than `b`
+--
+-- compare_positions({ 0, 1 }, { 0, 0 }) => 1
+-- compare_positions({ 0, 1 }, { 1, 0 }) => -1
+-- compare_positions({ 1, 1 }, { 1, 1 }) => 0
+function M.compare_positions(a, b)
+  if a[1] > b[1] then
+    return 1
+  elseif a[1] == b[1] then
+    if a[2] == b[2] then
+      return 0
+    elseif a[2] > b[2] then
+      return 1
     end
   end
-  return false
+  return -1
 end
 
 return M

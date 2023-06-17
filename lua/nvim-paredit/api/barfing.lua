@@ -72,7 +72,7 @@ function M.barf_forwards(opts)
   local cursor_behaviour = opts.cursor_behaviour or config.config.cursor_behaviour
   if cursor_behaviour == "auto" or cursor_behaviour == "follow" then
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
-    local cursor_out_of_bounds = common.pos_out_of_bounds({ cursor_pos[1] - 1, cursor_pos[2] }, end_pos)
+    local cursor_out_of_bounds = common.compare_positions({ cursor_pos[1] - 1, cursor_pos[2] }, end_pos) == 1
     if cursor_behaviour == "follow" or cursor_out_of_bounds then
       vim.api.nvim_win_set_cursor(0, { end_pos[1] + 1, end_pos[2] })
     end
@@ -138,7 +138,7 @@ function M.barf_backwards(opts)
   local cursor_behaviour = opts.cursor_behaviour or config.config.cursor_behaviour
   if cursor_behaviour == "auto" or cursor_behaviour == "follow" then
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
-    local cursor_out_of_bounds = common.pos_out_of_bounds(end_pos, { cursor_pos[1] - 1, cursor_pos[2] })
+    local cursor_out_of_bounds = common.compare_positions(end_pos, { cursor_pos[1] - 1, cursor_pos[2] }) == 1
     if cursor_behaviour == "follow" or cursor_out_of_bounds then
       vim.api.nvim_win_set_cursor(0, { end_pos[1] + 1, end_pos[2] })
     end

@@ -44,9 +44,9 @@ local function get_next_node_from_cursor(lang, reversed)
 
     local child_is_next
     if reversed then
-      child_is_next = common.pos_out_of_bounds(cursor, { range[3], range[4] })
+      child_is_next = common.compare_positions(cursor, { range[3], range[4] }) == 1
     else
-      child_is_next = common.pos_out_of_bounds(range, cursor)
+      child_is_next = common.compare_positions(range, cursor) == 1
     end
 
     if child_is_next then
@@ -64,11 +64,12 @@ function M.move_to_next_element()
   end
 
   local cursor_pos = vim.api.nvim_win_get_cursor(0)
-  local current_node_end = { current_node:end_() }
+  cursor_pos = {cursor_pos[1] - 1, cursor_pos[2]}
+  local node_end = { current_node:end_() }
 
   local next_pos
-  if cursor_pos[2] + 1 < current_node_end[2] then
-    next_pos = current_node_end
+  if common.compare_positions({node_end[1], node_end[2] - 1}, cursor_pos) == 1 then
+    next_pos = node_end
   else
     local next_sibling = traversal.get_next_sibling_ignoring_comments(current_node, {
       lang = lang,
@@ -93,10 +94,11 @@ function M.move_to_prev_element()
   end
 
   local cursor_pos = vim.api.nvim_win_get_cursor(0)
+  cursor_pos = {cursor_pos[1] - 1, cursor_pos[2]}
   local current_node_start = { current_node:start() }
 
   local next_pos
-  if cursor_pos[2] > current_node_start[2] then
+  if common.compare_positions(cursor_pos, current_node_start) == 1 then
     next_pos = current_node_start
   else
     local prev_sibling = traversal.get_prev_sibling_ignoring_comments(current_node, {
