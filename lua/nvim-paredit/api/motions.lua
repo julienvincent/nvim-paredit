@@ -49,7 +49,7 @@ local function get_next_node_from_cursor(lang, reversed)
       child_is_next = common.compare_positions(range, cursor) == 1
     end
 
-    if child_is_next then
+    if child_is_next and not lang.node_is_comment(child) then
       return child
     end
   end

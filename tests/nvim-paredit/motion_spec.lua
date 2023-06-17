@@ -118,6 +118,13 @@ describe("motions", function()
         action = paredit.move_to_next_element
       },
       {
+        "forwards skipping comments",
+        before_content = {"( ;; comment", "bb)"},
+        before_cursor = { 1, 1 },
+        after_cursor = { 2, 1 },
+        action = paredit.move_to_next_element
+      },
+      {
         "forwards from no char",
         before_content = { "(bb", "", "cc)" },
         before_cursor = { 2, 0 },
@@ -128,6 +135,13 @@ describe("motions", function()
         "backwards",
         before_content = "(aa  )",
         before_cursor = { 1, 4 },
+        after_cursor = { 1, 1 },
+        action = paredit.move_to_prev_element
+      },
+      {
+        "backwards skipping comments",
+        before_content = {"(aa ;; comment", " )"},
+        before_cursor = { 2, 0 },
         after_cursor = { 1, 1 },
         action = paredit.move_to_prev_element
       },
