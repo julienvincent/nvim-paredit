@@ -88,7 +88,7 @@ describe("motions", function()
     })
   end)
 
-  it("should stay on the same form is cursor is in the middle before jumping to prev form", function()
+  it("should move to the start of the current form before jumping to previous", function()
     prepare_buffer({
       content = { "(12345", "789)" },
       cursor = { 2, 1 },
