@@ -1,21 +1,49 @@
 local paredit = require("nvim-paredit.api")
 
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
+local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe("form raising", function()
   vim.api.nvim_buf_set_option(0, "filetype", "clojure")
 
   it("should raise the form", function()
-    prepare_buffer({
-      content = "(a (b c))",
-      cursor = { 1, 6 },
-    })
-
-    paredit.raise_form()
-    expect({
-      content = "(b c)",
-      cursor = { 1, 0 },
+    expect_all(paredit.raise_form, {
+      {
+        "list",
+        before_content = "(a (b c))",
+        before_cursor = { 1, 6 },
+        after_content = "(b c)",
+        after_cursor = { 1, 0 },
+      },
+      {
+        "list with deref",
+        before_content = "(a @(b c))",
+        before_cursor = { 1, 5 },
+        after_content = "@(b c)",
+        after_cursor = { 1, 0 },
+      },
+      {
+        "quoted list",
+        before_content = "(a '(b c))",
+        before_cursor = { 1, 5 },
+        after_content = "'(b c)",
+        after_cursor = { 1, 0 },
+      },
+      {
+        "set",
+        before_content = "(a #{b c})",
+        before_cursor = { 1, 5 },
+        after_content = "#{b c}",
+        after_cursor = { 1, 0 },
+      },
+      {
+        "anon fn",
+        before_content = "(a #(b c))",
+        before_cursor = { 1, 5 },
+        after_content = "#(b c)",
+        after_cursor = { 1, 0 },
+      },
     })
   end)
 

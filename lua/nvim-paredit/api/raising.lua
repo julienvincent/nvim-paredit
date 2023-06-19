@@ -6,9 +6,11 @@ local M = {}
 
 function M.raise_form()
   local lang = langs.get_language_api()
-  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang,
-  })
+  local current_form = lang.get_node_root(
+    traversal.find_nearest_form(ts.get_node_at_cursor(), {
+      lang = lang,
+    })
+  )
   if not current_form then
     return
   end
