@@ -8,31 +8,42 @@ local M = {
   api = require("nvim-paredit.api"),
 }
 
-function M.setup(opts)
-  config.update_config(common.merge(defaults.defaults, opts))
+local function setup_keybingings(filetype)
+  local filetypes = config.config.filetypes
+  local keys = config.config.keys
 
+  if common.included_in_table(filetypes, filetype) then
+    keybindings.setup_keybindings({
+      keys = keys,
+      buf = 0,
+    })
+  end
+end
+
+function M.setup(opts)
   for filetype, api in pairs(opts.extensions or {}) do
     lang.add_language_extension(filetype, api)
   end
 
+  local filetypes = opts.filetypes or lang.filetypes()
+  local keys = opts.keys or {}
+
   if type(opts.use_default_keys) ~= "boolean" or opts.use_default_keys then
-    config.update_config({
-      keys = common.merge(defaults.default_keys, opts.keys or {})
-    })
+    keys = common.merge(defaults.default_keys, opts.keys or {})
   end
+
+  config.update_config({
+    filetypes = filetypes,
+    keys = keys,
+  })
+
+  setup_keybingings(vim.bo.filetype)
 
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("Paredit", { clear = true }),
     pattern = "*",
     callback = function(event)
-      if not common.included_in_table(lang.filetypes(), event.match) then
-        return
-      end
-
-      keybindings.setup_keybindings({
-        keys = config.config.keys or {},
-        buf = event.buf
-      })
+      setup_keybingings(event.match)
     end,
   })
 end
