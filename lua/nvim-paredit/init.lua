@@ -40,10 +40,10 @@ function M.setup(opts)
     keys = common.merge(defaults.default_keys, opts.keys or {})
   end
 
-  config.update_config({
+  config.update_config(common.merge(opts, {
     filetypes = filetypes,
     keys = keys,
-  })
+  }))
 
   setup_keybingings(vim.bo.filetype)
 
