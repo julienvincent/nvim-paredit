@@ -25,7 +25,15 @@ function M.setup(opts)
     lang.add_language_extension(filetype, api)
   end
 
-  local filetypes = opts.filetypes or lang.filetypes()
+  local filetypes
+  if type(opts.filetypes) == "table" then
+    -- substract langs form opts.filetypes to avoid
+    -- binding keymaps to unsupported buffers
+    filetypes = common.remove_extras(opts.filetypes, lang.filetypes())
+  else
+    filetypes = lang.filetypes()
+  end
+
   local keys = opts.keys or {}
 
   if type(opts.use_default_keys) ~= "boolean" or opts.use_default_keys then
