@@ -8,14 +8,14 @@ local M = {
   api = require("nvim-paredit.api"),
 }
 
-local function setup_keybingings(filetype)
+local function setup_keybingings(filetype, buf)
   local filetypes = config.config.filetypes
   local keys = config.config.keys
 
   if common.included_in_table(filetypes, filetype) then
     keybindings.setup_keybindings({
       keys = keys,
-      buf = 0,
+      buf = buf,
     })
   end
 end
@@ -29,7 +29,7 @@ function M.setup(opts)
   if type(opts.filetypes) == "table" then
     -- substract langs form opts.filetypes to avoid
     -- binding keymaps to unsupported buffers
-    filetypes = common.remove_extras(opts.filetypes, lang.filetypes())
+    filetypes = common.intersection(opts.filetypes, lang.filetypes())
   else
     filetypes = lang.filetypes()
   end
@@ -51,7 +51,7 @@ function M.setup(opts)
     group = vim.api.nvim_create_augroup("Paredit", { clear = true }),
     pattern = "*",
     callback = function(event)
-      setup_keybingings(event.match)
+      setup_keybingings(event.match, event.buf)
     end,
   })
 end

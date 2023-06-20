@@ -42,8 +42,8 @@ end
 -- Removes all extra keys from t1 which is not in original
 -- and returns a new table
 --
--- remove_extras({ "a", "b", "f", "d"}, {"a", "b", "c"}) => { "a", "b" }
-function M.remove_extras(tbl, original)
+-- intersection({ "a", "b", "f", "d"}, {"a", "b", "c"}) => { "a", "b" }
+function M.intersection(tbl, original)
   local original_set = {}
   for _, v in ipairs(original) do
     original_set[v] = true
