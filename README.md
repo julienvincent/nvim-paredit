@@ -52,7 +52,7 @@ use {
 
 ```lua
 require("nvim-paredit").setup({
-  -- should plugin use default keybindings? (default = false)
+  -- should plugin use default keybindings? (default = true)
   use_default_keys = true,
   -- sometimes user wants to restrict plugin to certain file types only
   -- defaults to all supported file types including custom lang
