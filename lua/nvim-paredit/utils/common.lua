@@ -39,4 +39,25 @@ function M.compare_positions(a, b)
   return -1
 end
 
+-- Removes all extra keys from t1 which is not in original
+-- and returns a new table
+--
+-- intersection({ "a", "b", "f", "d"}, {"a", "b", "c"}) => { "a", "b" }
+function M.intersection(tbl, original)
+  local original_set = {}
+  for _, v in ipairs(original) do
+    original_set[v] = true
+  end
+
+  local result = {}
+  for _, v in ipairs(tbl) do
+    if original_set[v] then
+      table.insert(result, v)
+    end
+  end
+
+  return result
+end
+
 return M
+

@@ -13,10 +13,10 @@
 
 The goal of `nvim-paredit` is to provide a comparable s-expression editing experience in Neovim to that provided by Emacs. This is what is provided:
 
-+ Treesitter based lisp structural editing and cursor motions
-+ Dot-repeatable keybindings
-+ Language extensibility
-+ Programmable API
+- Treesitter based lisp structural editing and cursor motions
+- Dot-repeatable keybindings
+- Language extensibility
+- Programmable API
 
 ## Project Status
 
@@ -29,7 +29,7 @@ You will experience bugs and there are still several unimplemented operations. T
 ### Using [folke/lazy.vim](https://github.com/folke/lazy.nvim)
 
 ```lua
-{ 
+{
   "julienvincent/nvim-paredit",
   config = function()
     require("nvim-paredit").setup()
@@ -52,8 +52,14 @@ use {
 
 ```lua
 require("nvim-paredit").setup({
+  -- should plugin use default keybindings? (default = true)
   use_default_keys = true,
+  -- sometimes user wants to restrict plugin to certain file types only
+  -- defaults to all supported file types including custom lang
+  -- extensions (see next section)
+  filetypes = { "clojure" },
   cursor_behaviour = "auto", -- remain, follow, auto
+  -- list of default keybindings
   keys = {
     [">)"] = { paredit.api.slurp_forwards, "Slurp forwards" },
     [">("] = { paredit.api.slurp_backwards, "Slurp backwards" },
@@ -70,15 +76,24 @@ require("nvim-paredit").setup({
     ["<localleader>o"] = { paredit.api.raise_form, "Raise form" },
     ["<localleader>O"] = { paredit.api.raise_element, "Raise element" },
 
-    ["E"] = { paredit.api.move_to_next_element, "Jump to next element tail", repeatable = false },
-    ["B"] = { paredit.api.move_to_prev_element, "Jump to previous element head", repeatable = false },
+    ["E"] = { 
+      paredit.api.move_to_next_element,
+      "Jump to next element tail",
+      -- by default all keybindings are dot repeatable
+      repeatable = false 
+    },
+    ["B"] = {
+      paredit.api.move_to_prev_element, 
+      "Jump to previous element head",
+      repeatable = false
+    },
   }
 })
 ```
 
 ## Language Support
 
-As this is built using Treesitter it requires that you have the relevant Treesitter grammar installed for your language of choice. Additionally `nvim-paredit` will need explicit support for the treesitter grammar as the node names and metadata of nodes vary between languages. 
+As this is built using Treesitter it requires that you have the relevant Treesitter grammar installed for your language of choice. Additionally `nvim-paredit` will need explicit support for the treesitter grammar as the node names and metadata of nodes vary between languages.
 
 Right now `nvim-paredit` only has built in support for `clojure` but exposes an extension API for adding support for other lisp dialects. Extensions can either be added as config when calling `setup`:
 
@@ -87,7 +102,7 @@ require("nvim-paredit").setup({
   extensions = {
     commonlisp = {
       -- Should return the 'root' of the given Treesitter node. For example:
-      -- The node at cursor in the below example is `()` or 'list_lit': 
+      -- The node at cursor in the below example is `()` or 'list_lit':
       --   '(|)
       -- But the node root is `'()` or 'quoting_lit'
       get_node_root = function(node)
@@ -119,7 +134,7 @@ require("nvim-paredit").setup({
 })
 ```
 
-Or by calling the `add_language_extension` API directly. This would be the recommended approach for extension plugin authors.
+Or by calling the `add_language_extension` API directly before the setup. This would be the recommended approach for extension plugin authors.
 
 ```lua
 require("nvim-paredit.lang").add_language_extension("commonlisp", { ... }).
@@ -134,15 +149,15 @@ local paredit = require("nvim-paredit")
 paredit.api.slurp_forwards()
 ```
 
-+ **`slurp_forwards`**
-+ **`slurp_backwards`**
-+ **`barf_forwards`**
-+ **`barf_backwards`**
-+ **`drag_element_forwards`**
-+ **`drag_element_backwards`**
-+ **`drag_form_forwards`**
-+ **`drag_form_backwards`**
-+ **`raise_element`**
-+ **`raise_form`**
-+ **`move_to_next_element`**
-+ **`move_to_prev_element`**
+- **`slurp_forwards`**
+- **`slurp_backwards`**
+- **`barf_forwards`**
+- **`barf_backwards`**
+- **`drag_element_forwards`**
+- **`drag_element_backwards`**
+- **`drag_form_forwards`**
+- **`drag_form_backwards`**
+- **`raise_element`**
+- **`raise_form`**
+- **`move_to_next_element`**
+- **`move_to_prev_element`**

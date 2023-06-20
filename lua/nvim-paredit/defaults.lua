@@ -23,6 +23,7 @@ M.default_keys = {
 }
 
 M.defaults = {
+  use_default_keys = true,
   cursor_behaviour = "auto", -- remain, follow, auto
   keys = {}
 }
