@@ -18,14 +18,24 @@ M.default_keys = {
   ["<localleader>o"] = { api.raise_form, "Raise form" },
   ["<localleader>O"] = { api.raise_element, "Raise element" },
 
-  ["E"] = { api.move_to_next_element, "Jump to next element tail", repeatable = false },
-  ["B"] = { api.move_to_prev_element, "Jump to previous element head", repeatable = false },
+  ["E"] = {
+    api.move_to_next_element,
+    "Next element tail",
+    repeatable = false,
+    operator = true,
+  },
+  ["B"] = {
+    api.move_to_prev_element,
+    "Previous element head",
+    repeatable = false,
+    operator = true,
+  },
 }
 
 M.defaults = {
   use_default_keys = true,
   cursor_behaviour = "auto", -- remain, follow, auto
-  keys = {}
+  keys = {},
 }
 
 return M
