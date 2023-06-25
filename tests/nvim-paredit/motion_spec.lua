@@ -133,9 +133,9 @@ describe("motions", function()
       },
       {
         "backwards",
-        before_content = "(aa  )",
-        before_cursor = { 1, 4 },
-        after_cursor = { 1, 1 },
+        before_content = "(aa) (bb) ",
+        before_cursor = { 1, 9 },
+        after_cursor = { 1, 5 },
         action = paredit.move_to_prev_element
       },
       {
