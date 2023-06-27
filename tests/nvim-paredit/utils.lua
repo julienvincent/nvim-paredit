@@ -1,5 +1,13 @@
 local M = {}
 
+local function escape_keys(keys)
+  return vim.api.nvim_replace_termcodes(keys, true, false, true)
+end
+
+function M.feedkeys(keys)
+  vim.api.nvim_feedkeys(escape_keys(keys), "xmt", true)
+end
+
 function M.prepare_buffer(params)
   vim.api.nvim_buf_set_option(0, "filetype", "clojure")
 
