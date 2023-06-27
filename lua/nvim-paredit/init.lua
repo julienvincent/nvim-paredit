@@ -40,6 +40,7 @@ function M.setup(opts)
     keys = common.merge(defaults.default_keys, opts.keys or {})
   end
 
+  config.update_config(defaults.defaults)
   config.update_config(common.merge(opts, {
     filetypes = filetypes,
     keys = keys,
