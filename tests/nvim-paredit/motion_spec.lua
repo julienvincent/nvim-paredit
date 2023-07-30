@@ -161,7 +161,7 @@ describe("motions", function()
       cursor = { 1, 2 },
     })
 
-    internal_api._move_to_next_element(2)
+    internal_api._move_to_element(2, false)
     expect({
       cursor = { 1, 13 },
     })
@@ -176,7 +176,7 @@ describe("motions", function()
       cursor = { 1, 18 },
     })
 
-    internal_api._move_to_prev_element(3)
+    internal_api._move_to_element(3, true)
     expect({
       cursor = { 1, 4 },
     })
