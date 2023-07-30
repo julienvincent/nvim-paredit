@@ -81,13 +81,16 @@ end
 local function get_sibling_ignoring_comments(node, opts)
   local sibling = opts.sibling_fn(node)
   if not sibling then
-    return
+    return opts.sibling or nil
   end
 
   if sibling:extra() or opts.lang.node_is_comment(sibling) then
     return get_sibling_ignoring_comments(sibling, opts)
   elseif opts.count > 1 then
-    local new_opts = vim.tbl_deep_extend("force", opts, { count = opts.count - 1})
+    local new_opts = vim.tbl_deep_extend("force", opts, {
+      count = opts.count - 1,
+      sibling = sibling
+    })
     return get_sibling_ignoring_comments(sibling, new_opts)
   end
 
@@ -97,7 +100,7 @@ end
 function M.get_next_sibling_ignoring_comments(node, opts)
   return get_sibling_ignoring_comments(node, {
     lang = opts.lang,
-    count = opts.count,
+    count = opts.count or 1,
     sibling_fn = function(n)
       return n:next_named_sibling()
     end,
@@ -107,7 +110,7 @@ end
 function M.get_prev_sibling_ignoring_comments(node, opts)
   return get_sibling_ignoring_comments(node, {
     lang = opts.lang,
-    count = opts.count,
+    count = opts.count or 1,
     sibling_fn = function(n)
       return n:prev_named_sibling()
     end,
