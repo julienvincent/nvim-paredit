@@ -1,4 +1,5 @@
 local paredit = require("nvim-paredit.api")
+local internal_api = require("nvim-paredit.api.motions")
 
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local expect_all = require("tests.nvim-paredit.utils").expect_all
@@ -83,7 +84,7 @@ describe("motions", function()
       },
       {
         "multi line",
-        before_content = {"((a", ") (b))"},
+        before_content = { "((a", ") (b))" },
         before_cursor = { 1, 1 },
         after_cursor = { 2, 0 },
       },
@@ -100,7 +101,7 @@ describe("motions", function()
       },
       {
         "multi line",
-        before_content = {"((a) (", "b))"},
+        before_content = { "((a) (", "b))" },
         before_cursor = { 2, 1 },
         after_cursor = { 1, 5 },
       },
@@ -108,50 +109,76 @@ describe("motions", function()
   end)
 
   it("should move to the next element even when on whitespace", function()
-    expect_all(function()
-    end, {
+    expect_all(function() end, {
       {
         "forwards",
         before_content = "( bb)",
         before_cursor = { 1, 1 },
         after_cursor = { 1, 3 },
-        action = paredit.move_to_next_element
+        action = paredit.move_to_next_element,
       },
       {
         "forwards skipping comments",
-        before_content = {"( ;; comment", "bb)"},
+        before_content = { "( ;; comment", "bb)" },
         before_cursor = { 1, 1 },
         after_cursor = { 2, 1 },
-        action = paredit.move_to_next_element
+        action = paredit.move_to_next_element,
       },
       {
         "forwards from no char",
         before_content = { "(bb", "", "cc)" },
         before_cursor = { 2, 0 },
         after_cursor = { 3, 1 },
-        action = paredit.move_to_next_element
+        action = paredit.move_to_next_element,
       },
       {
         "backwards",
         before_content = "(aa) (bb) ",
         before_cursor = { 1, 9 },
         after_cursor = { 1, 5 },
-        action = paredit.move_to_prev_element
+        action = paredit.move_to_prev_element,
       },
       {
         "backwards skipping comments",
-        before_content = {"(aa ;; comment", " )"},
+        before_content = { "(aa ;; comment", " )" },
         before_cursor = { 2, 0 },
         after_cursor = { 1, 1 },
-        action = paredit.move_to_prev_element
+        action = paredit.move_to_prev_element,
       },
       {
         "backwards from no char",
         before_content = { "(bb", "", "cc)" },
         before_cursor = { 2, 0 },
         after_cursor = { 1, 1 },
-        action = paredit.move_to_prev_element
+        action = paredit.move_to_prev_element,
       },
+    })
+  end)
+
+  it("should support v:count", function()
+    prepare_buffer({
+      content = "(aa (bb) @(cc) #{1})",
+      cursor = { 1, 2 },
+    })
+
+    internal_api._move_to_element(2, false)
+    expect({
+      cursor = { 1, 13 },
+    })
+
+    internal_api.move_to_next_element()
+    expect({
+      cursor = { 1, 18 },
+    })
+
+    internal_api.move_to_next_element()
+    expect({
+      cursor = { 1, 18 },
+    })
+
+    internal_api._move_to_element(3, true)
+    expect({
+      cursor = { 1, 4 },
     })
   end)
 end)
