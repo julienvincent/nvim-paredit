@@ -65,6 +65,7 @@ local function get_next_node_from_cursor(lang, reversed)
 end
 
 function M.move_to_next_element()
+  local count = vim.v.count1
   local lang = langs.get_language_api()
 
   local current_node = get_next_node_from_cursor(lang, false)
@@ -76,12 +77,21 @@ function M.move_to_next_element()
   cursor_pos = { cursor_pos[1] - 1, cursor_pos[2] }
   local node_end = { current_node:end_() }
 
-  local next_pos
+  local is_before_end = false
   if common.compare_positions({ node_end[1], node_end[2] - 1 }, cursor_pos) == 1 then
+    is_before_end = true
+  end
+
+  local next_pos
+  if is_before_end and count == 1 then
     next_pos = node_end
   else
+    if is_before_end then
+      count = count - 1
+    end
     local next_sibling = traversal.get_next_sibling_ignoring_comments(current_node, {
       lang = lang,
+      count = count
     })
     if next_sibling then
       next_pos = { next_sibling:end_() }
@@ -96,6 +106,7 @@ function M.move_to_next_element()
 end
 
 function M.move_to_prev_element()
+  local count = vim.v.count1
   local lang = langs.get_language_api()
   local current_node = get_next_node_from_cursor(lang, true)
   if not current_node then
@@ -106,12 +117,22 @@ function M.move_to_prev_element()
   cursor_pos = { cursor_pos[1] - 1, cursor_pos[2] }
   local current_node_start = { current_node:start() }
 
-  local next_pos
+
+  local is_before_end = false
   if common.compare_positions(cursor_pos, current_node_start) == 1 then
+    is_before_end = true
+  end
+
+  local next_pos
+  if is_before_end and vim.v.count1 == 1 then
     next_pos = current_node_start
   else
+    if is_before_end then
+      count = count - 1
+    end
     local prev_sibling = traversal.get_prev_sibling_ignoring_comments(current_node, {
       lang = lang,
+      count = count
     })
     if prev_sibling then
       next_pos = { prev_sibling:start() }
