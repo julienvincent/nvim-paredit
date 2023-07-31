@@ -18,6 +18,10 @@ The goal of `nvim-paredit` is to provide a comparable s-expression editing exper
 - Language extensibility
 - Programmable API
 
+---
+
+![Demo](./assets/demo.gif)
+
 ## Project Status
 
 This is currently **beta software**. It works well in the workflows of the current maintainers but has not been thoroughly tested with many users.
