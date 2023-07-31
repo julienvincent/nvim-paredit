@@ -160,3 +160,20 @@ paredit.api.slurp_forwards()
 - **`raise_form`**
 - **`move_to_next_element`**
 - **`move_to_prev_element`**
+
+## Prior Art
+
+### [vim-sexp](https://github.com/guns/vim-sexp)
+
+Currently the de-facto s-expression editing plugin with the most extensive set of available editing operations. If you are looking for a more complete plugin with a wider range of supported languages then you might want to look into using this instead.
+
+The main reasons you might want to consider `nvim-paredit` instead are:
+
++ Easier configuration and an exposed lua API
++ Control over how the cursor is moved during slurp/barf. (For example if you don't want the cursor to always be moved)
++ Recursive slurp/barf operations. If your cursor is in a nested form you can still slurp from the forms parent(s)
++ Subjectively better out-of-the-box keybindings
+
+### [vim-sexp-mappings-for-regular-people](https://github.com/tpope/vim-sexp-mappings-for-regular-people)
+
+A companion to `vim-sexp` which configures `vim-sexp` with better mappings. The default mappings for `nvim-paredit` were derived from here.
