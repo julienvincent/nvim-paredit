@@ -18,11 +18,15 @@ The goal of `nvim-paredit` is to provide a comparable s-expression editing exper
 - Language extensibility
 - Programmable API
 
+---
+
+![Demo](./assets/demo.gif)
+
 ## Project Status
 
-This is currently **alpha software**.
+This is currently **beta software**. It works well in the workflows of the current maintainers but has not been thoroughly tested with many users.
 
-You will experience bugs and there are still several unimplemented operations. The fundamental operations are mostly complete and probably work as expected in 90% of cases. You can probably switch to using this full time if you can tolerate some oddities and don't need the unimplemented operations.
+It currently only has first-class support for the `clojure` language and has a focus on supporting the fundamental paredit operations and motions.
 
 ## Installation
 
@@ -34,17 +38,6 @@ You will experience bugs and there are still several unimplemented operations. T
   config = function()
     require("nvim-paredit").setup()
   end
-}
-```
-
-### Using [Packer](https://github.com/wbthomason/packer.nvim)
-
-```lua
-use {
-  "julienvincent/nvim-paredit",
-  config = function()
-    require('nvim-paredit').setup()
-  end,
 }
 ```
 
@@ -95,7 +88,9 @@ require("nvim-paredit").setup({
 
 As this is built using Treesitter it requires that you have the relevant Treesitter grammar installed for your language of choice. Additionally `nvim-paredit` will need explicit support for the treesitter grammar as the node names and metadata of nodes vary between languages.
 
-Right now `nvim-paredit` only has built in support for `clojure` but exposes an extension API for adding support for other lisp dialects. Extensions can either be added as config when calling `setup`:
+Right now `nvim-paredit` only has built in support for `clojure` but exposes an extension API for adding support for other lisp dialects. This API is considered **very alpha** and may change without warning to properly account for other languages when attempts are made to add support.
+
+Extensions can either be added as config when calling `setup`:
 
 ```lua
 require("nvim-paredit").setup({
@@ -140,9 +135,13 @@ Or by calling the `add_language_extension` API directly before the setup. This w
 require("nvim-paredit.lang").add_language_extension("commonlisp", { ... }).
 ```
 
+---
+
+As no attempt has been made to add support for other grammars I have no idea if the language extension API's are actually sufficient for adding additional languages. They will evolve as attempts are made.
+
 ## API
 
-The api is exposed as `paredit.api`:
+The core API is exposed as `paredit.api`:
 
 ```lua
 local paredit = require("nvim-paredit")
@@ -161,3 +160,20 @@ paredit.api.slurp_forwards()
 - **`raise_form`**
 - **`move_to_next_element`**
 - **`move_to_prev_element`**
+
+## Prior Art
+
+### [vim-sexp](https://github.com/guns/vim-sexp)
+
+Currently the de-facto s-expression editing plugin with the most extensive set of available editing operations. If you are looking for a more complete plugin with a wider range of supported languages then you might want to look into using this instead.
+
+The main reasons you might want to consider `nvim-paredit` instead are:
+
++ Easier configuration and an exposed lua API
++ Control over how the cursor is moved during slurp/barf. (For example if you don't want the cursor to always be moved)
++ Recursive slurp/barf operations. If your cursor is in a nested form you can still slurp from the forms parent(s)
++ Subjectively better out-of-the-box keybindings
+
+### [vim-sexp-mappings-for-regular-people](https://github.com/tpope/vim-sexp-mappings-for-regular-people)
+
+A companion to `vim-sexp` which configures `vim-sexp` with better mappings. The default mappings for `nvim-paredit` were derived from here.
