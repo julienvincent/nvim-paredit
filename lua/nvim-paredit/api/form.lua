@@ -32,7 +32,6 @@ function M.wrap_element_under_cursor(prefix, suffix)
   local enclosing_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
     lang = lang,
   })
-  print(vim.treesitter.get_node_text(enclosing_form, buf))
   return enclosing_form
 end
 
