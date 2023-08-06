@@ -30,7 +30,6 @@ function M.wrap_element_under_cursor(prefix, suffix)
 
   M.wrap_element(buf, current_element, prefix, suffix)
 
-  local lang = langs.get_language_api()
   local parser = vim.treesitter.get_parser(buf, vim.bo.filetype)
   parser:parse()
   local enclosing_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
