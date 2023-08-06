@@ -14,13 +14,17 @@ function M.wrap_element(buf, element, prefix, suffix)
 end
 
 function M.wrap_element_under_cursor(prefix, suffix)
-  if langs.is_whitespace_under_cursor() then
-    return
-  end
-
   local buf = vim.api.nvim_get_current_buf()
   local current_element = ts.get_node_at_cursor()
+  local lang = langs.get_language_api()
+
   if not current_element then
+    return
+  end
+  if lang.node_is_comment(current_element) then
+    return
+  end
+  if langs.is_whitespace_under_cursor() then
     return
   end
 
