@@ -74,6 +74,33 @@ describe("motions", function()
     })
   end)
 
+  it("make an extra motion if cursor is in comment", function()
+    prepare_buffer({
+      content = { "(aa", ";; comment", "bb)" },
+      cursor = { 2, 3 },
+    })
+    paredit.move_to_next_element()
+    expect({
+      cursor = { 3, 1 },
+    })
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 3, 0 },
+    })
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 1, 1 },
+    })
+    prepare_buffer({
+      content = { "(aa", ";; comment", "bb)" },
+      cursor = { 2, 3 },
+    })
+    paredit.move_to_prev_element()
+    expect({
+      cursor = { 1, 1 },
+    })
+  end)
+
   it("should move to the end of the current form before jumping to next", function()
     expect_all(paredit.move_to_next_element, {
       {
