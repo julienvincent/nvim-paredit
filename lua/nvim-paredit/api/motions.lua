@@ -88,6 +88,9 @@ function M._move_to_element(count, reversed)
     end
   end
 
+  if lang.node_is_comment(current_node) then
+    count = count + 1
+  end
   local next_pos
   if is_in_middle and count == 1 then
     next_pos = node_edge
