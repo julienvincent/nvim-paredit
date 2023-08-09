@@ -3,6 +3,7 @@ local barfing = require("nvim-paredit.api.barfing")
 local dragging = require("nvim-paredit.api.dragging")
 local raising = require("nvim-paredit.api.raising")
 local motions = require("nvim-paredit.api.motions")
+local deletions = require("nvim-paredit.api.deletions")
 
 local M = {
   slurp_forwards = slurping.slurp_forwards,
@@ -20,6 +21,10 @@ local M = {
 
   move_to_next_element = motions.move_to_next_element,
   move_to_prev_element = motions.move_to_prev_element,
+
+  delete_form = deletions.delete_form,
+  delete_in_form = deletions.delete_in_form,
+  delete_element = deletions.delete_element,
 }
 
 return M
