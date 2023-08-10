@@ -13,7 +13,7 @@
 
 The goal of `nvim-paredit` is to provide a comparable s-expression editing experience in Neovim to that provided by Emacs. This is what is provided:
 
-- Treesitter based lisp structural editing and cursor motions
+- Treesitter based lisp structural editing, cursor motions and text object selections
 - Dot-repeatable keybindings
 - Language extensibility
 - Programmable API
@@ -79,6 +79,20 @@ require("nvim-paredit").setup({
       paredit.api.move_to_prev_element, 
       "Jump to previous element head",
       repeatable = false
+    },
+
+    -- These are text object selection keybindings which can used with standard `d, y, c`
+    ["af"] = {
+      api.select_around_form,
+      "Around form",
+      repeatable = false,
+      mode = { "o" }
+    },
+    ["if"] = {
+      api.select_in_form,
+      "In form",
+      repeatable = false,
+      mode = { "o" }
     },
   }
 })
