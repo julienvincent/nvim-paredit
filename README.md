@@ -158,6 +158,9 @@ paredit.api.slurp_forwards()
 - **`drag_form_backwards`**
 - **`raise_element`**
 - **`raise_form`**
+- **`delete_form`**
+- **`delete_in_form`**
+- **`delete_element`**
 - **`move_to_next_element`**
 - **`move_to_prev_element`**
 
