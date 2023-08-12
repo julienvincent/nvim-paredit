@@ -42,10 +42,12 @@ function M.setup_keybindings(opts)
       fn = M.with_repeat(fn)
     end
 
-    vim.keymap.set({ "n", "x" }, keymap, fn, {
+    vim.keymap.set(action.mode or { "n", "x" }, keymap, fn, {
       desc = action[2],
       buffer = opts.buf or 0,
       expr = repeatable,
+      remap = false,
+      silent = true,
     })
 
     if operator then
@@ -53,6 +55,8 @@ function M.setup_keybindings(opts)
         desc = action[2],
         buffer = opts.buf or 0,
         expr = repeatable,
+        remap = false,
+        silent = true,
       })
     end
   end

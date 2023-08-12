@@ -30,6 +30,19 @@ M.default_keys = {
     repeatable = false,
     operator = true,
   },
+
+  ["af"] = {
+    api.select_around_form,
+    "Around form",
+    repeatable = false,
+    mode = { "o", "v" }
+  },
+  ["if"] = {
+    api.select_in_form,
+    "In form",
+    repeatable = false,
+    mode = { "o", "v" }
+  },
 }
 
 M.defaults = {

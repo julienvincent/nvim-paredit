@@ -58,4 +58,9 @@ function M.expect_all(action, expectations)
   end
 end
 
+function M.get_selected_text()
+  vim.cmd('noau normal! "vy"')
+  return vim.fn.getreg("v")
+end
+
 return M
