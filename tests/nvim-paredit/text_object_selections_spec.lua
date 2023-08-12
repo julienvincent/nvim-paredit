@@ -1,4 +1,5 @@
-local paredit = require("nvim-paredit.api")
+local keybindings = require("nvim-paredit.utils.keybindings")
+local defaults = require("nvim-paredit.defaults")
 
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local feedkeys = require("tests.nvim-paredit.utils").feedkeys
@@ -9,8 +10,9 @@ describe("form deletions", function()
   vim.api.nvim_buf_set_option(0, "filetype", "clojure")
 
   before_each(function()
-    vim.keymap.set("o", "af", paredit.select_around_form, { buffer = true, remap = false })
-    vim.keymap.set("o", "if", paredit.select_in_form, { buffer = true, remap = false })
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys,
+    })
   end)
 
   it("should delete the form", function()
@@ -78,8 +80,9 @@ describe("form selections", function()
   vim.api.nvim_buf_set_option(0, "filetype", "clojure")
 
   before_each(function()
-    vim.keymap.set("v", "af", paredit.select_around_form, { buffer = true, remap = false })
-    vim.keymap.set("v", "if", paredit.select_in_form, { buffer = true, remap = false })
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys,
+    })
   end)
 
   it("should select the form", function()

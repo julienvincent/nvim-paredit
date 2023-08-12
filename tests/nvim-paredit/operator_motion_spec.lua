@@ -2,15 +2,14 @@ local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local feedkeys = require("tests.nvim-paredit.utils").feedkeys
 local expect = require("tests.nvim-paredit.utils").expect
 local keybindings = require("nvim-paredit.utils.keybindings")
-local motions = require("nvim-paredit.api.motions")
 
-local next_element = keybindings.visualize(motions.move_to_next_element)
-local prev_element = keybindings.visualize(motions.move_to_prev_element)
+local defaults = require("nvim-paredit.defaults")
 
 describe("motions with operator pending", function()
   before_each(function()
-    vim.keymap.set("o", "E", next_element, { buffer = true })
-    vim.keymap.set("o", "B", prev_element, { buffer = true })
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys
+    })
   end)
 
   it("should delete next form", function()

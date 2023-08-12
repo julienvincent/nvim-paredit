@@ -73,26 +73,28 @@ require("nvim-paredit").setup({
       paredit.api.move_to_next_element,
       "Jump to next element tail",
       -- by default all keybindings are dot repeatable
-      repeatable = false 
+      repeatable = false,
+      mode = { "n", "x", "o", "v" },
     },
     ["B"] = {
       paredit.api.move_to_prev_element, 
       "Jump to previous element head",
-      repeatable = false
+      repeatable = false,
+      mode = { "n", "x", "o", "v" },
     },
 
-    -- These are text object selection keybindings which can used with standard `d, y, c`
+    -- These are text object selection keybindings which can used with standard `d, y, c`, `v`
     ["af"] = {
       api.select_around_form,
       "Around form",
       repeatable = false,
-      mode = { "o" }
+      mode = { "o", "v" }
     },
     ["if"] = {
       api.select_in_form,
       "In form",
       repeatable = false,
-      mode = { "o" }
+      mode = { "o", "v" }
     },
   }
 })
