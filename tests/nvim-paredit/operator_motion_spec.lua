@@ -86,8 +86,36 @@ describe("motions with operator pending", function()
       cursor = { 1, 4 },
     })
   end)
-  after_each(function()
-    vim.keymap.del("o", "E")
-    vim.keymap.del("o", "B")
+end)
+
+describe("motions with operator pending and v:count", function()
+  before_each(function()
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys
+    })
+  end)
+
+  it("should delete the next 2 elements", function()
+    prepare_buffer({
+      content = "(aa bb cc)",
+      cursor = { 1, 4 },
+    })
+    feedkeys("d2<S-e>")
+    expect({
+      content = "(aa )",
+      cursor = { 1, 4 },
+    })
+  end)
+
+  it("should delete the previous 2 elements", function()
+    prepare_buffer({
+      content = "(aa bb cc)",
+      cursor = { 1, 8 },
+    })
+    feedkeys("d2<S-b>")
+    expect({
+      content = "(aa )",
+      cursor = { 1, 4 },
+    })
   end)
 end)

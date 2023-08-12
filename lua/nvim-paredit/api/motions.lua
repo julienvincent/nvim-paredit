@@ -134,13 +134,15 @@ local function ensure_visual_if_operator_pending()
 end
 
 function M.move_to_prev_element()
+  local count = vim.v.count1
   ensure_visual_if_operator_pending()
-  M._move_to_element(vim.v.count1, true)
+  M._move_to_element(count, true)
 end
 
 function M.move_to_next_element()
+  local count = vim.v.count1
   ensure_visual_if_operator_pending()
-  M._move_to_element(vim.v.count1, false)
+  M._move_to_element(count, false)
 end
 
 return M
