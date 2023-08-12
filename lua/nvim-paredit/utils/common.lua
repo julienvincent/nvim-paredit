@@ -59,5 +59,11 @@ function M.intersection(tbl, original)
   return result
 end
 
+function M.ensure_visual_mode()
+  if vim.api.nvim_get_mode().mode ~= "v" then
+    vim.api.nvim_command("normal! v")
+  end
+end
+
 return M
 

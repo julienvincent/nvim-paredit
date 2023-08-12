@@ -124,12 +124,25 @@ function M._move_to_element(count, reversed)
   vim.api.nvim_win_set_cursor(0, cursor_pos)
 end
 
+-- When in operator-pending mode (`o` or `no`) then we need to switch to
+-- visual mode in order for the operator to apply over a range of text.
+local function ensure_visual_if_operator_pending()
+  local mode = vim.api.nvim_get_mode().mode
+  if mode == "o" or mode == "no" then
+    common.ensure_visual_mode()
+  end
+end
+
 function M.move_to_prev_element()
-  M._move_to_element(vim.v.count1, true)
+  local count = vim.v.count1
+  ensure_visual_if_operator_pending()
+  M._move_to_element(count, true)
 end
 
 function M.move_to_next_element()
-  M._move_to_element(vim.v.count1, false)
+  local count = vim.v.count1
+  ensure_visual_if_operator_pending()
+  M._move_to_element(count, false)
 end
 
 return M

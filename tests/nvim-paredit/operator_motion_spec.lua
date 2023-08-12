@@ -2,15 +2,14 @@ local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local feedkeys = require("tests.nvim-paredit.utils").feedkeys
 local expect = require("tests.nvim-paredit.utils").expect
 local keybindings = require("nvim-paredit.utils.keybindings")
-local motions = require("nvim-paredit.api.motions")
 
-local next_element = keybindings.visualize(motions.move_to_next_element)
-local prev_element = keybindings.visualize(motions.move_to_prev_element)
+local defaults = require("nvim-paredit.defaults")
 
 describe("motions with operator pending", function()
   before_each(function()
-    vim.keymap.set("o", "E", next_element, { buffer = true })
-    vim.keymap.set("o", "B", prev_element, { buffer = true })
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys
+    })
   end)
 
   it("should delete next form", function()
@@ -87,8 +86,36 @@ describe("motions with operator pending", function()
       cursor = { 1, 4 },
     })
   end)
-  after_each(function()
-    vim.keymap.del("o", "E")
-    vim.keymap.del("o", "B")
+end)
+
+describe("motions with operator pending and v:count", function()
+  before_each(function()
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys
+    })
+  end)
+
+  it("should delete the next 2 elements", function()
+    prepare_buffer({
+      content = "(aa bb cc)",
+      cursor = { 1, 4 },
+    })
+    feedkeys("d2<S-e>")
+    expect({
+      content = "(aa )",
+      cursor = { 1, 4 },
+    })
+  end)
+
+  it("should delete the previous 2 elements", function()
+    prepare_buffer({
+      content = "(aa bb cc)",
+      cursor = { 1, 8 },
+    })
+    feedkeys("d2<S-b>")
+    expect({
+      content = "(aa )",
+      cursor = { 1, 4 },
+    })
   end)
 end)
