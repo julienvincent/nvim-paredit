@@ -23,6 +23,8 @@ local function setup_keybingings(filetype, buf)
 end
 
 function M.setup(opts)
+  opts = opts or {}
+
   for filetype, api in pairs(opts.extensions or {}) do
     lang.add_language_extension(filetype, api)
   end

@@ -22,13 +22,26 @@ M.default_keys = {
     api.move_to_next_element,
     "Next element tail",
     repeatable = false,
-    operator = true,
+    mode = { "n", "x", "o", "v" },
   },
   ["B"] = {
     api.move_to_prev_element,
     "Previous element head",
     repeatable = false,
-    operator = true,
+    mode = { "n", "x", "o", "v" },
+  },
+
+  ["af"] = {
+    api.select_around_form,
+    "Around form",
+    repeatable = false,
+    mode = { "o", "v" },
+  },
+  ["if"] = {
+    api.select_in_form,
+    "In form",
+    repeatable = false,
+    mode = { "o", "v" },
   },
 }
 
