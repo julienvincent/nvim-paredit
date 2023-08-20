@@ -37,10 +37,13 @@ function M.get_node_root(node)
 end
 
 function M.element_lit(node)
-  if node:type():match("name$") then
-    return M.element_lit(node:parent())
+  local lit = node
+  if lit then
+    if not lit:type():match("lit$") then
+      lit = M.element_lit(lit:parent())
+    end
   end
-  return node
+  return lit
 end
 
 function M.unwrap_form(node)

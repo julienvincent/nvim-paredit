@@ -9,7 +9,7 @@ local function reparse(buf)
   parser:parse()
 end
 
-local function find_element_under_cursor(lang)
+function M.find_element_under_cursor(lang)
   local node = ts.get_node_at_cursor()
   if lang.element_lit then
     return lang.element_lit(node)
@@ -47,7 +47,7 @@ end
 function M.wrap_element_under_cursor(prefix, suffix)
   local buf = vim.api.nvim_get_current_buf()
   local lang = langs.get_language_api()
-  local current_element = find_element_under_cursor(lang)
+  local current_element = M.find_element_under_cursor(lang)
 
   if not current_element then
     return
@@ -70,16 +70,16 @@ end
 function M.wrap_enclosing_form_under_cursor(prefix, suffix)
   local buf = vim.api.nvim_get_current_buf()
   local lang = langs.get_language_api()
-  local current_element = find_element_under_cursor(lang)
+  local current_element = M.find_element_under_cursor(lang)
 
   if not current_element then
     return
   end
 
-  local use_parent = langs.is_whitespace_under_cursor()
+  local use_direct_parent = langs.is_whitespace_under_cursor() or lang.node_is_comment(ts.get_node_at_cursor())
 
   local form
-  if use_parent then
+  if use_direct_parent then
     form = M.find_form(current_element, lang)
   else
     form = M.find_parend_form(current_element, lang)
@@ -89,8 +89,8 @@ function M.wrap_enclosing_form_under_cursor(prefix, suffix)
 
   reparse(buf)
 
-  current_element = find_element_under_cursor(lang)
-  if use_parent then
+  current_element = M.find_element_under_cursor(lang)
+  if use_direct_parent then
     form = current_element
   else
     form = M.find_parend_form(current_element, lang)

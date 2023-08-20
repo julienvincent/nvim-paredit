@@ -1,7 +1,7 @@
 local M = {}
 
 function M.insert_mode()
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("i", true, true, true), "n", false)
+  vim.api.nvim_feedkeys("i", "n", true)
 end
 
 function M.place_cursor(form, opts)
