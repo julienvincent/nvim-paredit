@@ -12,10 +12,7 @@ end
 
 function M.find_element_under_cursor(lang)
   local node = ts.get_node_at_cursor()
-  if lang.element_lit then
-    return lang.get_node_root(node)
-  end
-  return node
+  return lang.get_node_root(node)
 end
 
 function M.find_form(element, lang)
@@ -69,7 +66,7 @@ function M.wrap_element_under_cursor(prefix, suffix)
 
   reparse(buf)
 
-  current_element = lang.element_lit(ts.get_node_at_cursor())
+  current_element = lang.get_node_root(ts.get_node_at_cursor())
   return M.find_form(current_element, lang)
 end
 
