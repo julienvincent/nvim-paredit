@@ -99,7 +99,7 @@ function M.select_element()
   M.ensure_visual_mode()
   vim.api.nvim_win_set_cursor(0, { range[1] + 1, range[2] })
   vim.api.nvim_command("normal! o")
-  vim.api.nvim_win_set_cursor(0, { range[3] + 1, range[4] })
+  vim.api.nvim_win_set_cursor(0, { range[3] + 1, range[4] - 1 })
 end
 
 return M

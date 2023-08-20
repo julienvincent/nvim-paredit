@@ -103,3 +103,44 @@ describe("form selections", function()
     assert.are.same("a a", utils.get_selected_text())
   end)
 end)
+
+describe("element deletions", function()
+  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+
+  before_each(function()
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys,
+    })
+  end)
+
+  it("should delete the element", function()
+    prepare_buffer({
+      content = "(a :a/b)",
+      cursor = { 1, 5 },
+    })
+    feedkeys("die")
+    expect({
+      content = "(a )",
+      cursor = { 1, 3 },
+    })
+  end)
+end)
+
+describe("element selections", function()
+  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+
+  before_each(function()
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys,
+    })
+  end)
+
+  it("should select the element", function()
+    prepare_buffer({
+      content = "(a :a/b)",
+      cursor = { 1, 5 },
+    })
+    feedkeys("vie")
+    assert.are.same(":a/b", utils.get_selected_text())
+  end)
+end)
