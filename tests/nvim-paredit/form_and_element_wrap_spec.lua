@@ -29,6 +29,18 @@ describe("element and form wrap", function()
     })
   end)
 
+  it("should wrap top level form", function()
+    prepare_buffer({
+      content = { "(+ 2 :foo/bar)" },
+      cursor = { 1, 0 },
+    })
+
+    paredit.form.wrap_element_under_cursor("(", ")")
+    expect({
+      content = { "((+ 2 :foo/bar))" },
+    })
+  end)
+
   it("should wrap namespaced keyword", function()
     prepare_buffer({
       content = { '(+ 2 "lol")' },
@@ -56,6 +68,18 @@ describe("element and form wrap", function()
         "((+ 2",
         " :foo/bar))",
       },
+    })
+  end)
+
+  it("should fallback to current form if parent is source", function()
+    prepare_buffer({
+      content = { "(+ 2 :foo/bar)" },
+      cursor = { 1, 0 },
+    })
+
+    paredit.form.wrap_enclosing_form_under_cursor("(", ")")
+    expect({
+      content = { "((+ 2 :foo/bar))" },
     })
   end)
 

@@ -18,18 +18,23 @@ function M.find_element_under_cursor(lang)
 end
 
 function M.find_form(element, lang)
-  return traversal.find_nearest_form(element, { lang = lang })
+  return traversal.find_nearest_form(element, { lang = lang, use_source = false })
 end
 
 function M.find_parend_form(element, lang)
   local nearest_form = M.find_form(element, lang)
+
+  if not nearest_form then
+    return element
+  end
+
   local parent = nearest_form
 
-  if nearest_form == element then
+  if nearest_form:equal(element) then
     parent = nearest_form:parent()
   end
 
-  if parent then
+  if parent and parent:type() ~= "source" then
     return M.find_form(parent, lang)
   end
   return nearest_form
@@ -78,10 +83,8 @@ function M.wrap_enclosing_form_under_cursor(prefix, suffix)
 
   local use_direct_parent = langs.is_whitespace_under_cursor() or lang.node_is_comment(ts.get_node_at_cursor())
 
-  local form
-  if use_direct_parent then
-    form = M.find_form(current_element, lang)
-  else
+  local form = M.find_form(current_element, lang)
+  if not use_direct_parent and form:type() ~= "source" then
     form = M.find_parend_form(current_element, lang)
   end
 
