@@ -69,7 +69,7 @@ require("nvim-paredit").setup({
     ["<localleader>o"] = { paredit.api.raise_form, "Raise form" },
     ["<localleader>O"] = { paredit.api.raise_element, "Raise element" },
 
-    ["E"] = { 
+    ["E"] = {
       paredit.api.move_to_next_element,
       "Jump to next element tail",
       -- by default all keybindings are dot repeatable
@@ -77,7 +77,7 @@ require("nvim-paredit").setup({
       mode = { "n", "x", "o", "v" },
     },
     ["B"] = {
-      paredit.api.move_to_prev_element, 
+      paredit.api.move_to_prev_element,
       "Jump to previous element head",
       repeatable = false,
       mode = { "n", "x", "o", "v" },
@@ -120,6 +120,16 @@ require("nvim-paredit").setup({
       end,
       -- This is the inverse of `get_node_root` for forms and should find the inner node for which
       -- the forms elements are direct children.
+      --
+      -- In some languages (i.e. clojure) elements consists of several parts
+      -- keyword has up to three parts
+      -- :foo/hello is represented as:
+      --  kwd_lit (":")
+      --    namespace: kwd_ns ("foo")
+      --    name: kwd_name ("hello")
+      -- this function should return whole element, in this case kwd_lit
+      element_lit = function(node)
+      end,
       --
       -- For example given the node `'()` or 'quoting_lit', this function should return `()` or 'list_lit'.
       unwrap_form = function(node)
@@ -188,10 +198,10 @@ Currently the de-facto s-expression editing plugin with the most extensive set o
 
 The main reasons you might want to consider `nvim-paredit` instead are:
 
-+ Easier configuration and an exposed lua API
-+ Control over how the cursor is moved during slurp/barf. (For example if you don't want the cursor to always be moved)
-+ Recursive slurp/barf operations. If your cursor is in a nested form you can still slurp from the forms parent(s)
-+ Subjectively better out-of-the-box keybindings
+- Easier configuration and an exposed lua API
+- Control over how the cursor is moved during slurp/barf. (For example if you don't want the cursor to always be moved)
+- Recursive slurp/barf operations. If your cursor is in a nested form you can still slurp from the forms parent(s)
+- Subjectively better out-of-the-box keybindings
 
 ### [vim-sexp-mappings-for-regular-people](https://github.com/tpope/vim-sexp-mappings-for-regular-people)
 
