@@ -10,7 +10,11 @@ local function reparse(buf)
 end
 
 local function find_element_under_cursor(lang)
-  return lang.element_lit(ts.get_node_at_cursor())
+  local node = ts.get_node_at_cursor()
+  if lang.element_lit then
+    return lang.element_lit(node)
+  end
+  return node
 end
 
 function M.find_form(element, lang)
