@@ -36,6 +36,13 @@ function M.get_node_root(node)
   return traversal.find_root_element_relative_to(root, node)
 end
 
+function M.element_lit(node)
+  if node:type():match("name$") then
+    return M.element_lit(node:parent())
+  end
+  return node
+end
+
 function M.unwrap_form(node)
   if common.included_in_table(form_types, node:type()) then
     return node

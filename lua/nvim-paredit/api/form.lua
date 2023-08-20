@@ -4,6 +4,33 @@ local langs = require("nvim-paredit.lang")
 
 local M = {}
 
+local function reparse(buf)
+  local parser = vim.treesitter.get_parser(buf, vim.bo.filetype)
+  parser:parse()
+end
+
+local function find_element_under_cursor(lang)
+  return lang.element_lit(ts.get_node_at_cursor())
+end
+
+function M.find_form(element, lang)
+  return traversal.find_nearest_form(element, { lang = lang })
+end
+
+function M.find_parend_form(element, lang)
+  local nearest_form = M.find_form(element, lang)
+  local parent = nearest_form
+
+  if nearest_form == element then
+    parent = nearest_form:parent()
+  end
+
+  if parent then
+    return M.find_form(parent, lang)
+  end
+  return nearest_form
+end
+
 function M.wrap_element(buf, element, prefix, suffix)
   prefix = prefix or ""
   suffix = suffix or ""
@@ -15,8 +42,8 @@ end
 
 function M.wrap_element_under_cursor(prefix, suffix)
   local buf = vim.api.nvim_get_current_buf()
-  local current_element = ts.get_node_at_cursor()
   local lang = langs.get_language_api()
+  local current_element = find_element_under_cursor(lang)
 
   if not current_element then
     return
@@ -30,12 +57,41 @@ function M.wrap_element_under_cursor(prefix, suffix)
 
   M.wrap_element(buf, current_element, prefix, suffix)
 
-  local parser = vim.treesitter.get_parser(buf, vim.bo.filetype)
-  parser:parse()
-  local enclosing_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang,
-  })
-  return enclosing_form
+  reparse(buf)
+
+  current_element = lang.element_lit(ts.get_node_at_cursor())
+  return M.find_form(current_element, lang)
+end
+
+function M.wrap_enclosing_form_under_cursor(prefix, suffix)
+  local buf = vim.api.nvim_get_current_buf()
+  local lang = langs.get_language_api()
+  local current_element = find_element_under_cursor(lang)
+
+  if not current_element then
+    return
+  end
+
+  local use_parent = langs.is_whitespace_under_cursor()
+
+  local form
+  if use_parent then
+    form = M.find_form(current_element, lang)
+  else
+    form = M.find_parend_form(current_element, lang)
+  end
+
+  M.wrap_element(buf, form, prefix, suffix)
+
+  reparse(buf)
+
+  current_element = find_element_under_cursor(lang)
+  if use_parent then
+    form = current_element
+  else
+    form = M.find_parend_form(current_element, lang)
+  end
+  return M.find_parend_form(form, lang)
 end
 
 return M
