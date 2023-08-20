@@ -22,7 +22,7 @@ local function get_next_node_from_cursor(lang, reversed)
   local cursor = vim.api.nvim_win_get_cursor(0)
   cursor = { cursor[1] - 1, cursor[2] }
 
-  if not (lang.node_is_form(current_node) and langs.is_whitespace_under_cursor()) then
+  if not (lang.node_is_form(current_node) and common.is_whitespace_under_cursor(lang)) then
     return lang.get_node_root(current_node)
   end
 
