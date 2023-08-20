@@ -11,7 +11,7 @@ describe("element and form wrap", function()
       cursor = { 1, 4 },
     })
 
-    paredit.form.wrap_element_under_cursor("(", ")")
+    paredit.wrap.wrap_element_under_cursor("(", ")")
     expect({
       content = { "(+ 2 :foo/bar)" },
     })
@@ -23,7 +23,7 @@ describe("element and form wrap", function()
       cursor = { 1, 7 },
     })
 
-    paredit.form.wrap_element_under_cursor("(", ")")
+    paredit.wrap.wrap_element_under_cursor("(", ")")
     expect({
       content = { "(+ 2 (:foo/bar))" },
     })
@@ -35,7 +35,7 @@ describe("element and form wrap", function()
       cursor = { 1, 0 },
     })
 
-    paredit.form.wrap_element_under_cursor("(", ")")
+    paredit.wrap.wrap_element_under_cursor("(", ")")
     expect({
       content = { "((+ 2 :foo/bar))" },
     })
@@ -47,7 +47,7 @@ describe("element and form wrap", function()
       cursor = { 1, 7 },
     })
 
-    paredit.form.wrap_element_under_cursor("(", ")")
+    paredit.wrap.wrap_element_under_cursor("(", ")")
     expect({
       content = { '(+ 2 ("lol"))' },
     })
@@ -62,7 +62,7 @@ describe("element and form wrap", function()
       cursor = { 2, 4 },
     })
 
-    paredit.form.wrap_enclosing_form_under_cursor("(", ")")
+    paredit.wrap.wrap_enclosing_form_under_cursor("(", ")")
     expect({
       content = {
         "((+ 2",
@@ -77,7 +77,7 @@ describe("element and form wrap", function()
       cursor = { 1, 0 },
     })
 
-    paredit.form.wrap_enclosing_form_under_cursor("(", ")")
+    paredit.wrap.wrap_enclosing_form_under_cursor("(", ")")
     expect({
       content = { "((+ 2 :foo/bar))" },
     })
@@ -93,7 +93,7 @@ describe("element and form wrap", function()
       cursor = { 2, 4 },
     })
 
-    paredit.form.wrap_enclosing_form_under_cursor("(", ")")
+    paredit.wrap.wrap_enclosing_form_under_cursor("(", ")")
     expect({
       content = {
         "((+ 2",

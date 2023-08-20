@@ -1,4 +1,5 @@
 local traversal = require("nvim-paredit.utils.traversal")
+local common = require("nvim-paredit.utils.common")
 local ts = require("nvim-treesitter.ts_utils")
 local langs = require("nvim-paredit.lang")
 
@@ -60,7 +61,7 @@ function M.wrap_element_under_cursor(prefix, suffix)
   if lang.node_is_comment(current_element) then
     return
   end
-  if langs.is_whitespace_under_cursor() then
+  if common.is_whitespace_under_cursor(lang) then
     return
   end
 
@@ -81,7 +82,7 @@ function M.wrap_enclosing_form_under_cursor(prefix, suffix)
     return
   end
 
-  local use_direct_parent = langs.is_whitespace_under_cursor() or lang.node_is_comment(ts.get_node_at_cursor())
+  local use_direct_parent = common.is_whitespace_under_cursor(lang) or lang.node_is_comment(ts.get_node_at_cursor())
 
   local form = M.find_form(current_element, lang)
   if not use_direct_parent and form:type() ~= "source" then
