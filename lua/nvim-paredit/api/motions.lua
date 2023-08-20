@@ -5,8 +5,6 @@ local langs = require("nvim-paredit.lang")
 
 local M = {}
 
-local default_whitespace_chars = { " ", "," }
-
 -- When the cursor is placed on whitespace within a form then the node returned by
 -- the treesitter `get_node_at_cursor` fn is the outer form and not a child within
 -- the form.
@@ -24,13 +22,7 @@ local function get_next_node_from_cursor(lang, reversed)
   local cursor = vim.api.nvim_win_get_cursor(0)
   cursor = { cursor[1] - 1, cursor[2] }
 
-  local char_under_cursor = vim.api.nvim_buf_get_text(0, cursor[1], cursor[2], cursor[1], cursor[2] + 1, {})
-  local char_is_whitespace = common.included_in_table(
-    lang.whitespace_chars or default_whitespace_chars,
-    char_under_cursor[1]
-  ) or char_under_cursor[1] == ""
-
-  if not (lang.node_is_form(current_node) and char_is_whitespace) then
+  if not (lang.node_is_form(current_node) and common.is_whitespace_under_cursor(lang)) then
     return lang.get_node_root(current_node)
   end
 

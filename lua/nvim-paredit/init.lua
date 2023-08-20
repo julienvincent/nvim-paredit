@@ -6,6 +6,8 @@ local lang = require("nvim-paredit.lang")
 
 local M = {
   api = require("nvim-paredit.api"),
+  wrap = require("nvim-paredit.api.wrap"),
+  cursor = require("nvim-paredit.api.cursor"),
 }
 
 local function setup_keybingings(filetype, buf)

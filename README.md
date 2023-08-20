@@ -69,7 +69,7 @@ require("nvim-paredit").setup({
     ["<localleader>o"] = { paredit.api.raise_form, "Raise form" },
     ["<localleader>O"] = { paredit.api.raise_element, "Raise element" },
 
-    ["E"] = { 
+    ["E"] = {
       paredit.api.move_to_next_element,
       "Jump to next element tail",
       -- by default all keybindings are dot repeatable
@@ -77,7 +77,7 @@ require("nvim-paredit").setup({
       mode = { "n", "x", "o", "v" },
     },
     ["B"] = {
-      paredit.api.move_to_prev_element, 
+      paredit.api.move_to_prev_element,
       "Jump to previous element head",
       repeatable = false,
       mode = { "n", "x", "o", "v" },
@@ -180,6 +180,73 @@ paredit.api.slurp_forwards()
 - **`move_to_next_element`**
 - **`move_to_prev_element`**
 
+Form/element wrap api is in `paredit.wrap` module:
+
+- **`wrap_element_under_cursor`** - accepts prefix and suffix, returns wrapped `TSNode`
+- **`wrap_enclosing_form_under_cursor`** - accepts prefix and suffix, returns wrapped `TSNode`
+
+Cursor api `paredit.cursor`
+
+- **`place_cursor`** - accepts `TSNode`, and following options:
+  - `placement` - enumeration `left_edge`,`inner_start`,`inner_end`,`right_edge`
+  - `mode` - currently only `insert` is supported, defaults to `normal`
+
+## API usage recipes
+
+### `vim-sexp` wrap form (head/tail) replication
+
+Require api module:
+```lua
+local paredit = require("nvim-paredit.api")
+```
+Add following keybindings to config:
+```lua
+["<localleader>w"] = {
+  function()
+    -- place cursor and set mode to `insert`
+    paredit.cursor.place_cursor(
+      -- wrap element under cursor with `( ` and `)`
+      paredit.wrap.wrap_element_under_cursor("( ", ")"),
+      -- cursor placement opts
+      { placement = "inner_start", mode = "insert" }
+    )
+  end,
+  "Wrap element insert head",
+},
+
+["<localleader>W"] = {
+  function()
+    paredit.cursor.place_cursor(
+      paredit.wrap.wrap_element_under_cursor("(", ")"),
+      { placement = "inner_end", mode = "insert" }
+    )
+  end,
+  "Wrap element insert tail",
+},
+
+-- same as above but for enclosing form
+["<localleader>i"] = {
+  function()
+    paredit.cursor.place_cursor(
+      paredit.wrap.wrap_enclosing_form_under_cursor("( ", ")"),
+      { placement = "inner_start", mode = "insert" }
+    )
+  end,
+  "Wrap form insert head",
+},
+
+["<localleader>I"] = {
+  function()
+    paredit.cursor.place_cursor(
+      paredit.wrap.wrap_enclosing_form_under_cursor("(", ")"),
+      { placement = "inner_end", mode = "insert" }
+    )
+  end,
+  "Wrap form insert tail",
+}
+```
+Same approach can be used for other `vim-sexp` keybindings (e.g. `<localleader>e[`) with cursor placement or without.
+
 ## Prior Art
 
 ### [vim-sexp](https://github.com/guns/vim-sexp)
@@ -188,10 +255,10 @@ Currently the de-facto s-expression editing plugin with the most extensive set o
 
 The main reasons you might want to consider `nvim-paredit` instead are:
 
-+ Easier configuration and an exposed lua API
-+ Control over how the cursor is moved during slurp/barf. (For example if you don't want the cursor to always be moved)
-+ Recursive slurp/barf operations. If your cursor is in a nested form you can still slurp from the forms parent(s)
-+ Subjectively better out-of-the-box keybindings
+- Easier configuration and an exposed lua API
+- Control over how the cursor is moved during slurp/barf. (For example if you don't want the cursor to always be moved)
+- Recursive slurp/barf operations. If your cursor is in a nested form you can still slurp from the forms parent(s)
+- Subjectively better out-of-the-box keybindings
 
 ### [vim-sexp-mappings-for-regular-people](https://github.com/tpope/vim-sexp-mappings-for-regular-people)
 
