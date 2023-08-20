@@ -43,6 +43,19 @@ M.default_keys = {
     repeatable = false,
     mode = { "o", "v" },
   },
+
+  ["ae"] = {
+    api.select_element,
+    "Around element",
+    repeatable = false,
+    mode = { "o", "v" },
+  },
+  ["ie"] = {
+    api.select_element,
+    "Element",
+    repeatable = false,
+    mode = { "o", "v" },
+  },
 }
 
 M.defaults = {
