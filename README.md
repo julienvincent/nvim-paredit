@@ -121,16 +121,6 @@ require("nvim-paredit").setup({
       -- This is the inverse of `get_node_root` for forms and should find the inner node for which
       -- the forms elements are direct children.
       --
-      -- In some languages (i.e. clojure) elements consists of several parts
-      -- keyword has up to three parts
-      -- :foo/hello is represented as:
-      --  kwd_lit (":")
-      --    namespace: kwd_ns ("foo")
-      --    name: kwd_name ("hello")
-      -- this function should return whole element, in this case kwd_lit
-      element_lit = function(node)
-      end,
-      --
       -- For example given the node `'()` or 'quoting_lit', this function should return `()` or 'list_lit'.
       unwrap_form = function(node)
       end,

@@ -36,16 +36,6 @@ function M.get_node_root(node)
   return traversal.find_root_element_relative_to(root, node)
 end
 
-function M.element_lit(node)
-  local lit = node
-  if lit then
-    if not lit:type():match("lit$") then
-      lit = M.element_lit(lit:parent())
-    end
-  end
-  return lit
-end
-
 function M.unwrap_form(node)
   if common.included_in_table(form_types, node:type()) then
     return node

@@ -13,7 +13,7 @@ end
 function M.find_element_under_cursor(lang)
   local node = ts.get_node_at_cursor()
   if lang.element_lit then
-    return lang.element_lit(node)
+    return lang.get_node_root(node)
   end
   return node
 end
