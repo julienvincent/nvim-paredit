@@ -10,7 +10,7 @@ function M.place_cursor(range_or_node, opts)
   if type(range_or_node) == "table" then
     range = range_or_node
   elseif type(range_or_node) == "userdata" then
-    range = range_or_node:range()
+    range = { range_or_node:range() }
   end
 
   if not range then
