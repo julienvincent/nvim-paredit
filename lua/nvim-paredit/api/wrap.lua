@@ -45,6 +45,18 @@ function M.wrap_element(buf, element, prefix, suffix)
   local range = { element:range() }
   vim.api.nvim_buf_set_text(buf, range[3], range[4], range[3], range[4], { suffix })
   vim.api.nvim_buf_set_text(buf, range[1], range[2], range[1], range[2], { prefix })
+  local end_col
+  if (range[1] == range[3]) then
+    end_col = range[4] + prefix:len() + suffix:len() - 1
+  else
+    end_col = range[4] + suffix:len() - 1
+  end
+  return {
+    range[1],
+    range[2],
+    range[3],
+    end_col,
+  }
 end
 
 function M.wrap_element_under_cursor(prefix, suffix)
@@ -62,12 +74,7 @@ function M.wrap_element_under_cursor(prefix, suffix)
     return
   end
 
-  M.wrap_element(buf, current_element, prefix, suffix)
-
-  reparse(buf)
-
-  current_element = lang.get_node_root(ts.get_node_at_cursor())
-  return M.find_form(current_element, lang)
+  return M.wrap_element(buf, current_element, prefix, suffix)
 end
 
 function M.wrap_enclosing_form_under_cursor(prefix, suffix)
@@ -79,24 +86,15 @@ function M.wrap_enclosing_form_under_cursor(prefix, suffix)
     return
   end
 
-  local use_direct_parent = common.is_whitespace_under_cursor(lang) or lang.node_is_comment(ts.get_node_at_cursor())
+  local use_direct_parent = common.is_whitespace_under_cursor(lang)
+    or lang.node_is_comment(ts.get_node_at_cursor())
 
   local form = M.find_form(current_element, lang)
   if not use_direct_parent and form:type() ~= "source" then
     form = M.find_parend_form(current_element, lang)
   end
 
-  M.wrap_element(buf, form, prefix, suffix)
-
-  reparse(buf)
-
-  current_element = M.find_element_under_cursor(lang)
-  if use_direct_parent then
-    form = current_element
-  else
-    form = M.find_parend_form(current_element, lang)
-  end
-  return M.find_parend_form(form, lang)
+  return M.wrap_element(buf, form, prefix, suffix)
 end
 
 return M

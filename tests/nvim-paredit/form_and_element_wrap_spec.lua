@@ -11,7 +11,8 @@ describe("element and form wrap", function()
       cursor = { 1, 4 },
     })
 
-    paredit.wrap.wrap_element_under_cursor("(", ")")
+    local range = paredit.wrap.wrap_element_under_cursor("(", ")")
+    assert.falsy(range)
     expect({
       content = { "(+ 2 :foo/bar)" },
     })
@@ -23,7 +24,8 @@ describe("element and form wrap", function()
       cursor = { 1, 7 },
     })
 
-    paredit.wrap.wrap_element_under_cursor("(", ")")
+    local range = paredit.wrap.wrap_element_under_cursor("(", ")")
+    assert.are.same({ 0, 5, 0, 14 }, range)
     expect({
       content = { "(+ 2 (:foo/bar))" },
     })
@@ -35,7 +37,8 @@ describe("element and form wrap", function()
       cursor = { 1, 0 },
     })
 
-    paredit.wrap.wrap_element_under_cursor("(", ")")
+    local range = paredit.wrap.wrap_element_under_cursor("(", ")")
+    assert.are.same({ 0, 0, 0, 15 }, range)
     expect({
       content = { "((+ 2 :foo/bar))" },
     })
@@ -43,13 +46,14 @@ describe("element and form wrap", function()
 
   it("should wrap namespaced keyword", function()
     prepare_buffer({
-      content = { '(+ 2 "lol")' },
+      content = { "(+ 2 :foo/lol)" },
       cursor = { 1, 7 },
     })
 
-    paredit.wrap.wrap_element_under_cursor("(", ")")
+    local range = paredit.wrap.wrap_element_under_cursor("(", ")")
+    assert.are.same({ 0, 5, 0, 14 }, range)
     expect({
-      content = { '(+ 2 ("lol"))' },
+      content = { "(+ 2 (:foo/lol))" },
     })
   end)
 
@@ -62,7 +66,8 @@ describe("element and form wrap", function()
       cursor = { 2, 4 },
     })
 
-    paredit.wrap.wrap_enclosing_form_under_cursor("(", ")")
+    local range = paredit.wrap.wrap_enclosing_form_under_cursor("(", ")")
+    assert.are.same({ 0, 0, 1, 10 }, range)
     expect({
       content = {
         "((+ 2",
@@ -77,7 +82,8 @@ describe("element and form wrap", function()
       cursor = { 1, 0 },
     })
 
-    paredit.wrap.wrap_enclosing_form_under_cursor("(", ")")
+    local range = paredit.wrap.wrap_enclosing_form_under_cursor("(", ")")
+    assert.are.same({ 0, 0, 0, 15 }, range)
     expect({
       content = { "((+ 2 :foo/bar))" },
     })
@@ -93,7 +99,8 @@ describe("element and form wrap", function()
       cursor = { 2, 4 },
     })
 
-    paredit.wrap.wrap_enclosing_form_under_cursor("(", ")")
+    local range = paredit.wrap.wrap_enclosing_form_under_cursor("(", ")")
+    assert.are.same({ 0, 0, 2, 10 }, range)
     expect({
       content = {
         "((+ 2",
