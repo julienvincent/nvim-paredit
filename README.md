@@ -160,7 +160,7 @@ require("nvim-paredit").setup({
 Or by calling the `add_language_extension` API directly before the setup. This would be the recommended approach for extension plugin authors.
 
 ```lua
-require("nvim-paredit.lang").add_language_extension("commonlisp", { ... }).
+require("nvim-paredit").extension.add_language_extension("commonlisp", { ... }).
 ```
 
 ---
