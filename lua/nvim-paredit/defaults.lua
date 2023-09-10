@@ -61,6 +61,10 @@ M.default_keys = {
 M.defaults = {
   use_default_keys = true,
   cursor_behaviour = "auto", -- remain, follow, auto
+  indent = {
+    enabled = true,
+    indentor = require("nvim-paredit.indentation.native").indentor,
+  },
   keys = {},
 }
 
