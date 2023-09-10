@@ -99,8 +99,17 @@ local function indent_barf(event)
   if parent:type() == "source" then
     delta = node_range[2]
   else
-    local form_edges = lang.get_form_edges(parent)
-    delta = node_range[2] - form_edges.left.range[2] - 1
+    local row
+    local ref_node = utils.get_first_sibling_on_upper_line(node, { lang = lang })
+    if ref_node then
+      local range = { ref_node:range() }
+      row = range[2]
+    else
+      local form_edges = lang.get_form_edges(parent)
+      row = form_edges.left.range[2] - 1
+    end
+
+    delta = node_range[2] - row
   end
 
   indent_lines(lines, delta * -1, {
@@ -127,9 +136,18 @@ local function indent_slurp(event)
   end
 
   local lines = utils.find_affected_lines(child, utils.get_node_line_range(child_range))
-  local form_edges = lang.get_form_edges(parent)
 
-  local delta = form_edges.left.range[4] - child_range[2]
+  local row
+  local ref_node = utils.get_first_sibling_on_upper_line(child, { lang = lang })
+  if ref_node then
+    local range = { ref_node:range() }
+    row = range[2]
+  else
+    local form_edges = lang.get_form_edges(parent)
+    row = form_edges.left.range[4]
+  end
+
+  local delta = row - child_range[2]
   indent_lines(lines, delta, {
     buf = event.buf,
   })

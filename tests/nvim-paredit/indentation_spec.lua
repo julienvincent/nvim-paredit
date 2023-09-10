@@ -72,6 +72,14 @@ describe("forward slurping indentation", function()
       after_content = { "(", ";; comment", " a)" },
       after_cursor = { 1, 0 },
     },
+
+    {
+      "should indent to the first relevant siblings indentation",
+      before_content = { "(def a []", "  target sibling)", "child" },
+      before_cursor = { 1, 1 },
+      after_content = { "(def a []", "  target sibling", "  child)" },
+      after_cursor = { 1, 1 },
+    },
   })
 end)
 
@@ -148,6 +156,14 @@ describe("forward barfing indentation", function()
       after_content = { "()", ";; comment", "a" },
       after_cursor = { 1, 0 },
     },
+
+    {
+      "should indent to the first relevant siblings indentation",
+      before_content = { "(def a []", "  target (sibling", "          child))" },
+      before_cursor = { 2, 10 },
+      after_content = { "(def a []", "  target (sibling)", "  child)" },
+      after_cursor = { 2, 10 },
+    },
   })
 end)
 
@@ -171,6 +187,14 @@ describe("backward barfing indentation", function()
       before_cursor = { 2, 3 },
       after_content = { "(a", " (bc", " de))" },
       after_cursor = { 2, 3 },
+    },
+
+    {
+      "should indent to the first relevant siblings indentation",
+      before_content = { "(def a []", "  target (sibling", "          child))" },
+      before_cursor = { 3, 1 },
+      after_content = { "(def a []", "  target sibling", "  (child))" },
+      after_cursor = { 3, 2 },
     },
   })
 end)

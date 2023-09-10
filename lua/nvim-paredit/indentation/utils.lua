@@ -61,4 +61,35 @@ function M.node_is_first_on_line(node, opts)
   return sibling_range[3] ~= node_range[1]
 end
 
+-- This functions finds the closest sibling to a given `node` which is:
+-- 1) Not on the same line (one line higher)
+-- 2) Is the first node on the line
+--
+-- This node can be used as an indentation reference point.
+function M.get_first_sibling_on_upper_line(node, opts)
+  local node_range = { node:range() }
+
+  local reference
+  local prev = node
+
+  while prev do
+    prev = traversal.get_prev_sibling_ignoring_comments(prev, opts)
+    if not prev then
+      return reference
+    end
+
+    local sibling_range = { prev:range() }
+
+    if reference and reference:range() ~= sibling_range[1] then
+      return reference
+    end
+
+    if sibling_range[1] ~= node_range[1] then
+      reference = prev
+    end
+  end
+
+  return reference
+end
+
 return M
