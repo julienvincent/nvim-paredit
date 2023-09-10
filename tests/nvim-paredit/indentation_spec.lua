@@ -163,7 +163,14 @@ describe("backward barfing indentation", function()
       before_content = { "(a", " b)" },
       before_cursor = { 1, 0 },
       after_content = { "a", "(b)" },
-      after_cursor = { 2, 1 },
+      after_cursor = { 2, 0 },
+    },
+    {
+      "should keep the cursor in the same place",
+      before_content = { "((a", "  bc", "  de))" },
+      before_cursor = { 2, 3 },
+      after_content = { "(a", " (bc", " de))" },
+      after_cursor = { 2, 3 },
     },
   })
 end)

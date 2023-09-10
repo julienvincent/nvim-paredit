@@ -1,5 +1,6 @@
 local traversal = require("nvim-paredit.utils.traversal")
 local utils = require("nvim-paredit.indentation.utils")
+local common = require("nvim-paredit.utils.common")
 local langs = require("nvim-paredit.lang")
 
 local M = {}
@@ -34,6 +35,8 @@ local function dedent_lines(lines, delta, opts)
       {}
     )
   end
+
+  return smallest_distance
 end
 
 local function indent_lines(lines, delta, opts)
@@ -41,19 +44,26 @@ local function indent_lines(lines, delta, opts)
     return
   end
 
+  local cursor_pos = vim.api.nvim_win_get_cursor(opts.buf or 0)
+  local cursor_delta = delta
+
   if delta < 0 then
-    return dedent_lines(lines, delta * -1, opts)
+    cursor_delta = dedent_lines(lines, delta * -1, opts) * -1
+  else
+    local chars = string.rep(" ", delta)
+    for _, line in ipairs(lines) do
+      -- stylua: ignore
+      vim.api.nvim_buf_set_text(
+        opts.buf or 0,
+        line, 0,
+        line, 0,
+        {chars}
+      )
+    end
   end
 
-  local chars = string.rep(" ", delta)
-  for _, line in ipairs(lines) do
-    -- stylua: ignore
-    vim.api.nvim_buf_set_text(
-      opts.buf or 0,
-      line, 0,
-      line, 0,
-      {chars}
-    )
+  if common.included_in_table(lines, cursor_pos[1] - 1) then
+    vim.api.nvim_win_set_cursor(opts.buf or 0, { cursor_pos[1], cursor_pos[2] + cursor_delta })
   end
 end
 
