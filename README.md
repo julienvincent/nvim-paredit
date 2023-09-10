@@ -163,6 +163,10 @@ Or by calling the `add_language_extension` API directly before the setup. This w
 require("nvim-paredit.lang").add_language_extension("commonlisp", { ... }).
 ```
 
+### Existing Language Extensions
+
++ [fennel](https://github.com/julienvincent/nvim-paredit-fennel)
+
 ---
 
 As no attempt has been made to add support for other grammars I have no idea if the language extension API's are actually sufficient for adding additional languages. They will evolve as attempts are made.
