@@ -4,23 +4,40 @@ local defaults = require("nvim-paredit.defaults")
 local config = require("nvim-paredit.config")
 local lang = require("nvim-paredit.lang")
 
+local function setup_keybingings(filetype, buf)
+  local whitelist = config.config.filetypes
+  local keys = config.config.keys
+
+  if whitelist and not common.included_in_table(whitelist, filetype) then
+    return
+  end
+
+  if not common.included_in_table(lang.filetypes(), filetype) then
+    return
+  end
+
+  keybindings.setup_keybindings({
+    keys = keys,
+    buf = buf,
+  })
+end
+
+local function add_language_extension(ft, api)
+  lang.add_language_extension(ft, api)
+
+  if vim.bo.filetype == ft then
+    setup_keybingings(ft, vim.api.nvim_get_current_buf())
+  end
+end
+
 local M = {
   api = require("nvim-paredit.api"),
   wrap = require("nvim-paredit.api.wrap"),
   cursor = require("nvim-paredit.api.cursor"),
+  extension = {
+    add_language_extension = add_language_extension,
+  },
 }
-
-local function setup_keybingings(filetype, buf)
-  local filetypes = config.config.filetypes
-  local keys = config.config.keys
-
-  if common.included_in_table(filetypes, filetype) then
-    keybindings.setup_keybindings({
-      keys = keys,
-      buf = buf,
-    })
-  end
-end
 
 function M.setup(opts)
   opts = opts or {}
@@ -29,24 +46,14 @@ function M.setup(opts)
     lang.add_language_extension(filetype, api)
   end
 
-  local filetypes
-  if type(opts.filetypes) == "table" then
-    -- substract langs form opts.filetypes to avoid
-    -- binding keymaps to unsupported buffers
-    filetypes = common.intersection(opts.filetypes, lang.filetypes())
-  else
-    filetypes = lang.filetypes()
-  end
-
   local keys = opts.keys or {}
 
   if type(opts.use_default_keys) ~= "boolean" or opts.use_default_keys then
-    keys = common.merge(defaults.default_keys, opts.keys or {})
+    keys = vim.tbl_deep_extend("force", defaults.default_keys, opts.keys or {})
   end
 
   config.update_config(defaults.defaults)
-  config.update_config(common.merge(opts, {
-    filetypes = filetypes,
+  config.update_config(vim.tbl_deep_extend("force", opts, {
     keys = keys,
   }))
 

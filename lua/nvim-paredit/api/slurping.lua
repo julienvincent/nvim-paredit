@@ -1,5 +1,5 @@
 local traversal = require("nvim-paredit.utils.traversal")
-local common = require("nvim-paredit.utils.common")
+local indentation = require("nvim-paredit.indentation")
 local ts = require("nvim-treesitter.ts_utils")
 local config = require("nvim-paredit.config")
 local langs = require("nvim-paredit.lang")
@@ -40,11 +40,12 @@ local function slurp(opts)
   end
 
   local buf = vim.api.nvim_get_current_buf()
+  local form_edges = lang.get_form_edges(form)
   local left_or_right_edge
   if opts.reversed then
-    left_or_right_edge = lang.get_form_edges(form).left
+    left_or_right_edge = form_edges.left
   else
-    left_or_right_edge = lang.get_form_edges(form).right
+    left_or_right_edge = form_edges.right
   end
 
   local start_or_end
@@ -57,6 +58,7 @@ local function slurp(opts)
   local row = start_or_end[1]
   local col = start_or_end[2]
 
+  -- stylua: ignore
   vim.api.nvim_buf_set_text(buf,
     row, col,
     row, col,
@@ -65,9 +67,10 @@ local function slurp(opts)
 
   local offset = 0
   if opts.reversed and row == left_or_right_edge.range[1] then
-    offset = string.len(left_or_right_edge.text)
+    offset = #left_or_right_edge.text
   end
 
+  -- stylua: ignore
   vim.api.nvim_buf_set_text(
     buf,
     left_or_right_edge.range[1], left_or_right_edge.range[2] + offset,
@@ -77,7 +80,7 @@ local function slurp(opts)
 
   local cursor_behaviour = opts.cursor_behaviour or config.config.cursor_behaviour
   if cursor_behaviour == "follow" then
-    local offset = 0
+    offset = 0
     if not opts.reversed then
       offset = string.len(left_or_right_edge.text)
     end
@@ -88,6 +91,30 @@ local function slurp(opts)
       vim.api.nvim_win_set_cursor(0, cursor_pos)
     end
   end
+
+  local operation_type
+  local new_range
+  if not opts.reversed then
+    operation_type = "slurp-forwards"
+    -- stylua: ignore
+    new_range = {
+      form_edges.left.range[1], form_edges.left.range[2],
+      row, col,
+    }
+  else
+    operation_type = "slurp-backwards"
+    -- stylua: ignore
+    new_range = {
+      row, col,
+      form_edges.right.range[1], form_edges.right.range[2],
+    }
+  end
+
+  local event = {
+    type = operation_type,
+    parent_range = new_range,
+  }
+  indentation.handle_indentation(event, opts)
 end
 
 function M.slurp_forwards(opts)
@@ -95,8 +122,8 @@ function M.slurp_forwards(opts)
 end
 
 function M.slurp_backwards(opts)
-  slurp(common.merge(opts or {}, {
-    reversed = true
+  slurp(vim.tbl_deep_extend("force", opts or {}, {
+    reversed = true,
   }))
 end
 
