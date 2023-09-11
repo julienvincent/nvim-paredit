@@ -19,6 +19,10 @@ end
 
 function M.setup_keybindings(opts)
   for keymap, action in pairs(opts.keys) do
+    if not action then
+      return
+    end
+
     local repeatable = true
     if type(action.repeatable) == "boolean" then
       repeatable = action.repeatable
