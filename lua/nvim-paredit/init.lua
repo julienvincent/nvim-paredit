@@ -49,11 +49,11 @@ function M.setup(opts)
   local keys = opts.keys or {}
 
   if type(opts.use_default_keys) ~= "boolean" or opts.use_default_keys then
-    keys = common.merge(defaults.default_keys, opts.keys or {})
+    keys = vim.tbl_deep_extend("force", defaults.default_keys, opts.keys or {})
   end
 
   config.update_config(defaults.defaults)
-  config.update_config(common.merge(opts, {
+  config.update_config(vim.tbl_deep_extend("force", opts, {
     keys = keys,
   }))
 

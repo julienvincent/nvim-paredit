@@ -9,17 +9,6 @@ function M.included_in_table(table, item)
   return false
 end
 
-function M.merge(a, b)
-  local result = {}
-  for k, v in pairs(a) do
-    result[k] = v
-  end
-  for k, v in pairs(b) do
-    result[k] = v
-  end
-  return result
-end
-
 -- Compares the two given { col, row } position tuples and returns -1/0/1 depending
 -- on whether `a` is less than, equal to or greater than `b`
 --
@@ -59,6 +48,20 @@ function M.intersection(tbl, original)
   return result
 end
 
+function M.ordered_set(lines)
+  local seen = {}
+  local result = {}
+  for _, value in ipairs(lines) do
+    if not seen[value] then
+      table.insert(result, value)
+      seen[value] = true
+    end
+  end
+
+  table.sort(result)
+  return result
+end
+
 function M.ensure_visual_mode()
   if vim.api.nvim_get_mode().mode ~= "v" then
     vim.api.nvim_command("normal! v")
@@ -72,11 +75,8 @@ function M.is_whitespace_under_cursor(lang)
   cursor = { cursor[1] - 1, cursor[2] }
 
   local char_under_cursor = vim.api.nvim_buf_get_text(0, cursor[1], cursor[2], cursor[1], cursor[2] + 1, {})
-  return M.included_in_table(
-    lang.whitespace_chars or M.default_whitespace_chars,
-    char_under_cursor[1]
-  ) or char_under_cursor[1] == ""
+  return M.included_in_table(lang.whitespace_chars or M.default_whitespace_chars, char_under_cursor[1])
+    or char_under_cursor[1] == ""
 end
 
 return M
-
