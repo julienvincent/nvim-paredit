@@ -19,27 +19,25 @@ end
 
 function M.setup_keybindings(opts)
   for keymap, action in pairs(opts.keys) do
-    if not action then
-      return
-    end
+    if action then
+      local repeatable = true
+      if type(action.repeatable) == "boolean" then
+        repeatable = action.repeatable
+      end
 
-    local repeatable = true
-    if type(action.repeatable) == "boolean" then
-      repeatable = action.repeatable
-    end
+      local fn = action[1]
+      if repeatable then
+        fn = M.with_repeat(fn)
+      end
 
-    local fn = action[1]
-    if repeatable then
-      fn = M.with_repeat(fn)
+      vim.keymap.set(action.mode or { "n", "x" }, keymap, fn, {
+        desc = action[2],
+        buffer = opts.buf or 0,
+        expr = repeatable,
+        remap = false,
+        silent = true,
+      })
     end
-
-    vim.keymap.set(action.mode or { "n", "x" }, keymap, fn, {
-      desc = action[2],
-      buffer = opts.buf or 0,
-      expr = repeatable,
-      remap = false,
-      silent = true,
-    })
   end
 end
 
