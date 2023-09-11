@@ -70,14 +70,16 @@ end
 local function indent_barf(event)
   local lang = langs.get_language_api()
 
+  local form = lang.get_node_root(event.parent)
+
   local lhs
   local node
   if event.type == "barf-forwards" then
-    node = traversal.get_next_sibling_ignoring_comments(event.parent, { lang = lang })
-    lhs = event.parent
+    node = traversal.get_next_sibling_ignoring_comments(form, { lang = lang })
+    lhs = form
   else
-    node = event.parent
-    lhs = traversal.get_prev_sibling_ignoring_comments(event.parent, { lang = lang })
+    node = form
+    lhs = traversal.get_prev_sibling_ignoring_comments(form, { lang = lang })
   end
 
   if not node or not lhs then
@@ -118,8 +120,8 @@ local function indent_barf(event)
 end
 
 local function indent_slurp(event)
-  local parent = event.parent
   local lang = langs.get_language_api()
+  local parent = lang.unwrap_form(event.parent)
 
   local child
   if event.type == "slurp-forwards" then

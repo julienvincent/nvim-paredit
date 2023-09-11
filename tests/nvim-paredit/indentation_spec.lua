@@ -24,6 +24,13 @@ describe("forward slurping indentation", function()
       after_cursor = { 1, 0 },
     },
     {
+      "should indent a nested child from a wrapped parent",
+      before_content = { "@()", "a" },
+      before_cursor = { 1, 2 },
+      after_content = { "@(", "  a)" },
+      after_cursor = { 1, 1 },
+    },
+    {
       "should indent a multi-line child",
       before_content = { "()", "(a", " b c)" },
       before_cursor = { 1, 1 },
@@ -120,6 +127,13 @@ describe("forward barfing indentation", function()
       before_cursor = { 1, 0 },
       after_content = { "()", "a" },
       after_cursor = { 1, 0 },
+    },
+    {
+      "should dedent the barfed child from a wrapped parent",
+      before_content = { "@(", "  a)" },
+      before_cursor = { 1, 1 },
+      after_content = { "@()", "a" },
+      after_cursor = { 1, 1 },
     },
     {
       "should dedent a multi-line child and affected siblings",
