@@ -44,7 +44,8 @@ It currently only has first-class support for the `clojure` language and has a f
 ## Configuration
 
 ```lua
-require("nvim-paredit").setup({
+local paredit = require("nvim-paredit")
+paredit.setup({
   -- should plugin use default keybindings? (default = true)
   use_default_keys = true,
   -- sometimes user wants to restrict plugin to certain file types only
@@ -105,25 +106,25 @@ require("nvim-paredit").setup({
 
     -- These are text object selection keybindings which can used with standard `d, y, c`, `v`
     ["af"] = {
-      api.select_around_form,
+      paredit.api.select_around_form,
       "Around form",
       repeatable = false,
       mode = { "o", "v" }
     },
     ["if"] = {
-      api.select_in_form,
+      paredit.api.select_in_form,
       "In form",
       repeatable = false,
       mode = { "o", "v" }
     },
     ["ae"] = {
-      api.select_element,
+      paredit.api.select_element,
       "Around element",
       repeatable = false,
       mode = { "o", "v" },
     },
     ["ie"] = {
-      api.select_element,
+      paredit.api.select_element,
       "Element",
       repeatable = false,
       mode = { "o", "v" },
