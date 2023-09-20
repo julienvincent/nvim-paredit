@@ -9,10 +9,16 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        channel: [stable, nightly]
     steps:
     - uses: actions/checkout@v2
 
     - uses: extractions/setup-just@v1
+
+    - name: Prepare ${{ matrix.channel }}
+      run: just prepare ${{ matrix.channel }}
 
     - name: Run Tests
       run: just test

@@ -1,16 +1,16 @@
-prepare:
+prepare channel="nightly":
   #!/usr/bin/env bash
   test -d .build/nvim || {
     mkdir -p ./.build/nvim
 
     os=$(uname)
     if [[ "$os" == "Darwin" ]]; then
-      curl -L https://github.com/neovim/neovim/releases/download/nightly/nvim-macos.tar.gz > ./.build/nvim-macos.tar.gz
+      curl -L https://github.com/neovim/neovim/releases/download/{{ channel }}/nvim-macos.tar.gz > ./.build/nvim-macos.tar.gz
       xattr -c ./.build/nvim-macos.tar.gz
       tar xzf ./.build/nvim-macos.tar.gz -C ./.build/nvim --strip-components=1
       rm ./.build/nvim-macos.tar.gz
     elif [[ "$os" == "Linux" ]]; then
-      curl -L https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz > ./.build/nvim-linux64.tar.gz
+      curl -L https://github.com/neovim/neovim/releases/download/{{ channel }}/nvim-linux64.tar.gz > ./.build/nvim-linux64.tar.gz
       tar xzf ./.build/nvim-linux64.tar.gz -C ./.build/nvim --strip-components=1
       rm ./.build/nvim-linux64.tar.gz
     else
