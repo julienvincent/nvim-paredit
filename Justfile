@@ -1,4 +1,4 @@
-prepare channel="nightly":
+prepare channel="stable":
   #!/usr/bin/env bash
   test -d .build/nvim || {
     mkdir -p ./.build/nvim
