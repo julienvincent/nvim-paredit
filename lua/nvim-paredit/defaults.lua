@@ -45,13 +45,13 @@ M.default_keys = {
   },
   ["aF"] = {
     api.select_around_top_level_form,
-    "Around form",
+    "Around top level form",
     repeatable = false,
     mode = { "o", "v" },
   },
   ["iF"] = {
     api.select_in_top_level_form,
-    "In form",
+    "In top level form",
     repeatable = false,
     mode = { "o", "v" },
   },
