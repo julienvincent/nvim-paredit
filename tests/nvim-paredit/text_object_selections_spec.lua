@@ -138,6 +138,34 @@ describe("form selections", function()
   end)
 end)
 
+describe("top form selections", function()
+  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+
+  before_each(function()
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys,
+    })
+  end)
+
+  it("should select the root form and not the siblings", function()
+    prepare_buffer({
+      content = {"(+ 1 2)", "(foo (a", "a)) (/ 6 2)"},
+      cursor = { 2, 6 },
+    })
+    feedkeys("vaF")
+    assert.are.same("(foo (a\na))", utils.get_selected_text())
+  end)
+
+  it("should select within the form", function()
+    prepare_buffer({
+      content = {"(+ 1 2)", "(foo (a", "a)) (/ 6 2)"},
+      cursor = { 2, 6 },
+    })
+    feedkeys("viF")
+    assert.are.same("foo (a\na)", utils.get_selected_text())
+  end)
+end)
+
 describe("element deletions", function()
   vim.api.nvim_buf_set_option(0, "filetype", "clojure")
 
