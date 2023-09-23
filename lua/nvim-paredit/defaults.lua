@@ -43,6 +43,18 @@ M.default_keys = {
     repeatable = false,
     mode = { "o", "v" },
   },
+  ["aF"] = {
+    api.select_around_top_level_form,
+    "Around form",
+    repeatable = false,
+    mode = { "o", "v" },
+  },
+  ["iF"] = {
+    api.select_in_top_level_form,
+    "In form",
+    repeatable = false,
+    mode = { "o", "v" },
+  },
 
   ["ae"] = {
     api.select_element,

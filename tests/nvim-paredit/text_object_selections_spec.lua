@@ -76,6 +76,40 @@ describe("form deletions", function()
   end)
 end)
 
+describe("top level form deletions", function()
+  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+
+  before_each(function()
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys,
+    })
+  end)
+
+  it("should delete the top level form, leaving other forms intact", function()
+    prepare_buffer({
+      content = { "(+ 1 2)", "(foo (a", "b", "c)) (comment thing)", "(x y)" },
+      cursor = { 2, 7 },
+    })
+    feedkeys("daF")
+    expect({
+      content = { "(+ 1 2)", " (comment thing)", "(x y)" },
+      cursor = { 2, 0 },
+    })
+  end)
+
+  it("should delete inside the top level form, leaving other forms and the outer parenthesis pair intact", function()
+    prepare_buffer({
+      content = { "(+ 1 2)", "(foo (a", "b", "c)) (comment thing)", "(x y)" },
+      cursor = { 2, 7 },
+    })
+    feedkeys("diF")
+    expect({
+      content = { "(+ 1 2)", "() (comment thing)", "(x y)" },
+      cursor = { 2, 1 },
+    })
+  end)
+end)
+
 describe("form selections", function()
   vim.api.nvim_buf_set_option(0, "filetype", "clojure")
 

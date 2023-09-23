@@ -117,6 +117,18 @@ paredit.setup({
       repeatable = false,
       mode = { "o", "v" }
     },
+    ["aF"] = {
+      paredit.api.select_around_top_level_form,
+      "Around form",
+      repeatable = false,
+      mode = { "o", "v" }
+    },
+    ["iF"] = {
+      paredit.api.select_in_top_level_form,
+      "In form",
+      repeatable = false,
+      mode = { "o", "v" }
+    },
     ["ae"] = {
       paredit.api.select_element,
       "Around element",
@@ -272,6 +284,8 @@ paredit.api.slurp_forwards()
 - **`raise_form`**
 - **`delete_form`**
 - **`delete_in_form`**
+- **`delete_top_level_form`**
+- **`delete_in_top_level_form`**
 - **`delete_element`**
 - **`move_to_next_element`**
 - **`move_to_prev_element`**

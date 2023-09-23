@@ -30,8 +30,41 @@ function M.get_range_around_form()
   }
 end
 
+function M.get_range_around_top_level_form()
+  local lang = langs.get_language_api()
+  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
+    lang = lang,
+    use_source = false,
+  })
+  if not current_form then
+    return
+  end
+
+  local top_level_form = traversal.get_top_level_node_below_document(current_form)
+  local root = lang.get_node_root(top_level_form)
+  local range = { root:range() }
+
+  -- stylua: ignore
+  return {
+    range[1], range[2],
+    range[3], range[4],
+  }
+end
+
 function M.select_around_form()
   local range = M.get_range_around_form()
+  if not range then
+    return
+  end
+
+  M.ensure_visual_mode()
+  vim.api.nvim_win_set_cursor(0, { range[1] + 1, range[2] })
+  vim.api.nvim_command("normal! o")
+  vim.api.nvim_win_set_cursor(0, { range[3] + 1, range[4] - 1 })
+end
+
+function M.select_around_top_level_form()
+  local range = M.get_range_around_top_level_form()
   if not range then
     return
   end
@@ -61,8 +94,40 @@ function M.get_range_in_form()
   }
 end
 
+function M.get_range_in_top_level_form()
+  local lang = langs.get_language_api()
+  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
+    lang = lang,
+    use_source = false,
+  })
+  if not current_form then
+    return
+  end
+
+  local top_level_form = traversal.get_top_level_node_below_document(current_form)
+  local edges = lang.get_form_edges(top_level_form)
+
+  -- stylua: ignore
+  return {
+    edges.left.range[3], edges.left.range[4],
+    edges.right.range[1], edges.right.range[2],
+  }
+end
+
 function M.select_in_form()
   local range = M.get_range_in_form()
+  if not range then
+    return
+  end
+
+  M.ensure_visual_mode()
+  vim.api.nvim_win_set_cursor(0, { range[1] + 1, range[2] })
+  vim.api.nvim_command("normal! o")
+  vim.api.nvim_win_set_cursor(0, { range[3] + 1, range[4] - 1 })
+end
+
+function M.select_in_top_level_form()
+  local range = M.get_range_in_top_level_form()
   if not range then
     return
   end

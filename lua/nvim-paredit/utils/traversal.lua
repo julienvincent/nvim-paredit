@@ -33,14 +33,14 @@ end
 function M.get_last_child_ignoring_comments(node, opts)
   return get_child_ignoring_comments(node, node:named_child_count() - 1, {
     direction = -1,
-    lang = opts.lang
+    lang = opts.lang,
   })
 end
 
 function M.get_first_child_ignoring_comments(node, opts)
   return get_child_ignoring_comments(node, 0, {
     direction = 1,
-    lang = opts.lang
+    lang = opts.lang,
   })
 end
 
@@ -89,7 +89,7 @@ local function get_sibling_ignoring_comments(node, opts)
   elseif opts.count > 1 then
     local new_opts = vim.tbl_deep_extend("force", opts, {
       count = opts.count - 1,
-      sibling = sibling
+      sibling = sibling,
     })
     return get_sibling_ignoring_comments(sibling, new_opts)
   end
@@ -137,6 +137,36 @@ function M.find_root_element_relative_to(root, child)
     return child
   end
   return M.find_root_element_relative_to(root, parent)
+end
+
+function M.get_top_level_node_below_document(node)
+  -- Document
+  --   - Branch A
+  --   -- Node X
+  --   --- Sub-node 1
+  --   - Branch B
+  --   -- Node Y
+  --   --- Sub-node 2
+  --   --- Sub-node 3
+
+  -- If we call this function on "Sub-node 2" we expect "Branch B" to be
+  -- returned, the top level one below the document itself. We know which
+  -- node is the document because it lacks a parent, just like Batman.
+
+  local parent = node:parent()
+
+  -- Does the node have a parent? If so, we might be at the right level.
+  -- If not, we should just return the node right away, we're already too high.
+  if parent then
+    -- If the parent _also_ has a parent then we still need to go higher, recur.
+    if parent:parent() then
+      return M.get_top_level_node_below_document(parent)
+    end
+  end
+
+  -- As soon as we don't have a grandparent or parent, return the node
+  -- we're on because it means we're one step below the top level document node.
+  return node
 end
 
 return M
