@@ -76,6 +76,40 @@ describe("form deletions", function()
   end)
 end)
 
+describe("top level form deletions", function()
+  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+
+  before_each(function()
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys,
+    })
+  end)
+
+  it("should delete the top level form, leaving other forms intact", function()
+    prepare_buffer({
+      content = { "(+ 1 2)", "(foo (a", "b", "c)) (comment thing)", "(x y)" },
+      cursor = { 2, 7 },
+    })
+    feedkeys("daF")
+    expect({
+      content = { "(+ 1 2)", " (comment thing)", "(x y)" },
+      cursor = { 2, 0 },
+    })
+  end)
+
+  it("should delete inside the top level form, leaving other forms and the outer parenthesis pair intact", function()
+    prepare_buffer({
+      content = { "(+ 1 2)", "(foo (a", "b", "c)) (comment thing)", "(x y)" },
+      cursor = { 2, 7 },
+    })
+    feedkeys("diF")
+    expect({
+      content = { "(+ 1 2)", "() (comment thing)", "(x y)" },
+      cursor = { 2, 1 },
+    })
+  end)
+end)
+
 describe("form selections", function()
   vim.api.nvim_buf_set_option(0, "filetype", "clojure")
 
@@ -101,6 +135,34 @@ describe("form selections", function()
     })
     feedkeys("vif")
     assert.are.same("a a", utils.get_selected_text())
+  end)
+end)
+
+describe("top form selections", function()
+  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+
+  before_each(function()
+    keybindings.setup_keybindings({
+      keys = defaults.default_keys,
+    })
+  end)
+
+  it("should select the root form and not the siblings", function()
+    prepare_buffer({
+      content = {"(+ 1 2)", "(foo (a", "a)) (/ 6 2)"},
+      cursor = { 2, 6 },
+    })
+    feedkeys("vaF")
+    assert.are.same("(foo (a\na))", utils.get_selected_text())
+  end)
+
+  it("should select within the form", function()
+    prepare_buffer({
+      content = {"(+ 1 2)", "(foo (a", "a)) (/ 6 2)"},
+      cursor = { 2, 6 },
+    })
+    feedkeys("viF")
+    assert.are.same("foo (a\na)", utils.get_selected_text())
   end)
 end)
 

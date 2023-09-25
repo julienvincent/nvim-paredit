@@ -10,7 +10,7 @@ function M.ensure_visual_mode()
   end
 end
 
-function M.get_range_around_form()
+local function get_range_around_form_impl(node_fn)
   local lang = langs.get_language_api()
   local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
     lang = lang,
@@ -20,7 +20,13 @@ function M.get_range_around_form()
     return
   end
 
-  local root = lang.get_node_root(current_form)
+  local selected = current_form
+
+  if node_fn then
+    selected = node_fn(selected)
+  end
+
+  local root = lang.get_node_root(selected)
   local range = { root:range() }
 
   -- stylua: ignore
@@ -30,8 +36,15 @@ function M.get_range_around_form()
   }
 end
 
-function M.select_around_form()
-  local range = M.get_range_around_form()
+function M.get_range_around_form()
+  return get_range_around_form_impl()
+end
+
+function M.get_range_around_top_level_form()
+  return get_range_around_form_impl(traversal.get_top_level_node_below_document)
+end
+
+local function select_around_form_impl(range)
   if not range then
     return
   end
@@ -42,7 +55,15 @@ function M.select_around_form()
   vim.api.nvim_win_set_cursor(0, { range[3] + 1, range[4] - 1 })
 end
 
-function M.get_range_in_form()
+function M.select_around_form()
+  return select_around_form_impl(M.get_range_around_form())
+end
+
+function M.select_around_top_level_form()
+  return select_around_form_impl(M.get_range_around_top_level_form())
+end
+
+local function get_range_in_form_impl(node_fn)
   local lang = langs.get_language_api()
   local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
     lang = lang,
@@ -52,7 +73,13 @@ function M.get_range_in_form()
     return
   end
 
-  local edges = lang.get_form_edges(current_form)
+  local selected = current_form
+
+  if node_fn then
+    selected = node_fn(selected)
+  end
+
+  local edges = lang.get_form_edges(selected)
 
   -- stylua: ignore
   return {
@@ -61,8 +88,15 @@ function M.get_range_in_form()
   }
 end
 
-function M.select_in_form()
-  local range = M.get_range_in_form()
+function M.get_range_in_form()
+  return get_range_in_form_impl()
+end
+
+function M.get_range_in_top_level_form()
+  return get_range_in_form_impl(traversal.get_top_level_node_below_document)
+end
+
+local function select_in_form_impl(range)
   if not range then
     return
   end
@@ -71,6 +105,14 @@ function M.select_in_form()
   vim.api.nvim_win_set_cursor(0, { range[1] + 1, range[2] })
   vim.api.nvim_command("normal! o")
   vim.api.nvim_win_set_cursor(0, { range[3] + 1, range[4] - 1 })
+end
+
+function M.select_in_form()
+  return select_in_form_impl(M.get_range_in_form())
+end
+
+function M.select_in_top_level_form()
+  return select_in_form_impl(M.get_range_in_top_level_form())
 end
 
 function M.get_element_range()

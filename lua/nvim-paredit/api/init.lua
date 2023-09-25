@@ -25,10 +25,14 @@ local M = {
 
   select_around_form = selections.select_around_form,
   select_in_form = selections.select_in_form,
+  select_around_top_level_form = selections.select_around_top_level_form,
+  select_in_top_level_form = selections.select_in_top_level_form,
   select_element = selections.select_element,
 
   delete_form = deletions.delete_form,
   delete_in_form = deletions.delete_in_form,
+  delete_top_level_form = deletions.delete_top_level_form,
+  delete_in_top_level_form = deletions.delete_in_top_level_form,
   delete_element = deletions.delete_element,
 }
 
