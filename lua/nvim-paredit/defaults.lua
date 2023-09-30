@@ -30,6 +30,7 @@ M.default_keys = {
     repeatable = false,
     mode = { "n", "x", "o", "v" },
   },
+
   ["B"] = {
     api.move_to_prev_element_head,
     "Previous element head",
@@ -44,19 +45,18 @@ M.default_keys = {
   },
 
   ["("] = {
-    api.move_to_prev_bracket,
+    api.move_to_parent_form_start,
     "Previous bracket in form tree",
     repeatable = false,
     mode = { "n", "x", "v" },
   },
 
   [")"] = {
-    api.move_to_next_bracket,
+    api.move_to_parent_form_end,
     "Next bracket in form tree",
     repeatable = false,
     mode = { "n", "x", "v" },
   },
-
 
   ["af"] = {
     api.select_around_form,
@@ -64,18 +64,21 @@ M.default_keys = {
     repeatable = false,
     mode = { "o", "v" },
   },
+
   ["if"] = {
     api.select_in_form,
     "In form",
     repeatable = false,
     mode = { "o", "v" },
   },
+
   ["aF"] = {
     api.select_around_top_level_form,
     "Around top level form",
     repeatable = false,
     mode = { "o", "v" },
   },
+
   ["iF"] = {
     api.select_in_top_level_form,
     "In top level form",
@@ -89,6 +92,7 @@ M.default_keys = {
     repeatable = false,
     mode = { "o", "v" },
   },
+
   ["ie"] = {
     api.select_element,
     "Element",

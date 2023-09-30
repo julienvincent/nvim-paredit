@@ -286,7 +286,6 @@ describe("motions", function()
     expect({
       cursor = { 1, 0 },
     })
-
   end)
 
 
@@ -314,6 +313,5 @@ describe("motions", function()
     expect({
       cursor = { 1, 19 },
     })
-
   end)
 end)
