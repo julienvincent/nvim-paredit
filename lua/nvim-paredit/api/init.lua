@@ -30,6 +30,8 @@ local M = {
   move_to_prev_element = common.deprecate(motions.move_to_prev_element_head, "use `api.move_to_prev_element_head`"),
   move_to_prev_element_head = motions.move_to_prev_element_head,
   move_to_prev_element_tail = motions.move_to_prev_element_tail,
+  move_to_prev_bracket = motions.move_to_parent_form_start,
+  move_to_next_bracket = motions.move_to_parent_form_end,
 
   select_around_form = selections.select_around_form,
   select_in_form = selections.select_in_form,

@@ -255,4 +255,65 @@ describe("motions", function()
       cursor = { 1, 4 },
     })
   end)
+
+  it("should move to parent form start", function()
+    -- (aa (bb) @(|cc) #{1})
+    prepare_buffer({
+      content = "(aa (bb) @(cc) #{1})",
+      cursor = { 1, 11 },
+    })
+
+    -- (aa (bb) @|(cc) #{1})
+    internal_api.move_to_parent_form_start()
+    expect({
+      cursor = { 1, 10 },
+    })
+
+    -- (aa (bb) |@(cc) #{1})
+    internal_api.move_to_parent_form_start()
+    expect({
+      cursor = { 1, 9 },
+    })
+
+    -- |(aa (bb) @(cc) #{1})
+    internal_api.move_to_parent_form_start()
+    expect({
+      cursor = { 1, 0 },
+    })
+
+    -- |(aa (bb) @(cc) #{1})
+    internal_api.move_to_parent_form_start()
+    expect({
+      cursor = { 1, 0 },
+    })
+
+  end)
+
+
+  it("should move to parent form end", function()
+    -- (aa (bb) |@(cc) #{1})
+    prepare_buffer({
+      content = "(aa (bb) @(cc) #{1})",
+      cursor = { 1, 9 },
+    })
+
+    -- (aa (bb) @(cc|) #{1})
+    internal_api.move_to_parent_form_end()
+    expect({
+      cursor = { 1, 13 },
+    })
+
+    -- (aa (bb) @(cc) #{1}|)
+    internal_api.move_to_parent_form_end()
+    expect({
+      cursor = { 1, 19 },
+    })
+
+    -- (aa (bb) @(cc) #{1}|)
+    internal_api.move_to_parent_form_end()
+    expect({
+      cursor = { 1, 19 },
+    })
+
+  end)
 end)

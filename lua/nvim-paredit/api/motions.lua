@@ -3,6 +3,8 @@ local common = require("nvim-paredit.utils.common")
 local ts = require("nvim-treesitter.ts_utils")
 local langs = require("nvim-paredit.lang")
 
+local MOTION_DIRECTIONS = { LEFT = "left", RIGHT = "right" }
+
 local M = {}
 
 -- When the cursor is placed on whitespace within a form then the node returned by
@@ -130,6 +132,52 @@ local function ensure_visual_if_operator_pending()
   end
 end
 
+local function move_to_form_edge(form_node, direction, lang)
+  if not form_node then
+    return
+  end
+
+  local form_edges = lang.get_form_edges(form_node)
+  local final_cursor_pos = {
+    form_edges[direction].range[1] + 1,
+    form_edges[direction].range[2]
+  }
+
+  vim.api.nvim_win_set_cursor(0, final_cursor_pos)
+end
+
+local function is_cursor_at_form_edge(form_node, direction, cur_cursor_pos, lang)
+  local form_edges = lang.get_form_edges(form_node)
+  local edge_cursor_pos = {
+    form_edges[direction].range[1] + 1,
+    form_edges[direction].range[2]
+  }
+
+  return common.compare_positions(edge_cursor_pos, cur_cursor_pos) == 0
+end
+
+local function move_to_parent_form_edge(direction)
+  local lang = langs.get_language_api()
+  local cur_node = ts.get_node_at_cursor()
+
+  local nearest_form_node = traversal.find_nearest_form(cur_node, { lang = lang })
+  if not nearest_form_node or nearest_form_node:type() == "source" then
+    return
+  end
+
+  local cur_cursor_pos = vim.api.nvim_win_get_cursor(0)
+  local form_node_to_move_to = nearest_form_node
+  while is_cursor_at_form_edge(form_node_to_move_to, direction, cur_cursor_pos, lang)
+    do
+      form_node_to_move_to = form_node_to_move_to:parent()
+      if not form_node_to_move_to or form_node_to_move_to:type() == "source" then
+        return
+      end
+    end
+
+  move_to_form_edge(form_node_to_move_to, direction, lang)
+end
+
 function M.move_to_prev_element_head()
   local count = vim.v.count1
   ensure_visual_if_operator_pending()
@@ -152,6 +200,14 @@ function M.move_to_next_element_head()
   local count = vim.v.count1
   ensure_visual_if_operator_pending()
   M._move_to_element(count, false, true)
+end
+
+function M.move_to_parent_form_start()
+  move_to_parent_form_edge(MOTION_DIRECTIONS.LEFT)
+end
+
+function M.move_to_parent_form_end()
+  move_to_parent_form_edge(MOTION_DIRECTIONS.RIGHT)
 end
 
 return M

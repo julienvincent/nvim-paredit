@@ -43,6 +43,21 @@ M.default_keys = {
     mode = { "n", "x", "o", "v" },
   },
 
+  ["("] = {
+    api.move_to_prev_bracket,
+    "Previous bracket in form tree",
+    repeatable = false,
+    mode = { "n", "x", "v" },
+  },
+
+  [")"] = {
+    api.move_to_next_bracket,
+    "Next bracket in form tree",
+    repeatable = false,
+    mode = { "n", "x", "v" },
+  },
+
+
   ["af"] = {
     api.select_around_form,
     "Around form",
