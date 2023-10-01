@@ -117,6 +117,19 @@ paredit.setup({
       mode = { "n", "x", "o", "v" },
     },
 
+    ["("] = {
+      paredit.api.move_to_parent_form_start,
+      "Jump to parent form's head",
+      repeatable = false,
+      mode = { "n", "x", "v" },
+    },
+    [")"] = {
+      paredit.api.move_to_parent_form_end,
+      "Jump to parent form's tail",
+      repeatable = false,
+      mode = { "n", "x", "v" },
+    },
+
     -- These are text object selection keybindings which can used with standard `d, y, c`, `v`
     ["af"] = {
       paredit.api.select_around_form,

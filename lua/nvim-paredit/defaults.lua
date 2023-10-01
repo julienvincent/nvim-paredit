@@ -46,14 +46,14 @@ M.default_keys = {
 
   ["("] = {
     api.move_to_parent_form_start,
-    "Previous bracket in form tree",
+    "Parent form's head",
     repeatable = false,
     mode = { "n", "x", "v" },
   },
 
   [")"] = {
     api.move_to_parent_form_end,
-    "Next bracket in form tree",
+    "Parent form's tail",
     repeatable = false,
     mode = { "n", "x", "v" },
   },
