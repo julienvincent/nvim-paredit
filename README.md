@@ -76,10 +76,10 @@ paredit.setup({
   -- list of default keybindings
   keys = {
     [">)"] = { paredit.api.slurp_forwards, "Slurp forwards" },
-    [">("] = { paredit.api.slurp_backwards, "Slurp backwards" },
+    [">("] = { paredit.api.barf_backwards, "Barf backwards" },
 
     ["<)"] = { paredit.api.barf_forwards, "Barf forwards" },
-    ["<("] = { paredit.api.barf_backwards, "Barf backwards" },
+    ["<("] = { paredit.api.slurp_backwards, "Slurp backwards" },
 
     [">e"] = { paredit.api.drag_element_forwards, "Drag element right" },
     ["<e"] = { paredit.api.drag_element_backwards, "Drag element left" },
