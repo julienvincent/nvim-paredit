@@ -5,6 +5,7 @@ local raising = require("nvim-paredit.api.raising")
 local motions = require("nvim-paredit.api.motions")
 local selections = require("nvim-paredit.api.selections")
 local deletions = require("nvim-paredit.api.deletions")
+local common = require("nvim-paredit.utils.common")
 
 local M = {
   slurp_forwards = slurping.slurp_forwards,
@@ -20,8 +21,15 @@ local M = {
   raise_form = raising.raise_form,
   raise_element = raising.raise_element,
 
-  move_to_next_element = motions.move_to_next_element,
-  move_to_prev_element = motions.move_to_prev_element,
+  -- TODO: remove deprecated code in next versions
+  move_to_next_element = common.deprecate(motions.move_to_next_element_tail, "use `api.move_to_next_element_tail`"),
+  move_to_next_element_tail = motions.move_to_next_element_tail,
+  move_to_next_element_head = motions.move_to_next_element_head,
+
+  -- TODO: remove deprecated code in next versions
+  move_to_prev_element = common.deprecate(motions.move_to_prev_element_head, "use `api.move_to_prev_element_head`"),
+  move_to_prev_element_head = motions.move_to_prev_element_head,
+  move_to_prev_element_tail = motions.move_to_prev_element_tail,
 
   select_around_form = selections.select_around_form,
   select_in_form = selections.select_in_form,

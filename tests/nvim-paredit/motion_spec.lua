@@ -8,50 +8,97 @@ local expect = require("tests.nvim-paredit.utils").expect
 describe("motions", function()
   vim.api.nvim_buf_set_option(0, "filetype", "clojure")
 
-  it("should jump to next element in form", function()
+  it("should jump to next element in form (tail)", function()
     prepare_buffer({
       content = "(aa (bb) @(cc) #{1})",
       cursor = { 1, 2 },
     })
 
-    paredit.move_to_next_element()
+    paredit.move_to_next_element_tail()
     expect({
       cursor = { 1, 7 },
     })
 
-    paredit.move_to_next_element()
+    paredit.move_to_next_element_tail()
     expect({
       cursor = { 1, 13 },
     })
 
-    paredit.move_to_next_element()
+    paredit.move_to_next_element_tail()
     expect({
       cursor = { 1, 18 },
     })
 
-    paredit.move_to_next_element()
+    paredit.move_to_next_element_tail()
     expect({
       cursor = { 1, 18 },
     })
   end)
 
-  it("should jump to previous element in form", function()
+  it("should jump to next element in form (head)", function()
+    prepare_buffer({
+      content = "(aa (bb) @(cc) #{1})",
+      cursor = { 1, 2 },
+    })
+
+    paredit.move_to_next_element_head()
+    expect({
+      cursor = { 1, 4 },
+    })
+
+    paredit.move_to_next_element_head()
+    expect({
+      cursor = { 1, 9 },
+    })
+
+    paredit.move_to_next_element_head()
+    expect({
+      cursor = { 1, 15 },
+    })
+
+    paredit.move_to_next_element_head()
+    expect({
+      cursor = { 1, 15 },
+    })
+  end)
+
+  it("should jump to previous element in form (head)", function()
     prepare_buffer({
       content = "(aa (bb) '(cc))",
       cursor = { 1, 9 },
     })
 
-    paredit.move_to_prev_element()
+    paredit.move_to_prev_element_head()
     expect({
       cursor = { 1, 4 },
     })
-    paredit.move_to_prev_element()
+    paredit.move_to_prev_element_head()
     expect({
       cursor = { 1, 1 },
     })
-    paredit.move_to_prev_element()
+    paredit.move_to_prev_element_head()
     expect({
       cursor = { 1, 1 },
+    })
+  end)
+
+  it("should jump to previous element in form (tail)", function()
+    prepare_buffer({
+      content = "(aa (bb) '(cc))",
+      cursor = { 1, 9 },
+    })
+
+    paredit.move_to_prev_element_tail()
+    expect({
+      cursor = { 1, 7 },
+    })
+    paredit.move_to_prev_element_tail()
+    expect({
+      cursor = { 1, 2 },
+    })
+    paredit.move_to_prev_element_tail()
+    expect({
+      cursor = { 1, 2 },
     })
   end)
 
@@ -60,15 +107,15 @@ describe("motions", function()
       content = { "(aa", ";; comment", "bb)" },
       cursor = { 1, 2 },
     })
-    paredit.move_to_next_element()
+    paredit.move_to_next_element_tail()
     expect({
       cursor = { 3, 1 },
     })
-    paredit.move_to_prev_element()
+    paredit.move_to_prev_element_head()
     expect({
       cursor = { 3, 0 },
     })
-    paredit.move_to_prev_element()
+    paredit.move_to_prev_element_head()
     expect({
       cursor = { 1, 1 },
     })
@@ -79,15 +126,15 @@ describe("motions", function()
       content = { "(aa", ";; comment", "bb)" },
       cursor = { 2, 3 },
     })
-    paredit.move_to_next_element()
+    paredit.move_to_next_element_tail()
     expect({
       cursor = { 3, 1 },
     })
-    paredit.move_to_prev_element()
+    paredit.move_to_prev_element_head()
     expect({
       cursor = { 3, 0 },
     })
-    paredit.move_to_prev_element()
+    paredit.move_to_prev_element_head()
     expect({
       cursor = { 1, 1 },
     })
@@ -95,14 +142,14 @@ describe("motions", function()
       content = { "(aa", ";; comment", "bb)" },
       cursor = { 2, 3 },
     })
-    paredit.move_to_prev_element()
+    paredit.move_to_prev_element_head()
     expect({
       cursor = { 1, 1 },
     })
   end)
 
   it("should move to the end of the current form before jumping to next", function()
-    expect_all(paredit.move_to_next_element, {
+    expect_all(paredit.move_to_next_element_tail, {
       {
         "same line",
         before_content = "(aaa bbb)",
@@ -119,7 +166,7 @@ describe("motions", function()
   end)
 
   it("should move to the start of the current form before jumping to previous", function()
-    expect_all(paredit.move_to_prev_element, {
+    expect_all(paredit.move_to_prev_element_head, {
       {
         "same line",
         before_content = "(aaa bbb)",
@@ -142,42 +189,42 @@ describe("motions", function()
         before_content = "( bb)",
         before_cursor = { 1, 1 },
         after_cursor = { 1, 3 },
-        action = paredit.move_to_next_element,
+        action = paredit.move_to_next_element_tail,
       },
       {
         "forwards skipping comments",
         before_content = { "( ;; comment", "bb)" },
         before_cursor = { 1, 1 },
         after_cursor = { 2, 1 },
-        action = paredit.move_to_next_element,
+        action = paredit.move_to_next_element_tail,
       },
       {
         "forwards from no char",
         before_content = { "(bb", "", "cc)" },
         before_cursor = { 2, 0 },
         after_cursor = { 3, 1 },
-        action = paredit.move_to_next_element,
+        action = paredit.move_to_next_element_tail,
       },
       {
         "backwards",
         before_content = "(aa) (bb) ",
         before_cursor = { 1, 9 },
         after_cursor = { 1, 5 },
-        action = paredit.move_to_prev_element,
+        action = paredit.move_to_prev_element_head,
       },
       {
         "backwards skipping comments",
         before_content = { "(aa ;; comment", " )" },
         before_cursor = { 2, 0 },
         after_cursor = { 1, 1 },
-        action = paredit.move_to_prev_element,
+        action = paredit.move_to_prev_element_head,
       },
       {
         "backwards from no char",
         before_content = { "(bb", "", "cc)" },
         before_cursor = { 2, 0 },
         after_cursor = { 1, 1 },
-        action = paredit.move_to_prev_element,
+        action = paredit.move_to_prev_element_head,
       },
     })
   end)
@@ -188,22 +235,22 @@ describe("motions", function()
       cursor = { 1, 2 },
     })
 
-    internal_api._move_to_element(2, false)
+    internal_api._move_to_element(2, false, false)
     expect({
       cursor = { 1, 13 },
     })
 
-    internal_api.move_to_next_element()
+    internal_api.move_to_next_element_tail()
     expect({
       cursor = { 1, 18 },
     })
 
-    internal_api.move_to_next_element()
+    internal_api.move_to_next_element_tail()
     expect({
       cursor = { 1, 18 },
     })
 
-    internal_api._move_to_element(3, true)
+    internal_api._move_to_element(3, true, true)
     expect({
       cursor = { 1, 4 },
     })
