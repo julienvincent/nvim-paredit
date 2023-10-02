@@ -19,14 +19,26 @@ M.default_keys = {
   ["<localleader>O"] = { api.raise_element, "Raise element" },
 
   ["E"] = {
-    api.move_to_next_element,
+    api.move_to_next_element_tail,
     "Next element tail",
     repeatable = false,
     mode = { "n", "x", "o", "v" },
   },
+  ["W"] = {
+    api.move_to_next_element_head,
+    "Next element head",
+    repeatable = false,
+    mode = { "n", "x", "o", "v" },
+  },
   ["B"] = {
-    api.move_to_prev_element,
+    api.move_to_prev_element_head,
     "Previous element head",
+    repeatable = false,
+    mode = { "n", "x", "o", "v" },
+  },
+  ["gE"] = {
+    api.move_to_prev_element_tail,
+    "Previous element tail",
     repeatable = false,
     mode = { "n", "x", "o", "v" },
   },

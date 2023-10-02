@@ -52,7 +52,8 @@ local function get_next_node_from_cursor(lang, reversed)
   end
 end
 
-function M._move_to_element(count, reversed)
+function M._move_to_element(count, reversed, is_head)
+  is_head = is_head or false
   local lang = langs.get_language_api()
 
   local current_node = get_next_node_from_cursor(lang, reversed)
@@ -67,16 +68,20 @@ function M._move_to_element(count, reversed)
 
   local is_in_middle = false
   if reversed then
-    node_edge = { current_node:start() }
     traversal_fn = traversal.get_prev_sibling_ignoring_comments
-    if common.compare_positions(cursor_pos, node_edge) == 1 then
-      is_in_middle = true
+    if is_head then
+      node_edge = { current_node:start() }
+      if common.compare_positions(cursor_pos, node_edge) == 1 then
+        is_in_middle = true
+      end
     end
   else
-    node_edge = { current_node:end_() }
     traversal_fn = traversal.get_next_sibling_ignoring_comments
-    if common.compare_positions({ node_edge[1], node_edge[2] - 1 }, cursor_pos) == 1 then
-      is_in_middle = true
+    if not is_head then
+      node_edge = { current_node:end_() }
+      if common.compare_positions({ node_edge[1], node_edge[2] - 1 }, cursor_pos) == 1 then
+        is_in_middle = true
+      end
     end
   end
 
@@ -95,7 +100,7 @@ function M._move_to_element(count, reversed)
       count = count,
     })
     if sibling then
-      if reversed then
+      if is_head then
         next_pos = { sibling:start() }
       else
         next_pos = { sibling:end_() }
@@ -107,7 +112,7 @@ function M._move_to_element(count, reversed)
     return
   end
 
-  if reversed then
+  if is_head then
     cursor_pos = { next_pos[1] + 1, next_pos[2] }
   else
     cursor_pos = { next_pos[1] + 1, next_pos[2] - 1 }
@@ -125,16 +130,28 @@ local function ensure_visual_if_operator_pending()
   end
 end
 
-function M.move_to_prev_element()
+function M.move_to_prev_element_head()
   local count = vim.v.count1
   ensure_visual_if_operator_pending()
-  M._move_to_element(count, true)
+  M._move_to_element(count, true, true)
 end
 
-function M.move_to_next_element()
+function M.move_to_prev_element_tail()
   local count = vim.v.count1
   ensure_visual_if_operator_pending()
-  M._move_to_element(count, false)
+  M._move_to_element(count, true, false)
+end
+
+function M.move_to_next_element_tail()
+  local count = vim.v.count1
+  ensure_visual_if_operator_pending()
+  M._move_to_element(count, false, false)
+end
+
+function M.move_to_next_element_head()
+  local count = vim.v.count1
+  ensure_visual_if_operator_pending()
+  M._move_to_element(count, false, true)
 end
 
 return M
