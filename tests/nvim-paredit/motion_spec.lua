@@ -269,12 +269,6 @@ describe("motions", function()
       cursor = { 1, 10 },
     })
 
-    -- (aa (bb) |@(cc) #{1})
-    internal_api.move_to_parent_form_start()
-    expect({
-      cursor = { 1, 9 },
-    })
-
     -- |(aa (bb) @(cc) #{1})
     internal_api.move_to_parent_form_start()
     expect({

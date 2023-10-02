@@ -169,7 +169,7 @@ local function move_to_parent_form_edge(direction)
   local form_node_to_move_to = nearest_form_node
   while is_cursor_at_form_edge(form_node_to_move_to, direction, cur_cursor_pos, lang)
     do
-      form_node_to_move_to = form_node_to_move_to:parent()
+      form_node_to_move_to = lang.get_node_root(form_node_to_move_to):parent()
       if not form_node_to_move_to or form_node_to_move_to:type() == "source" then
         return
       end
