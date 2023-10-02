@@ -31,6 +31,9 @@ local M = {
   move_to_prev_element_head = motions.move_to_prev_element_head,
   move_to_prev_element_tail = motions.move_to_prev_element_tail,
 
+  move_to_parent_form_start = motions.move_to_parent_form_start,
+  move_to_parent_form_end = motions.move_to_parent_form_end,
+
   select_around_form = selections.select_around_form,
   select_in_form = selections.select_in_form,
   select_around_top_level_form = selections.select_around_top_level_form,
