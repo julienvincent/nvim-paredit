@@ -333,7 +333,7 @@ Cursor api `paredit.cursor`
 
 Require api module:
 ```lua
-local paredit = require("nvim-paredit.api")
+local paredit = require("nvim-paredit")
 ```
 Add following keybindings to config:
 ```lua
