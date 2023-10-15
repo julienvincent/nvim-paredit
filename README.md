@@ -327,13 +327,13 @@ Cursor api `paredit.cursor`
   - `placement` - enumeration `left_edge`,`inner_start`,`inner_end`,`right_edge`
   - `mode` - currently only `insert` is supported, defaults to `normal`
 
-## API usage recipes
+## Additional API usage recipes
 
 ### `vim-sexp` wrap form (head/tail) replication
 
 Require api module:
 ```lua
-local paredit = require("nvim-paredit.api")
+local paredit = require("nvim-paredit")
 ```
 Add following keybindings to config:
 ```lua
@@ -383,6 +383,14 @@ Add following keybindings to config:
 ```
 Same approach can be used for other `vim-sexp` keybindings (e.g. `<localleader>e[`) with cursor placement or without.
 
+### `vim-sexp` splice sexp
+
+```lua
+  ["<localleader>@"] = {
+    paredit.unwrap.unwrap_form_under_cursor,
+    "Splice sexp",
+  },
+```
 ## Prior Art
 
 ### [vim-sexp](https://github.com/guns/vim-sexp)
