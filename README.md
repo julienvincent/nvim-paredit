@@ -75,6 +75,7 @@ paredit.setup({
 
   -- list of default keybindings
   keys = {
+    ["<localleader>@"] = { paredit.unwrap.unwrap_form_under_cursor, "Splice sexp" },
     [">)"] = { paredit.api.slurp_forwards, "Slurp forwards" },
     [">("] = { paredit.api.barf_backwards, "Barf backwards" },
 
