@@ -140,7 +140,6 @@ function M._move_to_element(count, reversed, is_head, is_exclusive)
     cursor_pos = { next_pos[1] + 1, next_pos[2] - 1 + offset }
   end
 
-  print(is_exclusive, is_head, offset, reversed)
   vim.api.nvim_win_set_cursor(0, cursor_pos)
 end
 
