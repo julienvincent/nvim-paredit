@@ -384,14 +384,6 @@ Add following keybindings to config:
 ```
 Same approach can be used for other `vim-sexp` keybindings (e.g. `<localleader>e[`) with cursor placement or without.
 
-### `vim-sexp` splice sexp
-
-```lua
-  ["<localleader>@"] = {
-    paredit.unwrap.unwrap_form_under_cursor,
-    "Splice sexp",
-  },
-```
 ## Prior Art
 
 ### [vim-sexp](https://github.com/guns/vim-sexp)
