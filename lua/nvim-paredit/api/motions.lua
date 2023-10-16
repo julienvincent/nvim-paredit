@@ -54,7 +54,8 @@ local function get_next_node_from_cursor(lang, reversed)
   end
 end
 
-function M._move_to_element(count, reversed, is_head)
+function M._move_to_element(count, reversed, is_head, is_exclusive)
+  is_exclusive = is_exclusive or false
   is_head = is_head or false
   local lang = langs.get_language_api()
 
@@ -97,16 +98,26 @@ function M._move_to_element(count, reversed, is_head)
     if is_in_middle then
       count = count - 1
     end
-    local sibling = traversal_fn(current_node, {
+    local sibling, count_left = traversal_fn(current_node, {
       lang = lang,
       count = count,
     })
+
     if sibling then
-      if is_head then
+      if is_head and count_left > 1 and not reversed then
+        is_head = false
+        is_exclusive = false
+        next_pos = { sibling:end_() }
+      elseif is_head then
         next_pos = { sibling:start() }
       else
         next_pos = { sibling:end_() }
       end
+    elseif is_head and not reversed then
+      -- convert head to tail motion
+      is_head = false
+      is_exclusive = false
+      next_pos = { current_node:end_() }
     end
   end
 
@@ -114,22 +125,35 @@ function M._move_to_element(count, reversed, is_head)
     return
   end
 
-  if is_head then
-    cursor_pos = { next_pos[1] + 1, next_pos[2] }
-  else
-    cursor_pos = { next_pos[1] + 1, next_pos[2] - 1 }
+  local offset = 0
+  if is_exclusive then
+    if reversed then
+      offset = 1
+    else
+      offset = -1
+    end
   end
 
+  if is_head then
+    cursor_pos = { next_pos[1] + 1, next_pos[2] + offset }
+  else
+    cursor_pos = { next_pos[1] + 1, next_pos[2] - 1 + offset }
+  end
+
+  print(is_exclusive, is_head, offset, reversed)
   vim.api.nvim_win_set_cursor(0, cursor_pos)
 end
 
 -- When in operator-pending mode (`o` or `no`) then we need to switch to
 -- visual mode in order for the operator to apply over a range of text.
+-- returns true if operator mode is on, false otherwise
 local function ensure_visual_if_operator_pending()
   local mode = vim.api.nvim_get_mode().mode
   if mode == "o" or mode == "no" then
     common.ensure_visual_mode()
+    return true
   end
+  return false
 end
 
 local function move_to_form_edge(form_node, direction, lang)
@@ -196,10 +220,12 @@ function M.move_to_next_element_tail()
   M._move_to_element(count, false, false)
 end
 
+-- also jumps to current element tail if there is no
+-- next element
 function M.move_to_next_element_head()
   local count = vim.v.count1
-  ensure_visual_if_operator_pending()
-  M._move_to_element(count, false, true)
+  local is_operator = ensure_visual_if_operator_pending()
+  M._move_to_element(count, false, true, is_operator)
 end
 
 function M.move_to_parent_form_start()
