@@ -81,7 +81,7 @@ end
 local function get_sibling_ignoring_comments(node, opts)
   local sibling = opts.sibling_fn(node)
   if not sibling then
-    return opts.sibling or nil
+    return opts.sibling or nil, opts.count + 1
   end
 
   if sibling:extra() or opts.lang.node_is_comment(sibling) then
@@ -94,7 +94,7 @@ local function get_sibling_ignoring_comments(node, opts)
     return get_sibling_ignoring_comments(sibling, new_opts)
   end
 
-  return sibling
+  return sibling, opts.count
 end
 
 function M.get_next_sibling_ignoring_comments(node, opts)
