@@ -55,10 +55,17 @@ describe("motions", function()
     expect({
       cursor = { 1, 15 },
     })
+  end)
+
+  it("should jump to current element's tail if there is no next element", function()
+    prepare_buffer({
+      content = "(aa (bb) @(cc) #{1})",
+      cursor = { 1, 15 },
+    })
 
     paredit.move_to_next_element_head()
     expect({
-      cursor = { 1, 15 },
+      cursor = { 1, 18 },
     })
   end)
 
