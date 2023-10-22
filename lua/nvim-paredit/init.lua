@@ -33,6 +33,7 @@ end
 local M = {
   api = require("nvim-paredit.api"),
   wrap = require("nvim-paredit.api.wrap"),
+  unwrap = require("nvim-paredit.api.unwrap"),
   cursor = require("nvim-paredit.api.cursor"),
   extension = {
     add_language_extension = add_language_extension,

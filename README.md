@@ -75,6 +75,7 @@ paredit.setup({
 
   -- list of default keybindings
   keys = {
+    ["<localleader>@"] = { paredit.unwrap.unwrap_form_under_cursor, "Splice sexp" },
     [">)"] = { paredit.api.slurp_forwards, "Slurp forwards" },
     [">("] = { paredit.api.barf_backwards, "Barf backwards" },
 
@@ -327,7 +328,7 @@ Cursor api `paredit.cursor`
   - `placement` - enumeration `left_edge`,`inner_start`,`inner_end`,`right_edge`
   - `mode` - currently only `insert` is supported, defaults to `normal`
 
-## API usage recipes
+## Additional API usage recipes
 
 ### `vim-sexp` wrap form (head/tail) replication
 
