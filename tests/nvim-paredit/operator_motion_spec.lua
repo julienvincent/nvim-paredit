@@ -8,7 +8,7 @@ local defaults = require("nvim-paredit.defaults")
 describe("motions with operator pending", function()
   before_each(function()
     keybindings.setup_keybindings({
-      keys = defaults.default_keys
+      keys = defaults.default_keys,
     })
   end)
 
@@ -26,6 +26,42 @@ describe("motions with operator pending", function()
     expect({
       content = "",
       cursor = { 1, 0 },
+    })
+  end)
+
+  it("should delete til next", function()
+    prepare_buffer({
+      content = "(a a) (b b)",
+      cursor = { 1, 0 },
+    })
+    feedkeys("d<S-w>")
+    expect({
+      content = "(b b)",
+      cursor = { 1, 0 },
+    })
+  end)
+
+  it("should delete form if there is no next", function()
+    prepare_buffer({
+      content = "(b b)",
+      cursor = { 1, 0 },
+    })
+    feedkeys("d<S-w>")
+    expect({
+      content = "",
+      cursor = { 1, 0 },
+    })
+  end)
+
+  it("should delete 2 forms within parent form and join up", function()
+    prepare_buffer({
+      content = {"[(a a) (b b) (c c)]"},
+      cursor = { 1, 1 },
+    })
+    feedkeys("2d<S-w>")
+    expect({
+      content = "[(c c)]",
+      cursor = { 1, 1 },
     })
   end)
 
@@ -91,7 +127,7 @@ end)
 describe("motions with operator pending and v:count", function()
   before_each(function()
     keybindings.setup_keybindings({
-      keys = defaults.default_keys
+      keys = defaults.default_keys,
     })
   end)
 
