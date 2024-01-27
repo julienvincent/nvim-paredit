@@ -265,7 +265,7 @@ require("nvim-paredit").setup({
       end,
       -- Accepts a Treesitter node representing a form and should return the 'edges' of the node. This
       -- includes the node text and the range covered by the node
-      get_node_edges = function(node)
+      get_form_edges = function(node)
         return {
           left = { text = "#{", range = { 0, 0, 0, 2 } },
           right = { text = "}", range = { 0, 5, 0, 6 } },
