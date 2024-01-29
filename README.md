@@ -285,6 +285,7 @@ require("nvim-paredit").extension.add_language_extension("commonlisp", { ... }).
 ### Existing Language Extensions
 
 + [fennel](https://github.com/julienvincent/nvim-paredit-fennel)
++ [scheme](https://github.com/ekaitz-zarraga/nvim-paredit-scheme)
 
 ---
 
