@@ -1,7 +1,7 @@
 local M = {}
 
 function M.insert_mode()
-  vim.api.nvim_feedkeys("i", "n", true)
+  vim.cmd("startinsert")
 end
 
 function M.get_cursor_pos(range_or_node, opts)
