@@ -20,7 +20,8 @@ function M.drag_form_forwards()
     return
   end
 
-  ts.swap_nodes(root, sibling, 0, true)
+  local buf = vim.api.nvim_get_current_buf()
+  ts.swap_nodes(root, sibling, buf, true)
 end
 
 function M.drag_form_backwards()
@@ -39,7 +40,8 @@ function M.drag_form_backwards()
     return
   end
 
-  ts.swap_nodes(root, sibling, 0, true)
+  local buf = vim.api.nvim_get_current_buf()
+  ts.swap_nodes(root, sibling, buf, true)
 end
 
 function M.drag_element_forwards()
@@ -51,7 +53,8 @@ function M.drag_element_forwards()
     return
   end
 
-  ts.swap_nodes(current_node, sibling, 0, true)
+  local buf = vim.api.nvim_get_current_buf()
+  ts.swap_nodes(current_node, sibling, buf, true)
 end
 
 function M.drag_element_backwards()
@@ -63,7 +66,8 @@ function M.drag_element_backwards()
     return
   end
 
-  ts.swap_nodes(current_node, sibling, 0, true)
+  local buf = vim.api.nvim_get_current_buf()
+  ts.swap_nodes(current_node, sibling, buf, true)
 end
 
 return M
