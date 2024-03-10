@@ -17,8 +17,5 @@ jobs:
 
     - uses: extractions/setup-just@v1
 
-    - name: Prepare ${{ matrix.channel }}
-      run: just prepare ${{ matrix.channel }}
-
-    - name: Run Tests
-      run: just test
+    - name: Run tests [${{ matrix.channel }}]
+      run: just test ${{ matrix.channel }}
