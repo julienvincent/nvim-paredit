@@ -7,6 +7,28 @@ local langs = require("nvim-paredit.lang")
 
 local M = {}
 
+local function position_cursor_according_to_edge(params)
+  if params.cursor_behaviour == "remain" then
+    return
+  end
+
+  local cursor_behaviour = params.cursor_behaviour or "auto"
+  local current_pos = vim.api.nvim_win_get_cursor(0)
+
+  local cursor_out_of_bounds
+  if params.reversed then
+    cursor_out_of_bounds = common.compare_positions(params.edge_pos, current_pos) == 1
+  else
+    cursor_out_of_bounds = common.compare_positions(current_pos, params.edge_pos) == 1
+  end
+
+  if cursor_behaviour == "follow" then
+    vim.api.nvim_win_set_cursor(0, params.edge_pos)
+  elseif cursor_behaviour == "auto" and cursor_out_of_bounds then
+    vim.api.nvim_win_set_cursor(0, params.edge_pos)
+  end
+end
+
 function M.barf_forwards(opts)
   opts = opts or {}
 
@@ -72,14 +94,10 @@ function M.barf_forwards(opts)
     { text }
   )
 
-  local cursor_behaviour = opts.cursor_behaviour or config.config.cursor_behaviour
-  if cursor_behaviour == "auto" or cursor_behaviour == "follow" then
-    local cursor_pos = vim.api.nvim_win_get_cursor(0)
-    local cursor_out_of_bounds = common.compare_positions({ cursor_pos[1] - 1, cursor_pos[2] }, end_pos) == 1
-    if cursor_behaviour == "follow" or cursor_out_of_bounds then
-      vim.api.nvim_win_set_cursor(0, { end_pos[1] + 1, end_pos[2] })
-    end
-  end
+  position_cursor_according_to_edge({
+    cursor_behaviour = opts.cursor_behaviour or config.config.cursor_behaviour,
+    edge_pos = { end_pos[1] + 1, end_pos[2] },
+  })
 
   local event = {
     type = "barf-forwards",
@@ -150,14 +168,11 @@ function M.barf_backwards(opts)
     {}
   )
 
-  local cursor_behaviour = opts.cursor_behaviour or config.config.cursor_behaviour
-  if cursor_behaviour == "auto" or cursor_behaviour == "follow" then
-    local cursor_pos = vim.api.nvim_win_get_cursor(0)
-    local cursor_out_of_bounds = common.compare_positions(end_pos, { cursor_pos[1] - 1, cursor_pos[2] }) == 1
-    if cursor_behaviour == "follow" or cursor_out_of_bounds then
-      vim.api.nvim_win_set_cursor(0, { end_pos[1] + 1, end_pos[2] })
-    end
-  end
+  position_cursor_according_to_edge({
+    reversed = true,
+    cursor_behaviour = opts.cursor_behaviour or config.config.cursor_behaviour,
+    edge_pos = { end_pos[1] + 1, end_pos[2] },
+  })
 
   local event = {
     type = "barf-backwards",

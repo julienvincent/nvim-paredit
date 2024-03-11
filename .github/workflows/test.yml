@@ -2,6 +2,8 @@ name: Tests
 
 on:
   push:
+    branches:
+    - master
   pull_request:
   workflow_dispatch:
 
@@ -11,7 +13,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        channel: [stable] #, nightly]
+        channel: [stable, nightly]
     steps:
     - uses: actions/checkout@v2
 
