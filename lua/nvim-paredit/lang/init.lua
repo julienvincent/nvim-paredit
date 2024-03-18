@@ -15,7 +15,12 @@ local function keys(tbl)
 end
 
 function M.get_language_api()
-  return langs[vim.bo.filetype]
+  for l in string.gmatch(vim.bo.filetype, "[^.]+") do
+    if langs[l] ~= nil then
+      return langs[l]
+    end
+  end
+  return nil
 end
 
 function M.add_language_extension(filetype, api)
