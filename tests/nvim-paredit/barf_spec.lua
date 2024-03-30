@@ -54,9 +54,9 @@ describe("barfing ::", function()
         },
         {
           "reader conditional",
-          before_content = "#?{:cljs a :clj b}",
+          before_content = "#?(:cljs a :clj b)",
           before_cursor = { 1, 3 },
-          after_content = "#?{:cljs a :clj} b",
+          after_content = "#?(:cljs a :clj) b",
           after_cursor = { 1, 3 },
         }
       })
