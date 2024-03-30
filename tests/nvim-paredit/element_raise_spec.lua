@@ -97,4 +97,17 @@ describe("element raising", function()
       cursor = { 1, 0 },
     })
   end)
+
+  it("should raise a element inside reader conditional", function()
+    prepare_buffer({
+      content = { "#?(:clj (b", " c))" },
+      cursor = { 1, 8 },
+    })
+
+    paredit.raise_element()
+    expect({
+      content = { "(b", " c)" },
+      cursor = { 1, 0 },
+    })
+  end)
 end)

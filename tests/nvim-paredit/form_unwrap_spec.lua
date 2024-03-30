@@ -53,4 +53,16 @@ describe("form uwrap (e.g. splice)", function()
       content = { "+ % 2 3" },
     })
   end)
+
+  it("should uwrap reader conditionsl under cursor", function()
+    prepare_buffer({
+      content = { "#?(:clj :foo/bar)" },
+      cursor = { 1, 10 },
+    })
+
+    unwrap.unwrap_form_under_cursor()
+    expect({
+      content = { ":clj :foo/bar" },
+    })
+  end)
 end)

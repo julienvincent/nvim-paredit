@@ -52,6 +52,13 @@ describe("barfing ::", function()
           after_content = "#{}a",
           after_cursor = { 1, 2 },
         },
+        {
+          "reader conditional",
+          before_content = "#?{:cljs a :clj b}",
+          before_cursor = { 1, 3 },
+          after_content = "#?{:cljs a :clj} b",
+          after_cursor = { 1, 3 },
+        }
       })
     end)
 
