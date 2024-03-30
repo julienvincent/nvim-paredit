@@ -44,6 +44,13 @@ describe("form raising", function()
         after_content = "#(b c)",
         after_cursor = { 1, 0 },
       },
+      {
+        "reader conditional",
+        before_content = "(let [z 1] #?(:clj a :cljs #{b c}))",
+        before_cursor = { 1, 14 },
+        after_content = "#?(:clj a :cljs #{b c})",
+        after_cursor = { 1, 0 },
+      },
     })
   end)
 

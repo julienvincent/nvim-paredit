@@ -4,6 +4,7 @@ local common = require("nvim-paredit.utils.common")
 local M = {}
 
 local form_types = {
+  "read_cond_lit",
   "list_lit",
   "vec_lit",
   "map_lit",

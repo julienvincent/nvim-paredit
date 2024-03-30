@@ -51,6 +51,18 @@ describe("form deletions", function()
     })
   end)
 
+  it("should delete the reader conditional form", function()
+    prepare_buffer({
+      content = "#?(:clj a :cljs a)",
+      cursor = { 1, 5 },
+    })
+    feedkeys("daf")
+    expect({
+      content = "",
+      cursor = { 1, 0 },
+    })
+  end)
+
   it("should delete everything in the form", function()
     prepare_buffer({
       content = "(a b)",
@@ -72,6 +84,18 @@ describe("form deletions", function()
     expect({
       content = "()",
       cursor = { 1, 1 },
+    })
+  end)
+
+  it("should delete everything in the reader conditional form", function()
+    prepare_buffer({
+      content = "#?(:clj a b)",
+      cursor = { 1, 4 },
+    })
+    feedkeys("dif")
+    expect({
+      content = "#?()",
+      cursor = { 1, 3 },
     })
   end)
 end)
@@ -149,7 +173,7 @@ describe("top form selections", function()
 
   it("should select the root form and not the siblings", function()
     prepare_buffer({
-      content = {"(+ 1 2)", "(foo (a", "a)) (/ 6 2)"},
+      content = { "(+ 1 2)", "(foo (a", "a)) (/ 6 2)" },
       cursor = { 2, 6 },
     })
     feedkeys("vaF")
@@ -158,7 +182,7 @@ describe("top form selections", function()
 
   it("should select within the form", function()
     prepare_buffer({
-      content = {"(+ 1 2)", "(foo (a", "a)) (/ 6 2)"},
+      content = { "(+ 1 2)", "(foo (a", "a)) (/ 6 2)" },
       cursor = { 2, 6 },
     })
     feedkeys("viF")

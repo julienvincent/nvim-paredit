@@ -52,6 +52,13 @@ describe("slurping backward", function()
         after_content = "#{a }",
         after_cursor = { 1, 4 },
       },
+      {
+        "reader conditional",
+        before_content = "a #?(:clj)",
+        before_cursor = { 1, 5 },
+        after_content = "#?(a :clj)",
+        after_cursor = { 1, 5 },
+      }
     })
   end)
 
