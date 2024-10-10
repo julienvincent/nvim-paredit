@@ -13,7 +13,11 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        channel: [stable, nightly]
+        channel: 
+        - v0.9.5
+        - v0.10.0
+        - stable
+        - nightly
     steps:
     - uses: actions/checkout@v2
 
