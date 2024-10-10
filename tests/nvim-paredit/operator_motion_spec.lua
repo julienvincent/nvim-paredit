@@ -22,6 +22,7 @@ describe("motions with operator pending", function()
       content = " (b b)",
       cursor = { 1, 0 },
     })
+    vim.treesitter.get_parser(0):parse()
     feedkeys("d<S-e>")
     expect({
       content = "",
@@ -36,7 +37,7 @@ describe("motions with operator pending", function()
     })
     feedkeys("d<S-w>")
     expect({
-      content = {"(b b)"},
+      content = { "(b b)" },
       cursor = { 1, 0 },
     })
   end)
@@ -48,7 +49,7 @@ describe("motions with operator pending", function()
     })
     feedkeys("dg<S-e>")
     expect({
-      content = {"(a a)"},
+      content = { "(a a)" },
       cursor = { 1, 4 },
     })
   end)
@@ -79,7 +80,7 @@ describe("motions with operator pending", function()
 
   it("should delete 2 forms within parent form and join up", function()
     prepare_buffer({
-      content = {"[(a a) (b b) (c c)]"},
+      content = { "[(a a) (b b) (c c)]" },
       cursor = { 1, 1 },
     })
     feedkeys("2d<S-w>")
@@ -99,6 +100,7 @@ describe("motions with operator pending", function()
       content = { "", ";; comment", "(b b)" },
       cursor = { 1, 0 },
     })
+    vim.treesitter.get_parser(0):parse()
     feedkeys("d<S-e>")
     expect({
       content = "",
