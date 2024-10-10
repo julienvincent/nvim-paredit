@@ -15,6 +15,10 @@ local M = {
 
   drag_element_forwards = dragging.drag_element_forwards,
   drag_element_backwards = dragging.drag_element_backwards,
+
+  drag_pair_forwards = dragging.drag_pair_forwards,
+  drag_pair_backwards = dragging.drag_pair_backwards,
+
   drag_form_forwards = dragging.drag_form_forwards,
   drag_form_backwards = dragging.drag_form_backwards,
 

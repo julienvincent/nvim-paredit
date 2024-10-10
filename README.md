@@ -65,6 +65,13 @@ paredit.setup({
   --              this case it will place the cursor on the moved edge
   cursor_behaviour = "auto", -- remain, follow, auto
 
+  dragging = {
+    -- If set to `true` paredit will attempt to infer if an element being
+    -- dragged is part of a 'paired' form like as a map. If so then the element
+    -- will be dragged along with it's pair.
+    auto_drag_pairs = true,
+  },
+
   indent = {
     -- This controls how nvim-paredit handles indentation when performing operations which
     -- should change the indentation of the form (such as when slurping or barfing).
@@ -87,6 +94,9 @@ paredit.setup({
 
     [">e"] = { paredit.api.drag_element_forwards, "Drag element right" },
     ["<e"] = { paredit.api.drag_element_backwards, "Drag element left" },
+
+    [">p"] = { api.drag_pair_forwards, "Drag element pairs right" },
+    ["<p"] = { api.drag_pair_backwards, "Drag element pairs left" },
 
     [">f"] = { paredit.api.drag_form_forwards, "Drag form right" },
     ["<f"] = { paredit.api.drag_form_backwards, "Drag form left" },
@@ -246,14 +256,69 @@ vim.lsp.buf.format({
 end
 
 require("nvim-paredit").setup({
-indent = {
-  enabled = true,
-  indentor = lsp_indent,
-},
+  indent = {
+    enabled = true,
+    indentor = lsp_indent,
+  },
 })
 ```
 
 </details>
+
+## Pairwise Dragging
+
+Nvim-paredit has support for dragging elements pairwise. If an element being dragged is within a form that contains
+pairs of elements (such as a clojure `map`) then the element will be dragged along with it's pair.
+
+For example:
+
+```clojure
+{:a 1
+ |:b 2}
+;; Drag backwards
+{|:b 2
+ :a 1}
+```
+
+This is enabled by default and can be disabled by setting `dragging.auto_drag_pairs = false`.
+
+Pairwise dragging works using treesitter queries to identify element pairs within some localized node. This means you
+can very easily extend the paredit pairwise implementation by simply adding new treesitter queries to your nvim
+configuration.
+
+You might want to extend if:
+
+1) You are a language extension author and want to add pairwise dragging support to your extension.
+2) You want to add support for some syntax not supported by nvim-paredit.
+
+This is especially useful if you have your own clojure macros that you want to enable pairwise dragging on.
+
+All you need to do to extend is to add a new file called `queries/<language>/paredit/pairwise.scm` in your nvim config
+directory. Make sure to include the `;; extends` directive to the file or you will overwrite any pre-existing queries
+defined by nvim-paredit or other language extensions.
+
+As an example if you want to add support for the following clojure macro:
+
+```clojure
+(defmacro my-custom-bindings [bindings & body]
+  ...)
+
+(my-custom-bindings [a 1
+                     b 2]
+  (println a b))
+```
+
+You can add the following TS query
+
+```scm
+;; extends
+
+(list_lit
+  (sym_lit) @fn-name
+  (vec_lit
+    (_) @pair)
+  (#eq? @fn-name "my-custom-bindings"))
+```
 
 ## Language Support
 
@@ -332,6 +397,8 @@ paredit.api.slurp_forwards()
 - **`barf_backwards`**
 - **`drag_element_forwards`**
 - **`drag_element_backwards`**
+- **`drag_pair_forwards`**
+- **`drag_pair_backwards`**
 - **`drag_form_forwards`**
 - **`drag_form_backwards`**
 - **`raise_element`**

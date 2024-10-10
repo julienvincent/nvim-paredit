@@ -16,6 +16,22 @@ function M.find_nearest_form(current_node, opts)
   end
 end
 
+function M.get_children_ignoring_comments(node, opts)
+  local children = {}
+
+  local index = 0
+  local child = node:named_child(index)
+  while child do
+    if not child:extra() and not opts.lang.node_is_comment(child) then
+      table.insert(children, child)
+    end
+    index = index + 1
+    child = node:named_child(index)
+  end
+
+  return children
+end
+
 local function get_child_ignoring_comments(node, index, opts)
   if index < 0 or index >= node:named_child_count() then
     return
@@ -139,34 +155,18 @@ function M.find_root_element_relative_to(root, child)
   return M.find_root_element_relative_to(root, parent)
 end
 
-function M.get_top_level_node_below_document(node)
-  -- Document
-  --   - Branch A
-  --   -- Node X
-  --   --- Sub-node 1
-  --   - Branch B
-  --   -- Node Y
-  --   --- Sub-node 2
-  --   --- Sub-node 3
-
-  -- If we call this function on "Sub-node 2" we expect "Branch B" to be
-  -- returned, the top level one below the document itself. We know which
-  -- node is the document because it lacks a parent, just like Batman.
-
-  local parent = node:parent()
-
-  -- Does the node have a parent? If so, we might be at the right level.
-  -- If not, we should just return the node right away, we're already too high.
-  if parent then
-    -- If the parent _also_ has a parent then we still need to go higher, recur.
-    if parent:parent() then
-      return M.get_top_level_node_below_document(parent)
+-- Find the root node of the tree `node` is a member of, excluding the root
+-- 'source' document.
+function M.find_local_root(node)
+  local current = node
+  while true do
+    local next = current:parent()
+    if not next or next:type() == "source" then
+      break
     end
+    current = next
   end
-
-  -- As soon as we don't have a grandparent or parent, return the node
-  -- we're on because it means we're one step below the top level document node.
-  return node
+  return current
 end
 
 return M
