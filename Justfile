@@ -1,12 +1,17 @@
 [macos]
 prepare-nvim channel:
   #!/usr/bin/env bash
+  set -eo pipefail
+
   NVIM_DIR=".build/nvim/{{ channel }}"
 
   test -d $NVIM_DIR || {
     mkdir -p $NVIM_DIR
 
-    curl -L https://github.com/neovim/neovim/releases/download/{{ channel }}/nvim-macos.tar.gz > ./.build/nvim-macos.tar.gz
+    # Older versions of nvim don't have arch specific releases - so we do a simple retry without the arch component.
+    curl -L https://github.com/neovim/neovim/releases/download/{{ channel }}/nvim-macos-$(arch).tar.gz --fail > ./.build/nvim-macos.tar.gz || \
+    curl -L https://github.com/neovim/neovim/releases/download/{{ channel }}/nvim-macos.tar.gz --fail > ./.build/nvim-macos.tar.gz
+
     xattr -c ./.build/nvim-macos.tar.gz
     tar xzf ./.build/nvim-macos.tar.gz -C $NVIM_DIR --strip-components=1
     rm ./.build/nvim-macos.tar.gz
@@ -15,6 +20,8 @@ prepare-nvim channel:
 [linux]
 prepare-nvim channel:
   #!/usr/bin/env bash
+  set -eo pipefail
+
   NVIM_DIR=".build/nvim/{{ channel }}"
 
   test -d $NVIM_DIR || {
@@ -37,11 +44,13 @@ prepare channel: (prepare-nvim channel) prepare-dependencies
 
 test channel="stable" file="": (prepare channel)
   #!/usr/bin/env bash
+  set -eo pipefail
+
   NVIM_DIR=".build/nvim/{{ channel }}"
 
   ./$NVIM_DIR/bin/nvim --version
   ./$NVIM_DIR/bin/nvim \
     --headless \
     --noplugin \
-    -u tests/init.lua \
-    -c "PlenaryBustedDirectory tests/nvim-paredit/{{ file }} { minimal_init='tests/init.lua', sequential=true }"
+    -u tests/config.lua \
+    -c "PlenaryBustedDirectory tests/nvim-paredit/{{ file }} { minimal_init='tests/config.lua', sequential=true }"
