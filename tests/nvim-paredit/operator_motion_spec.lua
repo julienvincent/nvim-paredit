@@ -29,6 +29,30 @@ describe("motions with operator pending", function()
     })
   end)
 
+  it("should delete until the next element head", function()
+    prepare_buffer({
+      content = { "(a a)", "(b b)" },
+      cursor = { 1, 0 },
+    })
+    feedkeys("d<S-w>")
+    expect({
+      content = {"(b b)"},
+      cursor = { 1, 0 },
+    })
+  end)
+
+  it("should delete until the previous element tail", function()
+    prepare_buffer({
+      content = { "(a a)", "(b b)" },
+      cursor = { 2, 5 },
+    })
+    feedkeys("dg<S-e>")
+    expect({
+      content = {"(a a)"},
+      cursor = { 1, 4 },
+    })
+  end)
+
   it("should delete til next", function()
     prepare_buffer({
       content = "(a a) (b b)",
