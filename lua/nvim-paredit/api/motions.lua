@@ -140,6 +140,19 @@ function M._move_to_element(count, reversed, is_head, is_exclusive)
     cursor_pos = { next_pos[1] + 1, next_pos[2] - 1 + offset }
   end
 
+  -- When the offset results in a negative overflow then we need to adjust to
+  -- the last row in the previous col.
+  --
+  -- To do this we need to first calculate the length of the previous col to
+  -- get the end pos.
+  if cursor_pos[2] < 0 then
+    local line = vim.api.nvim_buf_get_lines(0, cursor_pos[1] - 1, cursor_pos[1], false)[1]
+    local line_end_col = vim.fn.strlen(line)
+
+    cursor_pos[1] = cursor_pos[1] - 1
+    cursor_pos[2] = line_end_col
+  end
+
   vim.api.nvim_win_set_cursor(0, cursor_pos)
 end
 
@@ -163,7 +176,7 @@ local function move_to_form_edge(form_node, direction, lang)
   local form_edges = lang.get_form_edges(form_node)
   local final_cursor_pos = {
     form_edges[direction].range[1] + 1,
-    form_edges[direction].range[2]
+    form_edges[direction].range[2],
   }
 
   vim.api.nvim_win_set_cursor(0, final_cursor_pos)
@@ -173,7 +186,7 @@ local function is_cursor_at_form_edge(form_node, direction, cur_cursor_pos, lang
   local form_edges = lang.get_form_edges(form_node)
   local edge_cursor_pos = {
     form_edges[direction].range[1] + 1,
-    form_edges[direction].range[2]
+    form_edges[direction].range[2],
   }
 
   return common.compare_positions(edge_cursor_pos, cur_cursor_pos) == 0
@@ -190,13 +203,12 @@ local function move_to_parent_form_edge(direction)
 
   local cur_cursor_pos = vim.api.nvim_win_get_cursor(0)
   local form_node_to_move_to = nearest_form_node
-  while is_cursor_at_form_edge(form_node_to_move_to, direction, cur_cursor_pos, lang)
-    do
-      form_node_to_move_to = lang.get_node_root(form_node_to_move_to):parent()
-      if not form_node_to_move_to or form_node_to_move_to:type() == "source" then
-        return
-      end
+  while is_cursor_at_form_edge(form_node_to_move_to, direction, cur_cursor_pos, lang) do
+    form_node_to_move_to = lang.get_node_root(form_node_to_move_to):parent()
+    if not form_node_to_move_to or form_node_to_move_to:type() == "source" then
+      return
     end
+  end
 
   move_to_form_edge(form_node_to_move_to, direction, lang)
 end
@@ -209,8 +221,8 @@ end
 
 function M.move_to_prev_element_tail()
   local count = vim.v.count1
-  ensure_visual_if_operator_pending()
-  M._move_to_element(count, true, false)
+  local is_operator = ensure_visual_if_operator_pending()
+  M._move_to_element(count, true, false, is_operator)
 end
 
 function M.move_to_next_element_tail()
