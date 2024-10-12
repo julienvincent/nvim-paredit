@@ -1,10 +1,9 @@
 local api = require("nvim-paredit.api")
-local unwrap = require("nvim-paredit.api.unwrap")
 
 local M = {}
 
 M.default_keys = {
-  ["<localleader>@"] = { unwrap.unwrap_form_under_cursor, "Splice sexp" },
+  ["<localleader>@"] = { api.unwrap_form_under_cursor, "Splice sexp" },
 
   [">)"] = { api.slurp_forwards, "Slurp forwards" },
   [">("] = { api.barf_backwards, "Barf backwards" },

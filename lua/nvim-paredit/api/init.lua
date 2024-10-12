@@ -5,7 +5,16 @@ local raising = require("nvim-paredit.api.raising")
 local motions = require("nvim-paredit.api.motions")
 local selections = require("nvim-paredit.api.selections")
 local deletions = require("nvim-paredit.api.deletions")
-local common = require("nvim-paredit.utils.common")
+local wrap = require("nvim-paredit.api.wrap")
+local unwrap = require("nvim-paredit.api.unwrap")
+
+-- Use this to wrap an API with if it becomes deprecated
+-- local function deprecate(fn, message)
+--   return function(...)
+--     print("Warning: Deprecated function called. " .. message)
+--     return fn(...)
+--   end
+-- end
 
 local M = {
   slurp_forwards = slurping.slurp_forwards,
@@ -25,13 +34,9 @@ local M = {
   raise_form = raising.raise_form,
   raise_element = raising.raise_element,
 
-  -- TODO: remove deprecated code in next versions
-  move_to_next_element = common.deprecate(motions.move_to_next_element_tail, "use `api.move_to_next_element_tail`"),
   move_to_next_element_tail = motions.move_to_next_element_tail,
   move_to_next_element_head = motions.move_to_next_element_head,
 
-  -- TODO: remove deprecated code in next versions
-  move_to_prev_element = common.deprecate(motions.move_to_prev_element_head, "use `api.move_to_prev_element_head`"),
   move_to_prev_element_head = motions.move_to_prev_element_head,
   move_to_prev_element_tail = motions.move_to_prev_element_tail,
 
@@ -49,6 +54,10 @@ local M = {
   delete_top_level_form = deletions.delete_top_level_form,
   delete_in_top_level_form = deletions.delete_in_top_level_form,
   delete_element = deletions.delete_element,
+
+  wrap_element_under_cursor = wrap.wrap_element_under_cursor,
+  wrap_enclosing_form_under_cursor = wrap.wrap_enclosing_form_under_cursor,
+  unwrap_form_under_cursor = unwrap.unwrap_form_under_cursor,
 }
 
 return M
