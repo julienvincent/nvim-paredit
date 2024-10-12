@@ -93,11 +93,4 @@ function M.is_whitespace_under_cursor(lang)
     or char_under_cursor[1] == ""
 end
 
-function M.deprecate(fn, message)
-  return function(...)
-    print("Warning: Deprecated function called. " .. message)
-    return fn(...)
-  end
-end
-
 return M
