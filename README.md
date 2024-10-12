@@ -4,7 +4,7 @@
 
 <div align="center">
   <p>
-    <img src="assets/logo.png" align="center" alt="Logo" />
+    <img src="https://github.com/user-attachments/assets/4175e39c-42b4-48bd-81b6-ed7ef52bda30" align="center" alt="Logo" />
   </p>
   <p>
     A <a href="https://paredit.org/">Paredit</a> implementation for <a href="https://github.com/neovim/neovim/">Neovim</a>, built using <a href="https://github.com/tree-sitter/tree-sitter">Treesitter</a> and written in Lua.
@@ -21,7 +21,7 @@ Emacs. This is what is provided:
 
 ---
 
-![Demo](./assets/demo.gif)
+![Demo](https://github.com/user-attachments/assets/634ae915-43d6-487b-9453-cf0257e38630)
 
 ## Index
 
