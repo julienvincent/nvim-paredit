@@ -35,7 +35,14 @@ local language_extension = {
 }
 ```
 
-See also [the clojure implementation](../lua/nvim-paredit/lang/clojure.lua) for a good reference.
+See [the clojure implementation](../lua/nvim-paredit/lang/clojure.lua) for a good reference implementation.
+
+In addition to implementing the above API it is also necessary to provide pairwise treesitter queries if you want
+paredit to support [pairwise dragging](../README.md#pairwise-dragging) in the language you are building for. This is
+completely optional but will provide a better experience.
+
+You can do this by adding a `queries/<language>/paredit/pairwise.scm` file to your plugin. See the [clojure
+queries](../queries/clojure/paredit/pairwise.scm) for a good reference on how to write these queries.
 
 ## Registration
 
