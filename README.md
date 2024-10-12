@@ -23,13 +23,18 @@ Emacs. This is what is provided:
 
 ![Demo](./assets/demo.gif)
 
-## Project Status
+## Index
 
-This is currently **beta software**. It works well in the workflows of the current maintainers but has not been
-thoroughly tested with many users.
-
-It currently only has first-class support for the `clojure` language and has a focus on supporting the fundamental
-paredit operations and motions.
+- **[Installation](#installation)**
+- **[Configuration](#configuration)**
+- **[API Reference](./docs/api-reference.md)**
+- **[Recipes](./docs/recipes.md)**
+- **[Auto Indentation](#auto-indentation)**
+- **[Pairwise Dragging](#pairwise-dragging)**
+- **[Language Support](#language-support)**
+  - **[Language Extension Spec](./docs/language-extension-spec.md)**
+  - **[Third-Party Language Extensions](#third-party-language-extensions)**
+- **[Prior Art](#prior-art)**
 
 ## Installation
 
@@ -45,6 +50,20 @@ paredit operations and motions.
 ```
 
 ## Configuration
+
+```lua
+local paredit = require("nvim-paredit")
+paredit.setup({
+  -- Change some keys
+  keys = {
+    ["<localleader>o"] = false,
+    ["<localleader>r"] = { paredit.api.raise_form, "Raise form" },
+  },
+})
+```
+
+<details>
+  <summary><code><b>Default Configuration Values</b></code></summary>
 
 ```lua
 local paredit = require("nvim-paredit")
@@ -185,6 +204,14 @@ paredit.setup({
 })
 ```
 
+</details>
+
+---
+
+## API Reference
+
+See **[api-reference.md](./docs/api-reference.md)**
+
 ## Auto Indentation
 
 Nvim-paredit comes with built-in support for fixing form indentation when performing slurp and barf operations. By
@@ -197,73 +224,10 @@ fast and does not result in any UI lag or jitter.
 
 The goal is _not_ to be 100% correct. The implementation follows a simple set of rules which account for most scenarios
 but not all. If a more correct implementation is needed then the native implementation can be replaced by setting the
-configuration property `intent.indentor`. For example an implementation using `vim.lsp.buf.format` could be built if the
-user doesn't mind sacrificing performance for correctness.
+configuration property `intent.indentor`.
 
-### Recipes
-
-<details>
-  <summary><code>vim.lsp.buf.format</code></summary>
-
-Below is a reference implementation for using `vim.lsp.buf.format` to replace the native implementation. This
-implementation won't be nearly as performant but it will be more correct.
-
-```lua
-local function lsp_indent(event, opts)
-  local traversal = require("nvim-paredit.utils.traversal")
-  local utils = require("nvim-paredit.indentation.utils")
-  local langs = require("nvim-paredit.lang")
-
-  local lang = langs.get_language_api()
-
-  local parent = event.parent
-
-  local child
-  if event.type == "slurp-forwards" then
-    child = parent:named_child(parent:named_child_count() - 1)
-  elseif event.type == "slurp-backwards" then
-    child = parent:named_child(1)
-  elseif event.type == "barf-forwards" then
-    child = traversal.get_next_sibling_ignoring_comments(event.parent, { lang = lang })
-  elseif event.type == "barf-backwards" then
-    child = event.parent
-  else
-    return
-  end
-
-  local child_range = { child:range() }
-  local lines = utils.find_affected_lines(child, utils.get_node_line_range(child_range))
-
-  vim.lsp.buf.format({
-    bufnr = opts.buf or 0,
-    range = {
-      ["start"] = { lines[1] + 1, 0 },
-      ["end"] = { lines[#lines] + 1, 0 },
-    },
-  })
-end
-
-local child_range = { child:range() }
-local lines = utils.find_affected_lines(child, utils.get_node_line_range(child_range))
-
-vim.lsp.buf.format({
-  bufnr = opts.buf or 0,
-  range = {
-    ["start"] = { lines[1] + 1, 0 },
-    ["end"] = { lines[#lines] + 1, 0 },
-  },
-})
-end
-
-require("nvim-paredit").setup({
-  indent = {
-    enabled = true,
-    indentor = lsp_indent,
-  },
-})
-```
-
-</details>
+For example an implementation using `vim.lsp.buf.format` could be built if you don't mind sacrificing performance for
+correctness. See the **[lsp indentation recipe](./docs/recipes.md#lsp-indentation)** for an example of this.
 
 ## Pairwise Dragging
 
@@ -280,7 +244,8 @@ For example:
  :a 1}
 ```
 
-This is enabled by default and can be disabled by setting `dragging.auto_drag_pairs = false`.
+This is enabled by default and can be disabled by setting `dragging.auto_drag_pairs = false` in the
+[configuration](#configuration).
 
 Pairwise dragging works using treesitter queries to identify element pairs within some localized node. This means you
 can very easily extend the paredit pairwise implementation by simply adding new treesitter queries to your nvim
@@ -288,8 +253,8 @@ configuration.
 
 You might want to extend if:
 
-1) You are a language extension author and want to add pairwise dragging support to your extension.
-2) You want to add support for some syntax not supported by nvim-paredit.
+1. You are a language extension author and want to add pairwise dragging support to your extension.
+2. You want to add support for some syntax not supported by nvim-paredit.
 
 This is especially useful if you have your own clojure macros that you want to enable pairwise dragging on.
 
@@ -305,7 +270,7 @@ As an example if you want to add support for the following clojure macro:
 
 (my-custom-bindings [a 1
                      b 2]
-  (println a b))
+                    (println a b))
 ```
 
 You can add the following TS query
@@ -323,168 +288,24 @@ You can add the following TS query
 ## Language Support
 
 As this is built using Treesitter it requires that you have the relevant Treesitter grammar installed for your language
-of choice. Additionally `nvim-paredit` will need explicit support for the treesitter grammar as the node names and
-metadata of nodes vary between languages.
+of choice. Additionally `nvim-paredit` will need explicit support for the treesitter grammar used by your language as
+the node names and metadata of nodes vary between languages.
 
 Right now `nvim-paredit` only has built in support for `clojure` but exposes an extension API for adding support for
-other lisp dialects. This API is considered **very alpha** and may change without warning to properly account for other
-languages when attempts are made to add support.
+other lisp dialects. See **[third-party language extensions](#third-party-language-extensions)** for some existing
+support for other languages.
 
-Extensions can either be added as config when calling `setup`:
+If you are an extension author and would like to add support for a lisp dialect take a look at the
+[Language Extension Spec](./docs/language-extension-spec.md) for an overview on how to achieve this.
 
-```lua
-require("nvim-paredit").setup({
-  extensions = {
-    commonlisp = {
-      -- Should return the 'root' of the given Treesitter node. For example:
-      -- The node at cursor in the below example is `()` or 'list_lit':
-      --   '(|)
-      -- But the node root is `'()` or 'quoting_lit'
-      get_node_root = function(node) end,
-      -- This is the inverse of `get_node_root` for forms and should find the inner node for which
-      -- the forms elements are direct children.
-      --
-      -- For example given the node `'()` or 'quoting_lit', this function should return `()` or 'list_lit'.
-      unwrap_form = function(node) end,
-      -- Accepts a Treesitter node and should return true or false depending on whether the given node
-      -- can be considered a 'form'
-      node_is_form = function(node) end,
-      -- Accepts a Treesitter node and should return true or false depending on whether the given node
-      -- can be considered a 'comment'
-      node_is_comment = function(node) end,
-      -- Accepts a Treesitter node representing a form and should return the 'edges' of the node. This
-      -- includes the node text and the range covered by the node
-      get_form_edges = function(node)
-        return {
-          left = { text = "#{", range = { 0, 0, 0, 2 } },
-          right = { text = "}", range = { 0, 5, 0, 6 } },
-        }
-      end,
-    },
-  },
-})
-```
+### Third-Party Language Extensions
 
-Or by calling the `add_language_extension` API directly before the setup. This would be the recommended approach for
-extension plugin authors.
-
-```lua
-require("nvim-paredit").extension.add_language_extension("commonlisp", { ... }).
-```
-
-### Existing Language Extensions
-
-- [fennel](https://github.com/julienvincent/nvim-paredit-fennel)
-- [scheme](https://github.com/ekaitz-zarraga/nvim-paredit-scheme)
-
----
-
-As no attempt has been made to add support for other grammars I have no idea if the language extension API's are
-actually sufficient for adding additional languages. They will evolve as attempts are made.
-
-## API
-
-The core API is exposed as `paredit.api`:
-
-```lua
-local paredit = require("nvim-paredit")
-paredit.api.slurp_forwards()
-```
-
-- **`slurp_forwards`**
-- **`slurp_backwards`**
-- **`barf_forwards`**
-- **`barf_backwards`**
-- **`drag_element_forwards`**
-- **`drag_element_backwards`**
-- **`drag_pair_forwards`**
-- **`drag_pair_backwards`**
-- **`drag_form_forwards`**
-- **`drag_form_backwards`**
-- **`raise_element`**
-- **`raise_form`**
-- **`delete_form`**
-- **`delete_in_form`**
-- **`delete_top_level_form`**
-- **`delete_in_top_level_form`**
-- **`delete_element`**
-- **`move_to_next_element`**
-- **`move_to_prev_element`**
-
-Form/element wrap api is in `paredit.wrap` module:
-
-- **`wrap_element_under_cursor`** - accepts prefix and suffix, returns wrapped `TSNode`
-- **`wrap_enclosing_form_under_cursor`** - accepts prefix and suffix, returns wrapped `TSNode`
-
-Cursor api `paredit.cursor`
-
-- **`place_cursor`** - accepts `TSNode`, and following options:
-  - `placement` - enumeration `left_edge`,`inner_start`,`inner_end`,`right_edge`
-  - `mode` - currently only `insert` is supported, defaults to `normal`
-
-## Additional API usage recipes
-
-### `vim-sexp` wrap form (head/tail) replication
-
-Require api module:
-
-```lua
-local paredit = require("nvim-paredit")
-```
-
-Add following keybindings to config:
-
-```lua
-["<localleader>w"] = {
-  function()
-    -- place cursor and set mode to `insert`
-    paredit.cursor.place_cursor(
-      -- wrap element under cursor with `( ` and `)`
-      paredit.wrap.wrap_element_under_cursor("( ", ")"),
-      -- cursor placement opts
-      { placement = "inner_start", mode = "insert" }
-    )
-  end,
-  "Wrap element insert head",
-},
-
-["<localleader>W"] = {
-  function()
-    paredit.cursor.place_cursor(
-      paredit.wrap.wrap_element_under_cursor("(", ")"),
-      { placement = "inner_end", mode = "insert" }
-    )
-  end,
-  "Wrap element insert tail",
-},
-
--- same as above but for enclosing form
-["<localleader>i"] = {
-  function()
-    paredit.cursor.place_cursor(
-      paredit.wrap.wrap_enclosing_form_under_cursor("( ", ")"),
-      { placement = "inner_start", mode = "insert" }
-    )
-  end,
-  "Wrap form insert head",
-},
-
-["<localleader>I"] = {
-  function()
-    paredit.cursor.place_cursor(
-      paredit.wrap.wrap_enclosing_form_under_cursor("(", ")"),
-      { placement = "inner_end", mode = "insert" }
-    )
-  end,
-  "Wrap form insert tail",
-}
-```
-
-Same approach can be used for other `vim-sexp` keybindings (e.g. `<localleader>e[`) with cursor placement or without.
+- **[fennel](https://github.com/julienvincent/nvim-paredit-fennel)**
+- **[scheme](https://github.com/ekaitz-zarraga/nvim-paredit-scheme)**
 
 ## Prior Art
 
-### [vim-sexp](https://github.com/guns/vim-sexp)
+#### [vim-sexp](https://github.com/guns/vim-sexp)
 
 Currently the de-facto s-expression editing plugin with the most extensive set of available editing operations. If you
 are looking for a more complete plugin with a wider range of supported languages then you might want to look into using
@@ -498,7 +319,7 @@ The main reasons you might want to consider `nvim-paredit` instead are:
 - Automatic form/element indentations on slurp/barf
 - Subjectively better out-of-the-box keybindings
 
-### [vim-sexp-mappings-for-regular-people](https://github.com/tpope/vim-sexp-mappings-for-regular-people)
+#### [vim-sexp-mappings-for-regular-people](https://github.com/tpope/vim-sexp-mappings-for-regular-people)
 
 A companion to `vim-sexp` which configures `vim-sexp` with better mappings. The default mappings for `nvim-paredit` were
 derived from here.
