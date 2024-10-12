@@ -41,7 +41,7 @@ function M.get_range_around_form()
 end
 
 function M.get_range_around_top_level_form()
-  return get_range_around_form_impl(traversal.get_top_level_node_below_document)
+  return get_range_around_form_impl(traversal.find_local_root)
 end
 
 local function select_around_form_impl(range)
@@ -93,7 +93,7 @@ function M.get_range_in_form()
 end
 
 function M.get_range_in_top_level_form()
-  return get_range_in_form_impl(traversal.get_top_level_node_below_document)
+  return get_range_in_form_impl(traversal.find_local_root)
 end
 
 local function select_in_form_impl(range)

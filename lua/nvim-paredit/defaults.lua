@@ -4,7 +4,7 @@ local unwrap = require("nvim-paredit.api.unwrap")
 local M = {}
 
 M.default_keys = {
-  ["<localleader>@"] = { unwrap.unwrap_form_under_cursor, "Splice sexp", },
+  ["<localleader>@"] = { unwrap.unwrap_form_under_cursor, "Splice sexp" },
 
   [">)"] = { api.slurp_forwards, "Slurp forwards" },
   [">("] = { api.barf_backwards, "Barf backwards" },
@@ -14,6 +14,9 @@ M.default_keys = {
 
   [">e"] = { api.drag_element_forwards, "Drag element right" },
   ["<e"] = { api.drag_element_backwards, "Drag element left" },
+
+  [">p"] = { api.drag_pair_forwards, "Drag element pairs right" },
+  ["<p"] = { api.drag_pair_backwards, "Drag element pairs left" },
 
   [">f"] = { api.drag_form_forwards, "Drag form right" },
   ["<f"] = { api.drag_form_backwards, "Drag form left" },
@@ -107,6 +110,12 @@ M.default_keys = {
 M.defaults = {
   use_default_keys = true,
   cursor_behaviour = "auto", -- remain, follow, auto
+  dragging = {
+    -- If set to `true` paredit will attempt to infer if an element being
+    -- dragged is part of a 'paired' form like as a map. If so then the element
+    -- will be dragged along with it's pair.
+    auto_drag_pairs = true,
+  },
   indent = {
     enabled = false,
     indentor = require("nvim-paredit.indentation.native").indentor,

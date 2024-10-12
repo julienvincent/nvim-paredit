@@ -9,6 +9,20 @@ function M.included_in_table(table, item)
   return false
 end
 
+function M.chunk_table(tbl, chunk_size)
+  local result = {}
+  for i = 1, #tbl, chunk_size do
+    local chunk = {}
+    for j = 0, chunk_size - 1 do
+      if tbl[i + j] then
+        table.insert(chunk, tbl[i + j])
+      end
+    end
+    table.insert(result, chunk)
+  end
+  return result
+end
+
 -- Compares the two given { col, row } position tuples and returns -1/0/1 depending
 -- on whether `a` is less than, equal to or greater than `b`
 --

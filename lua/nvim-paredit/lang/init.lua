@@ -1,5 +1,3 @@
-local common = require("nvim-paredit.utils.common")
-
 local langs = {
   clojure = require("nvim-paredit.lang.clojure"),
 }
@@ -14,13 +12,14 @@ local function keys(tbl)
   return result
 end
 
+--- @return table<string, function>
 function M.get_language_api()
   for l in string.gmatch(vim.bo.filetype, "[^.]+") do
     if langs[l] ~= nil then
       return langs[l]
     end
   end
-  return nil
+  error("Could not find language extension for filetype " .. vim.bo.filetype, vim.log.levels.ERROR)
 end
 
 function M.add_language_extension(filetype, api)
