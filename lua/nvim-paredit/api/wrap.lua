@@ -5,11 +5,6 @@ local langs = require("nvim-paredit.lang")
 
 local M = {}
 
-local function reparse(buf)
-  local parser = vim.treesitter.get_parser(buf, vim.bo.filetype)
-  parser:parse()
-end
-
 function M.find_element_under_cursor(lang)
   local node = ts.get_node_at_cursor()
   return lang.get_node_root(node)

@@ -6,6 +6,8 @@ local motions = require("nvim-paredit.api.motions")
 local selections = require("nvim-paredit.api.selections")
 local deletions = require("nvim-paredit.api.deletions")
 local common = require("nvim-paredit.utils.common")
+local wrap = require("nvim-paredit.api.wrap")
+local unwrap = require("nvim-paredit.api.unwrap")
 
 local M = {
   slurp_forwards = slurping.slurp_forwards,
@@ -49,6 +51,10 @@ local M = {
   delete_top_level_form = deletions.delete_top_level_form,
   delete_in_top_level_form = deletions.delete_in_top_level_form,
   delete_element = deletions.delete_element,
+
+  wrap_element_under_cursor = wrap.wrap_element_under_cursor,
+  wrap_enclosing_form_under_cursor = wrap.wrap_enclosing_form_under_cursor,
+  unwrap_form_under_cursor = unwrap.unwrap_form_under_cursor,
 }
 
 return M
