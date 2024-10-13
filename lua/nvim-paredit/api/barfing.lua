@@ -1,9 +1,10 @@
+local ts_context = require("nvim-paredit.treesitter.context")
+local ts_forms = require("nvim-paredit.treesitter.forms")
+local ts_utils = require("nvim-paredit.treesitter.utils")
 local traversal = require("nvim-paredit.utils.traversal")
 local indentation = require("nvim-paredit.indentation")
 local common = require("nvim-paredit.utils.common")
-local ts = require("nvim-treesitter.ts_utils")
 local config = require("nvim-paredit.config")
-local langs = require("nvim-paredit.lang")
 
 local M = {}
 
@@ -32,41 +33,34 @@ end
 function M.barf_forwards(opts)
   opts = opts or {}
 
-  local lang = langs.get_language_api()
-  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
-    use_source = false,
-    lang = lang,
-  })
+  local context = ts_context.create_context(opts)
+  if not context then
+    return
+  end
+
+  local current_form = ts_forms.find_nearest_form(context.node, context)
   if not current_form then
     return
   end
 
-  local form = traversal.find_closest_form_with_children(current_form, {
-    lang = lang,
-  })
-  if not form or form:type() == "source" then
+  local form = traversal.find_closest_form_with_children(current_form, context)
+  if not form or ts_utils.is_document_root(form) then
     return
   end
 
   local child
   if opts.reversed then
-    child = traversal.get_first_child_ignoring_comments(form, {
-      lang = lang,
-    })
+    child = traversal.get_first_child_ignoring_comments(form, context)
   else
-    child = traversal.get_last_child_ignoring_comments(form, {
-      lang = lang,
-    })
+    child = traversal.get_last_child_ignoring_comments(form, context)
   end
   if not child then
     return
   end
 
-  local edges = lang.get_form_edges(form)
+  local edges = ts_forms.get_form_edges(form, context)
 
-  local sibling = traversal.get_prev_sibling_ignoring_comments(child, {
-    lang = lang,
-  })
+  local sibling = traversal.get_prev_sibling_ignoring_comments(child, context)
 
   local end_pos
   if sibling then
@@ -113,34 +107,29 @@ end
 function M.barf_backwards(opts)
   opts = opts or {}
 
-  local lang = langs.get_language_api()
-  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
-    use_source = false,
-    lang = lang,
-  })
+  local context = ts_context.create_context(opts)
+  if not context then
+    return
+  end
+
+  local current_form = ts_forms.find_nearest_form(context.node, context)
   if not current_form then
     return
   end
 
-  local form = traversal.find_closest_form_with_children(current_form, {
-    lang = lang,
-  })
-  if not form or form:type() == "source" then
+  local form = traversal.find_closest_form_with_children(current_form, context)
+  if not form or ts_utils.is_document_root(form) then
     return
   end
 
-  local child = traversal.get_first_child_ignoring_comments(form, {
-    lang = lang,
-  })
+  local child = traversal.get_first_child_ignoring_comments(form, context)
   if not child then
     return
   end
 
-  local edges = lang.get_form_edges(lang.get_node_root(form))
+  local edges = ts_forms.get_form_edges(ts_forms.get_node_root(form, context), context)
 
-  local sibling = traversal.get_next_sibling_ignoring_comments(child, {
-    lang = lang,
-  })
+  local sibling = traversal.get_next_sibling_ignoring_comments(child, context)
 
   local end_pos
   if sibling then

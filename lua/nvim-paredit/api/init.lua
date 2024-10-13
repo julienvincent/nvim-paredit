@@ -8,14 +8,6 @@ local deletions = require("nvim-paredit.api.deletions")
 local wrap = require("nvim-paredit.api.wrap")
 local unwrap = require("nvim-paredit.api.unwrap")
 
--- Use this to wrap an API with if it becomes deprecated
--- local function deprecate(fn, message)
---   return function(...)
---     print("Warning: Deprecated function called. " .. message)
---     return fn(...)
---   end
--- end
-
 local M = {
   slurp_forwards = slurping.slurp_forwards,
   slurp_backwards = slurping.slurp_backwards,

@@ -3,7 +3,9 @@ local ts = require("nvim-treesitter.ts_utils")
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 
 describe("cursor pos api tests", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   it("should place cursor inside form at the beginning", function()
     prepare_buffer({

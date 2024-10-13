@@ -1,22 +1,25 @@
+local ts_context = require("nvim-paredit.treesitter.context")
+local ts_forms = require("nvim-paredit.treesitter.forms")
+local ts_pairs = require("nvim-paredit.treesitter.pairs")
 local traversal = require("nvim-paredit.utils.traversal")
 local common = require("nvim-paredit.utils.common")
-local ts_utils = require("nvim-paredit.utils.ts")
 local ts = require("nvim-treesitter.ts_utils")
 local config = require("nvim-paredit.config")
-local langs = require("nvim-paredit.lang")
 
 local M = {}
 
 function M.drag_form_forwards()
-  local lang = langs.get_language_api()
-  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang,
-  })
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local current_form = ts_forms.find_nearest_form(context.node, context)
   if not current_form then
     return
   end
 
-  local root = lang.get_node_root(current_form)
+  local root = ts_forms.get_node_root(current_form, context)
 
   local sibling = root:next_named_sibling()
   if not sibling then
@@ -28,15 +31,17 @@ function M.drag_form_forwards()
 end
 
 function M.drag_form_backwards()
-  local lang = langs.get_language_api()
-  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang,
-  })
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local current_form = ts_forms.find_nearest_form(context.node, context)
   if not current_form then
     return
   end
 
-  local root = lang.get_node_root(current_form)
+  local root = ts_forms.get_node_root(current_form, context)
 
   local sibling = root:prev_named_sibling()
   if not sibling then
@@ -81,38 +86,42 @@ local function drag_node_in_pair(current_node, nodes, opts)
 end
 
 local function drag_pair(opts)
-  local lang = langs.get_language_api()
-  local current_node = lang.get_node_root(ts.get_node_at_cursor())
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local current_node = ts_forms.get_node_root(context.node, context)
   if not current_node then
     return
   end
 
-  local pairwise_nodes = ts_utils.find_pairwise_nodes(
-    current_node,
-    vim.tbl_deep_extend("force", opts, {
-      lang = lang,
-    })
-  )
+  local pairwise_nodes = ts_pairs.find_pairwise_nodes(current_node, context)
   if not pairwise_nodes then
     local parent = current_node:parent()
     if not parent then
       return
     end
 
-    pairwise_nodes = traversal.get_children_ignoring_comments(parent, {
-      lang = lang,
-    })
+    pairwise_nodes = traversal.get_children_ignoring_comments(parent, context)
   end
 
   drag_node_in_pair(current_node, pairwise_nodes, opts)
 end
 
 local function drag_element(opts)
-  local lang = langs.get_language_api()
-  local current_node = lang.get_node_root(ts.get_node_at_cursor())
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local current_node = ts_forms.get_node_root(context.node, context)
+  if not current_node then
+    return
+  end
 
   if opts.dragging.auto_drag_pairs then
-    local pairwise_nodes = ts_utils.find_pairwise_nodes(current_node, { lang = lang })
+    local pairwise_nodes = ts_pairs.find_pairwise_nodes(current_node, context)
     if pairwise_nodes then
       return drag_node_in_pair(current_node, pairwise_nodes, opts)
     end

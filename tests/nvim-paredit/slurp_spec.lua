@@ -5,8 +5,13 @@ local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe("slurping backward", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
   local parser = vim.treesitter.get_parser(0)
+  if not parser then
+    return error("Failed to get parser for language")
+  end
 
   it("should slurp different form types", function()
     expect_all(paredit.slurp_backwards, {
@@ -125,8 +130,13 @@ describe("slurping backward", function()
 end)
 
 describe("slurping forward", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
   local parser = vim.treesitter.get_parser(0)
+  if not parser then
+    return error("Failed to get parser for language")
+  end
 
   it("should slurp forward different form types", function()
     expect_all(paredit.slurp_forwards, {

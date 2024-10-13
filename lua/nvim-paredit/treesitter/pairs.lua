@@ -1,4 +1,4 @@
-local traversal = require("nvim-paredit.utils.traversal")
+local ts_utils = require("nvim-paredit.treesitter.utils")
 
 local M = {}
 
@@ -8,12 +8,15 @@ local M = {}
 -- If any of these labeled nodes match the given target node then return all
 -- matched nodes.
 function M.find_pairwise_nodes(target_node, opts)
-  local root_node = traversal.find_local_root(target_node)
+  local root_node = ts_utils.find_local_root(target_node)
 
   local bufnr = vim.api.nvim_get_current_buf()
   local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+  if not lang then
+    return
+  end
 
-  local query = vim.treesitter.query.get(lang, "paredit/pairwise")
+  local query = vim.treesitter.query.get(lang, "paredit/pairs")
   if not query then
     return
   end
@@ -23,7 +26,7 @@ function M.find_pairwise_nodes(target_node, opts)
   local found = false
   for id, node in captures do
     if query.captures[id] == "pair" then
-      if not node:extra() and not opts.lang.node_is_comment(node) then
+      if not ts_utils.node_is_comment(node, opts) then
         table.insert(pairwise_nodes, node)
         if node:equal(target_node) then
           found = true

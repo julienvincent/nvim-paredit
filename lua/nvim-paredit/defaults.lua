@@ -119,6 +119,12 @@ M.defaults = {
     enabled = false,
     indentor = require("nvim-paredit.indentation.native").indentor,
   },
+  filetypes = { "clojure" },
+  languages = {
+    clojure = {
+      whitespace_chars = { " ", "," },
+    },
+  },
   keys = {},
 }
 

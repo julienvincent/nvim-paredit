@@ -10,7 +10,9 @@ local opts = vim.tbl_deep_extend("force", defaults.defaults, {
 })
 
 describe("forward slurping indentation", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
   local function slurp_forwards()
     paredit.slurp_forwards(opts)
   end

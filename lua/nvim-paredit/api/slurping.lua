@@ -1,17 +1,20 @@
+local ts_context = require("nvim-paredit.treesitter.context")
+local ts_forms = require("nvim-paredit.treesitter.forms")
 local traversal = require("nvim-paredit.utils.traversal")
 local indentation = require("nvim-paredit.indentation")
-local ts = require("nvim-treesitter.ts_utils")
 local config = require("nvim-paredit.config")
-local langs = require("nvim-paredit.lang")
 
 local M = {}
 
 local function slurp(opts)
   local cursor_pos = vim.api.nvim_win_get_cursor(0)
-  local lang = langs.get_language_api()
-  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang,
-  })
+
+  local context = ts_context.create_context(opts)
+  if not context then
+    return
+  end
+
+  local current_form = ts_forms.find_nearest_form(context.node, context)
   if not current_form then
     return
   end
@@ -30,9 +33,9 @@ local function slurp(opts)
   local sibling
 
   if opts.reversed then
-    sibling = traversal.get_prev_sibling_ignoring_comments(form, { lang = lang })
+    sibling = traversal.get_prev_sibling_ignoring_comments(form, context)
   else
-    sibling = traversal.get_next_sibling_ignoring_comments(form, { lang = lang })
+    sibling = traversal.get_next_sibling_ignoring_comments(form, context)
   end
 
   if not sibling then
@@ -40,7 +43,7 @@ local function slurp(opts)
   end
 
   local buf = vim.api.nvim_get_current_buf()
-  local form_edges = lang.get_form_edges(form)
+  local form_edges = ts_forms.get_form_edges(form, context)
   local left_or_right_edge
   if opts.reversed then
     left_or_right_edge = form_edges.left

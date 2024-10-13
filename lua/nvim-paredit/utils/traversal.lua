@@ -1,20 +1,7 @@
+local ts_forms = require("nvim-paredit.treesitter.forms")
+local ts_utils = require("nvim-paredit.treesitter.utils")
+
 local M = {}
-
-function M.find_nearest_form(current_node, opts)
-  if opts.lang.node_is_form(current_node) then
-    return current_node
-  end
-
-  local parent = current_node:parent()
-  if parent then
-    return M.find_nearest_form(parent, opts)
-  end
-
-  -- We are in the root of the document, which we can consider a form.
-  if type(opts.use_source) ~= "boolean" or opts.use_source then
-    return current_node
-  end
-end
 
 function M.get_children_ignoring_comments(node, opts)
   local children = {}
@@ -22,7 +9,7 @@ function M.get_children_ignoring_comments(node, opts)
   local index = 0
   local child = node:named_child(index)
   while child do
-    if not child:extra() and not opts.lang.node_is_comment(child) then
+    if not ts_utils.node_is_comment(child, opts) then
       table.insert(children, child)
     end
     index = index + 1
@@ -40,7 +27,7 @@ local function get_child_ignoring_comments(node, index, opts)
   if not child then
     return
   end
-  if child:extra() or opts.lang.node_is_comment(child) then
+  if ts_utils.node_is_comment(child, opts) then
     return get_child_ignoring_comments(node, index + opts.direction, opts)
   end
   return child
@@ -49,20 +36,20 @@ end
 function M.get_last_child_ignoring_comments(node, opts)
   return get_child_ignoring_comments(node, node:named_child_count() - 1, {
     direction = -1,
-    lang = opts.lang,
+    captures = opts.captures,
   })
 end
 
 function M.get_first_child_ignoring_comments(node, opts)
   return get_child_ignoring_comments(node, 0, {
     direction = 1,
-    lang = opts.lang,
+    captures = opts.captures,
   })
 end
 
 function M.find_closest_form_with_children(current_node, opts)
-  local form = opts.lang.unwrap_form(current_node)
-  if form:named_child_count() > 0 and current_node:type() ~= "source" then
+  local form = ts_forms.get_form_inner(current_node, opts)
+  if form:named_child_count() > 0 and not ts_utils.is_document_root(current_node) then
     return form
   end
 
@@ -100,7 +87,7 @@ local function get_sibling_ignoring_comments(node, opts)
     return opts.sibling or nil, opts.count + 1
   end
 
-  if sibling:extra() or opts.lang.node_is_comment(sibling) then
+  if ts_utils.node_is_comment(sibling, opts) then
     return get_sibling_ignoring_comments(sibling, opts)
   elseif opts.count > 1 then
     local new_opts = vim.tbl_deep_extend("force", opts, {
@@ -115,7 +102,7 @@ end
 
 function M.get_next_sibling_ignoring_comments(node, opts)
   return get_sibling_ignoring_comments(node, {
-    lang = opts.lang,
+    captures = opts.captures,
     count = opts.count or 1,
     sibling_fn = function(n)
       return n:next_named_sibling()
@@ -125,48 +112,12 @@ end
 
 function M.get_prev_sibling_ignoring_comments(node, opts)
   return get_sibling_ignoring_comments(node, {
-    lang = opts.lang,
+    captures = opts.captures,
     count = opts.count or 1,
     sibling_fn = function(n)
       return n:prev_named_sibling()
     end,
   })
-end
-
--- Find the root most parent of the given `child` node which is still contained within
--- the given `root` node.
---
--- This is useful to discover the element that we need to operate on within an enclosing
--- form. As an example, take the following senario with the cursor indicated with `|`:
---
--- (:keyword '|(a))
---
--- The enclosing `(` `)` brackets would be given as `root` while the inner list would be
--- given as `child`. The inner list may be wrapped in a `quoting` node, which is the
--- actual node we are wanting to operate on.
-function M.find_root_element_relative_to(root, child)
-  local parent = child:parent()
-  if not parent then
-    return child
-  end
-  if root:equal(parent) then
-    return child
-  end
-  return M.find_root_element_relative_to(root, parent)
-end
-
--- Find the root node of the tree `node` is a member of, excluding the root
--- 'source' document.
-function M.find_local_root(node)
-  local current = node
-  while true do
-    local next = current:parent()
-    if not next or next:type() == "source" then
-      break
-    end
-    current = next
-  end
-  return current
 end
 
 return M

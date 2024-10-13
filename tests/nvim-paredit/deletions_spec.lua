@@ -5,7 +5,9 @@ local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe("form deletions", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   it("should delete the form", function()
     prepare_buffer({
@@ -92,7 +94,9 @@ describe("form deletions", function()
 end)
 
 describe("form inner deletions", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   it("should delete everything in the form", function()
     prepare_buffer({
@@ -179,7 +183,9 @@ describe("form inner deletions", function()
 end)
 
 describe("element deletions", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   it("should delete the element under cursor", function()
     prepare_buffer({

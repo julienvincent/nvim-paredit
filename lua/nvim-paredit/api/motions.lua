@@ -1,7 +1,9 @@
+local ts_context = require("nvim-paredit.treesitter.context")
+local ts_forms = require("nvim-paredit.treesitter.forms")
+local whitespace = require("nvim-paredit.api.whitespace")
 local traversal = require("nvim-paredit.utils.traversal")
+local ts_utils = require("nvim-paredit.treesitter.utils")
 local common = require("nvim-paredit.utils.common")
-local ts = require("nvim-treesitter.ts_utils")
-local langs = require("nvim-paredit.lang")
 
 local MOTION_DIRECTIONS = { LEFT = "left", RIGHT = "right" }
 
@@ -19,13 +21,13 @@ local M = {}
 --
 -- This function attempts to find the next adjacent node from the cursor if the cursor
 -- is placed on whitespace.
-local function get_next_node_from_cursor(lang, reversed)
-  local current_node = ts.get_node_at_cursor()
+local function get_next_node_from_cursor(reversed, context)
+  local current_node = context.node
   local cursor = vim.api.nvim_win_get_cursor(0)
   cursor = { cursor[1] - 1, cursor[2] }
 
-  if not (lang.node_is_form(current_node) and common.is_whitespace_under_cursor(lang)) then
-    return lang.get_node_root(current_node)
+  if not (ts_forms.node_is_form(current_node, context) and whitespace.is_whitespace_under_cursor()) then
+    return ts_forms.get_node_root(current_node, context)
   end
 
   local start
@@ -48,18 +50,22 @@ local function get_next_node_from_cursor(lang, reversed)
 
     local child_is_next = common.compare_positions(range, cursor) == step
 
-    if child_is_next and not lang.node_is_comment(child) then
+    if child_is_next and not ts_utils.node_is_comment(child, context) then
       return child
     end
   end
 end
 
 function M._move_to_element(count, reversed, is_head, is_exclusive)
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
   is_exclusive = is_exclusive or false
   is_head = is_head or false
-  local lang = langs.get_language_api()
 
-  local current_node = get_next_node_from_cursor(lang, reversed)
+  local current_node = get_next_node_from_cursor(reversed, context)
   if not current_node then
     return
   end
@@ -88,7 +94,7 @@ function M._move_to_element(count, reversed, is_head, is_exclusive)
     end
   end
 
-  if lang.node_is_comment(current_node) then
+  if ts_utils.node_is_comment(current_node, context) then
     count = count + 1
   end
   local next_pos
@@ -99,7 +105,7 @@ function M._move_to_element(count, reversed, is_head, is_exclusive)
       count = count - 1
     end
     local sibling, count_left = traversal_fn(current_node, {
-      lang = lang,
+      captures = context.captures,
       count = count,
     })
 
@@ -168,12 +174,12 @@ local function ensure_visual_if_operator_pending()
   return false
 end
 
-local function move_to_form_edge(form_node, direction, lang)
+local function move_to_form_edge(form_node, direction, context)
   if not form_node then
     return
   end
 
-  local form_edges = lang.get_form_edges(form_node)
+  local form_edges = ts_forms.get_form_edges(form_node, context)
   local final_cursor_pos = {
     form_edges[direction].range[1] + 1,
     form_edges[direction].range[2],
@@ -182,8 +188,8 @@ local function move_to_form_edge(form_node, direction, lang)
   vim.api.nvim_win_set_cursor(0, final_cursor_pos)
 end
 
-local function is_cursor_at_form_edge(form_node, direction, cur_cursor_pos, lang)
-  local form_edges = lang.get_form_edges(form_node)
+local function cursor_is_at_form_edge(form_node, direction, cur_cursor_pos, context)
+  local form_edges = ts_forms.get_form_edges(form_node, context)
   local edge_cursor_pos = {
     form_edges[direction].range[1] + 1,
     form_edges[direction].range[2],
@@ -193,24 +199,35 @@ local function is_cursor_at_form_edge(form_node, direction, cur_cursor_pos, lang
 end
 
 local function move_to_parent_form_edge(direction)
-  local lang = langs.get_language_api()
-  local cur_node = ts.get_node_at_cursor()
-
-  local nearest_form_node = traversal.find_nearest_form(cur_node, { lang = lang })
-  if not nearest_form_node or nearest_form_node:type() == "source" then
+  local context = ts_context.create_context()
+  if not context then
     return
   end
 
-  local cur_cursor_pos = vim.api.nvim_win_get_cursor(0)
-  local form_node_to_move_to = nearest_form_node
-  while is_cursor_at_form_edge(form_node_to_move_to, direction, cur_cursor_pos, lang) do
-    form_node_to_move_to = lang.get_node_root(form_node_to_move_to):parent()
-    if not form_node_to_move_to or form_node_to_move_to:type() == "source" then
-      return
-    end
+  local nearest_form = ts_forms.find_nearest_form(context.node, {
+    use_source = false,
+    captures = context.captures,
+  })
+  if not nearest_form then
+    return
   end
 
-  move_to_form_edge(form_node_to_move_to, direction, lang)
+  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+
+  local target_form = nearest_form
+  if cursor_is_at_form_edge(target_form, direction, cursor_pos, context) then
+    local root = ts_forms.get_node_root(nearest_form, context)
+    if not root then
+      return
+    end
+    target_form = root:parent()
+  end
+
+  if not target_form or ts_utils.is_document_root(target_form) then
+    return
+  end
+
+  move_to_form_edge(target_form, direction, context)
 end
 
 function M.move_to_prev_element_head()

@@ -1,14 +1,13 @@
-local traversal = require("nvim-paredit.utils.traversal")
-local langs = require("nvim-paredit.lang")
-local ts = require("nvim-treesitter.ts_utils")
+local ts_context = require("nvim-paredit.treesitter.context")
+local ts_forms = require("nvim-paredit.treesitter.forms")
 
 local M = {}
 
-function M.unwrap_form(buf, form)
-  local lang = langs.get_language_api()
-  local edges = lang.get_form_edges(form)
+local function unwrap_form(buf, form, context)
+  local edges = ts_forms.get_form_edges(form, context)
   local left = edges.left
   local right = edges.right
+  -- stylua: ignore
   vim.api.nvim_buf_set_text(
     buf,
     right.range[1],
@@ -17,6 +16,7 @@ function M.unwrap_form(buf, form)
     right.range[4],
     { "" }
   )
+  -- stylua: ignore
   vim.api.nvim_buf_set_text(
     buf,
     left.range[1],
@@ -28,19 +28,22 @@ function M.unwrap_form(buf, form)
 end
 
 function M.unwrap_form_under_cursor()
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
   local buf = vim.api.nvim_get_current_buf()
-  local lang = langs.get_language_api()
-  local node = ts.get_node_at_cursor()
-  local current_element = lang.get_node_root(node)
-  local form = traversal.find_nearest_form(
-    current_element,
-    { lang = lang, use_source = false }
-  )
+  local current_element = ts_forms.get_node_root(context.node, context)
+  local form = ts_forms.find_nearest_form(current_element, {
+    captures = context.captures,
+    use_source = false,
+  })
   if not form then
     return false
   end
 
-  M.unwrap_form(buf, form)
+  unwrap_form(buf, form, context)
   return true
 end
 

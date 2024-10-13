@@ -32,8 +32,7 @@ Emacs. This is what is provided:
 - **[Auto Indentation](#auto-indentation)**
 - **[Pairwise Dragging](#pairwise-dragging)**
 - **[Language Support](#language-support)**
-  - **[Language Extension Spec](./docs/language-extension-spec.md)**
-  - **[Third-Party Language Extensions](#third-party-language-extensions)**
+  - **[Language Queries Spec](./docs/language-queries.md)**
 - **[Prior Art](#prior-art)**
 
 ## Installation
@@ -68,12 +67,24 @@ paredit.setup({
 ```lua
 local paredit = require("nvim-paredit")
 paredit.setup({
-  -- should plugin use default keybindings? (default = true)
+  -- Should plugin use default keybindings? (default = true)
   use_default_keys = true,
-  -- sometimes user wants to restrict plugin to certain file types only
-  -- defaults to all supported file types including custom lang
-  -- extensions (see next section)
-  filetypes = { "clojure" },
+  -- Sometimes user wants to restrict plugin to certain filetypes only or add support
+  -- for new filetypes.
+  --
+  -- Defaults to all supported filetypes.
+  filetypes = { "clojure", "fennel", "scheme" },
+
+  -- This is some language specific configuration. Right now this is just used for
+  -- setting character lists that are considered whitespace.
+  languages = {
+    clojure = {
+      whitespace_chars = { " ", "," },
+    },
+    fennel = {
+      whitespace_chars = { " ", "," },
+    },
+  },
 
   -- This controls where the cursor is placed when performing slurp/barf operations
   --
@@ -215,7 +226,7 @@ See **[api-reference.md](./docs/api-reference.md)**
 ## Auto Indentation
 
 Nvim-paredit comes with built-in support for fixing form indentation when performing slurp and barf operations. By
-default this behaviour is disabled and can be enabled by setting `indent.enabled = true` in the
+default, this behaviour is disabled and can be enabled by setting `indent.enabled = true` in the
 [configuration](#configuration)
 
 The main goal of this implementation is to provide a visual aid to the user, allowing them to confirm they are operating
@@ -232,7 +243,7 @@ correctness. See the **[lsp indentation recipe](./docs/recipes.md#lsp-indentatio
 ## Pairwise Dragging
 
 Nvim-paredit has support for dragging elements pairwise. If an element being dragged is within a form that contains
-pairs of elements (such as a clojure `map`) then the element will be dragged along with it's pair.
+pairs of elements (such as a Clojure `map`) then the element will be dragged along with its pair.
 
 For example:
 
@@ -256,67 +267,47 @@ You might want to extend if:
 1. You are a language extension author and want to add pairwise dragging support to your extension.
 2. You want to add support for some syntax not supported by nvim-paredit.
 
-This is especially useful if you have your own clojure macros that you want to enable pairwise dragging on.
+This is especially useful if you have your own Clojure macros that you want to enable pairwise dragging on.
 
-All you need to do to extend is to add a new file called `queries/<language>/paredit/pairwise.scm` in your nvim config
-directory. Make sure to include the `;; extends` directive to the file or you will overwrite any pre-existing queries
+All you need to do to extend is to add a new file called `queries/<language>/paredit/pairs.scm` in your nvim config
+directory. Make sure to include the `;; extends` directive to the file, or you will overwrite any pre-existing queries
 defined by nvim-paredit or other language extensions.
 
-As an example if you want to add support for the following clojure macro:
-
-```clojure
-(defmacro my-custom-bindings [bindings & body]
-  ...)
-
-(my-custom-bindings [a 1
-                     b 2]
-                    (println a b))
-```
-
-You can add the following TS query
-
-```scm
-;; extends
-
-(list_lit
-  (sym_lit) @fn-name
-  (vec_lit
-    (_) @pair)
-  (#eq? @fn-name "my-custom-bindings"))
-```
+See the **[custom macro pairwise dragging recipe](./docs/recipes.md#custom-macro-pairwise-dragging)** for an example of
+how to add pairwise dragging support for new syntax
 
 ## Language Support
 
 As this is built using Treesitter it requires that you have the relevant Treesitter grammar installed for your language
-of choice. Additionally `nvim-paredit` will need explicit support for the treesitter grammar used by your language as
+of choice. Additionally, `nvim-paredit` will need explicit support for the treesitter grammar used by your language as
 the node names and metadata of nodes vary between languages.
 
-Right now `nvim-paredit` only has built in support for `clojure` but exposes an extension API for adding support for
-other lisp dialects. See **[third-party language extensions](#third-party-language-extensions)** for some existing
-support for other languages.
+Language support is added by providing treesitter query files that specify specific captures nvim-paredit can use to
+understand the AST.
 
-If you are an extension author and would like to add support for a lisp dialect take a look at the
-[Language Extension Spec](./docs/language-extension-spec.md) for an overview on how to achieve this.
+Right now `nvim-paredit` has built-in support for:
 
-### Third-Party Language Extensions
+- `clojure`
+- `fennel`
+- `scheme`
 
-- **[fennel](https://github.com/julienvincent/nvim-paredit-fennel)**
-- **[scheme](https://github.com/ekaitz-zarraga/nvim-paredit-scheme)**
+Take a look at the [Language Queries Spec](./docs/language-queries.md) if you are wanting to add support for languages
+not built-in to nvim-paredit, or you want to develop on the existing queries.
 
 ## Prior Art
 
 #### [vim-sexp](https://github.com/guns/vim-sexp)
 
-Currently the de-facto s-expression editing plugin with the most extensive set of available editing operations. If you
-are looking for a more complete plugin with a wider range of supported languages then you might want to look into using
-this instead.
+Historically this was the de-facto s-expression editing plugin. Supports a wider range of motions than nvim-paredit but
+otherwise significantly less functionality.
 
 The main reasons you might want to consider `nvim-paredit` instead are:
 
-- Easier configuration and an exposed lua API
+- Easier configuration and an exposed Lua API
 - Control over how the cursor is moved during slurp/barf. (For example if you don't want the cursor to always be moved)
 - Recursive slurp/barf operations. If your cursor is in a nested form you can still slurp from the forms parent(s)
 - Automatic form/element indentations on slurp/barf
+- Pairwise element dragging
 - Subjectively better out-of-the-box keybindings
 
 #### [vim-sexp-mappings-for-regular-people](https://github.com/tpope/vim-sexp-mappings-for-regular-people)

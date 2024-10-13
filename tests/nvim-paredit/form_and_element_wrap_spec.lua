@@ -3,7 +3,9 @@ local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe("element and form wrap", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   it("should not wrap if cursor is whitespace", function()
     prepare_buffer({

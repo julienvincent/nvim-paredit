@@ -1,6 +1,6 @@
-local traversal = require("nvim-paredit.utils.traversal")
-local ts = require("nvim-treesitter.ts_utils")
-local langs = require("nvim-paredit.lang")
+local ts_context = require("nvim-paredit.treesitter.context")
+local ts_forms = require("nvim-paredit.treesitter.forms")
+local ts_utils = require("nvim-paredit.treesitter.utils")
 
 local M = {}
 
@@ -11,9 +11,13 @@ function M.ensure_visual_mode()
 end
 
 local function get_range_around_form_impl(node_fn)
-  local lang = langs.get_language_api()
-  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang,
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local current_form = ts_forms.find_nearest_form(context.node, {
+    captures = context.captures,
     use_source = false,
   })
   if not current_form then
@@ -26,7 +30,7 @@ local function get_range_around_form_impl(node_fn)
     selected = node_fn(selected)
   end
 
-  local root = lang.get_node_root(selected)
+  local root = ts_forms.get_node_root(selected, context)
   local range = { root:range() }
 
   -- stylua: ignore
@@ -41,7 +45,7 @@ function M.get_range_around_form()
 end
 
 function M.get_range_around_top_level_form()
-  return get_range_around_form_impl(traversal.find_local_root)
+  return get_range_around_form_impl(ts_utils.find_local_root)
 end
 
 local function select_around_form_impl(range)
@@ -64,9 +68,13 @@ function M.select_around_top_level_form()
 end
 
 local function get_range_in_form_impl(node_fn)
-  local lang = langs.get_language_api()
-  local current_form = traversal.find_nearest_form(ts.get_node_at_cursor(), {
-    lang = lang,
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local current_form = ts_forms.find_nearest_form(context.node, {
+    captures = context.captures,
     use_source = false,
   })
   if not current_form then
@@ -79,7 +87,7 @@ local function get_range_in_form_impl(node_fn)
     selected = node_fn(selected)
   end
 
-  local edges = lang.get_form_edges(selected)
+  local edges = ts_forms.get_form_edges(selected, context)
 
   -- stylua: ignore
   return {
@@ -93,7 +101,7 @@ function M.get_range_in_form()
 end
 
 function M.get_range_in_top_level_form()
-  return get_range_in_form_impl(traversal.find_local_root)
+  return get_range_in_form_impl(ts_utils.find_local_root)
 end
 
 local function select_in_form_impl(range)
@@ -115,14 +123,8 @@ function M.select_in_top_level_form()
   return select_in_form_impl(M.get_range_in_top_level_form())
 end
 
-function M.get_element_range()
-  local lang = langs.get_language_api()
-  local node = ts.get_node_at_cursor()
-  if not node then
-    return
-  end
-
-  local root = lang.get_node_root(node)
+function M.get_element_range(opts)
+  local root = ts_forms.get_node_root(opts.node, opts)
   local range = { root:range() }
 
   -- stylua: ignore
@@ -133,10 +135,12 @@ function M.get_element_range()
 end
 
 function M.select_element()
-  local range = M.get_element_range()
-  if not range then
+  local context = ts_context.create_context()
+  if not context then
     return
   end
+
+  local range = M.get_element_range(context)
 
   M.ensure_visual_mode()
   vim.api.nvim_win_set_cursor(0, { range[1] + 1, range[2] })
