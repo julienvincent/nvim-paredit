@@ -5,7 +5,9 @@ local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe("paired-element-auto-dragging", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
   it("should drag map pairs forward", function()
     prepare_buffer({
       content = "{:a 1 :b 2}",
@@ -70,7 +72,9 @@ describe("paired-element-auto-dragging", function()
 end)
 
 describe("paired-element-dragging", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
   it("should drag vector elements forwards", function()
     prepare_buffer({
       content = "'[a b c d]",

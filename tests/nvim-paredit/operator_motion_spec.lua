@@ -7,6 +7,10 @@ local defaults = require("nvim-paredit.defaults")
 
 describe("motions with operator pending", function()
   before_each(function()
+    vim.api.nvim_set_option_value("filetype", "clojure", {
+      buf = 0,
+    })
+
     keybindings.setup_keybindings({
       keys = defaults.default_keys,
     })
@@ -152,6 +156,10 @@ end)
 
 describe("motions with operator pending and v:count", function()
   before_each(function()
+    vim.api.nvim_set_option_value("filetype", "clojure", {
+      buf = 0,
+    })
+
     keybindings.setup_keybindings({
       keys = defaults.default_keys,
     })

@@ -7,7 +7,9 @@ local expect = require("tests.nvim-paredit.utils").expect
 local utils = require("tests.nvim-paredit.utils")
 
 describe("form deletions", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   before_each(function()
     keybindings.setup_keybindings({
@@ -101,7 +103,9 @@ describe("form deletions", function()
 end)
 
 describe("top level form deletions", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   before_each(function()
     keybindings.setup_keybindings({
@@ -135,7 +139,9 @@ describe("top level form deletions", function()
 end)
 
 describe("form selections", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   before_each(function()
     keybindings.setup_keybindings({
@@ -163,7 +169,9 @@ describe("form selections", function()
 end)
 
 describe("top form selections", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   before_each(function()
     keybindings.setup_keybindings({
@@ -191,7 +199,9 @@ describe("top form selections", function()
 end)
 
 describe("element deletions", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   before_each(function()
     keybindings.setup_keybindings({
@@ -213,7 +223,9 @@ describe("element deletions", function()
 end)
 
 describe("element selections", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   before_each(function()
     keybindings.setup_keybindings({

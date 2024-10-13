@@ -9,8 +9,6 @@ function M.feedkeys(keys)
 end
 
 function M.prepare_buffer(params)
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
-
   local content = params.content
   if type(content) == "string" then
     content = { content }
