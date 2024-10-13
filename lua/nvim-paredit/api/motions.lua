@@ -223,7 +223,7 @@ local function move_to_parent_form_edge(direction)
     target_form = root:parent()
   end
 
-  if not target_form or target_form:type() == "source" then
+  if not target_form or ts_utils.is_document_root(target_form) then
     return
   end
 

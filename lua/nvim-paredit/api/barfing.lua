@@ -1,5 +1,6 @@
 local ts_context = require("nvim-paredit.treesitter.context")
 local ts_forms = require("nvim-paredit.treesitter.forms")
+local ts_utils = require("nvim-paredit.treesitter.utils")
 local traversal = require("nvim-paredit.utils.traversal")
 local indentation = require("nvim-paredit.indentation")
 local common = require("nvim-paredit.utils.common")
@@ -43,7 +44,7 @@ function M.barf_forwards(opts)
   end
 
   local form = traversal.find_closest_form_with_children(current_form, context)
-  if not form or form:type() == "source" then
+  if not form or ts_utils.is_document_root(form) then
     return
   end
 
@@ -117,7 +118,7 @@ function M.barf_backwards(opts)
   end
 
   local form = traversal.find_closest_form_with_children(current_form, context)
-  if not form or form:type() == "source" then
+  if not form or ts_utils.is_document_root(form) then
     return
   end
 

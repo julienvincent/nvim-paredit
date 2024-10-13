@@ -1,5 +1,6 @@
 local ts_context = require("nvim-paredit.treesitter.context")
 local ts_forms = require("nvim-paredit.treesitter.forms")
+local ts_utils = require("nvim-paredit.treesitter.utils")
 local traversal = require("nvim-paredit.utils.traversal")
 local utils = require("nvim-paredit.indentation.utils")
 local common = require("nvim-paredit.utils.common")
@@ -102,7 +103,7 @@ local function indent_barf(event)
   local lines = utils.find_affected_lines(node, utils.get_node_line_range(node_range))
 
   local delta
-  if parent:type() == "source" then
+  if ts_utils.is_document_root(parent) then
     delta = node_range[2]
   else
     local row

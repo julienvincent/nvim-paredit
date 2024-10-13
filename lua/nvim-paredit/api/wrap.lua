@@ -21,7 +21,7 @@ local function find_parent_form(element, opts)
     parent = nearest_form:parent()
   end
 
-  if parent and parent:type() ~= "source" then
+  if parent and not ts_utils.is_document_root(parent) then
     return ts_forms.find_nearest_form(parent, {
       captures = opts.captures,
       use_source = false,
@@ -106,7 +106,7 @@ function M.wrap_enclosing_form_under_cursor(prefix, suffix)
     return
   end
 
-  if not use_direct_parent and form:type() ~= "source" then
+  if not use_direct_parent and not ts_utils.is_document_root(form) then
     form = find_parent_form(current_element, context)
   end
 

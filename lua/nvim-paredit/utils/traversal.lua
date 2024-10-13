@@ -49,7 +49,7 @@ end
 
 function M.find_closest_form_with_children(current_node, opts)
   local form = ts_forms.get_form_inner(current_node, opts)
-  if form:named_child_count() > 0 and current_node:type() ~= "source" then
+  if form:named_child_count() > 0 and not ts_utils.is_document_root(current_node) then
     return form
   end
 

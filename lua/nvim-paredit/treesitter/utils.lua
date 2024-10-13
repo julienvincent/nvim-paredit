@@ -2,13 +2,17 @@ local common = require("nvim-paredit.utils.common")
 
 local M = {}
 
+function M.is_document_root(node)
+  return node and node:tree():root():equal(node)
+end
+
 -- Find the root node of the tree `node` is a member of, excluding the root
 -- 'source' document.
 function M.find_local_root(node)
   local current = node
   while true do
     local next = current:parent()
-    if not next or next:type() == "source" then
+    if not next or M.is_document_root(next) then
       break
     end
     current = next
