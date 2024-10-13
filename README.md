@@ -73,7 +73,7 @@ paredit.setup({
   -- for new filetypes.
   --
   -- Defaults to all supported filetypes.
-  filetypes = { "clojure", "fennel", "scheme" },
+  filetypes = { "clojure", "fennel", "scheme", "lisp" },
 
   -- This is some language specific configuration. Right now this is just used for
   -- setting character lists that are considered whitespace.
@@ -288,8 +288,13 @@ understand the AST.
 Right now `nvim-paredit` has built-in support for:
 
 - `clojure`
-- `fennel`
-- `scheme`
+- `fennel` *
+- `scheme` *
+- `commonlisp` *
+
+> [!NOTE]
+>
+> Items marked with `*` only have partial test coverage. Not all language syntax is guaranteed to work.
 
 Take a look at the [Language Queries Spec](./docs/language-queries.md) if you are wanting to add support for languages
 not built-in to nvim-paredit, or you want to develop on the existing queries.
