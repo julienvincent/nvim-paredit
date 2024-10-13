@@ -64,7 +64,7 @@ require("nvim-paredit").setup({
 
 This is to mimic the behaviour from `vim-sexp`
 
-Require api module:
+Require API module:
 
 ```lua
 local paredit = require("nvim-paredit")
@@ -119,3 +119,31 @@ Add following keybindings to config:
 ```
 
 Same approach can be used for other `vim-sexp` keybindings (e.g. `<localleader>e[`) with cursor placement or without.
+
+### Custom Macro Pairwise Dragging
+
+This is an example of how you can add pairwise dragging support for the following custom Clojure macro:
+
+```clojure
+(defmacro my-custom-bindings [bindings & body]
+  ...)
+
+(my-custom-bindings [a 1
+                     b 2]
+  (println a b))
+```
+
+Create a new file under `queries/clojure/paredit/pairs.scm` in your neovim configuration directory and add the following
+treesitter query:
+
+```scm
+;; extends
+
+(list_lit
+  (sym_lit) @fn-name
+  (vec_lit
+    (_) @pair)
+  (#eq? @fn-name "my-custom-bindings"))
+```
+
+That's it!
