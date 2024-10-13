@@ -1,7 +1,8 @@
+local ts_context = require("nvim-paredit.treesitter.context")
+local ts_forms = require("nvim-paredit.treesitter.forms")
 local traversal = require("nvim-paredit.utils.traversal")
 local utils = require("nvim-paredit.indentation.utils")
 local common = require("nvim-paredit.utils.common")
-local langs = require("nvim-paredit.lang")
 
 local M = {}
 
@@ -68,18 +69,21 @@ local function indent_lines(lines, delta, opts)
 end
 
 local function indent_barf(event)
-  local lang = langs.get_language_api()
+  local captures = ts_context.create_capture_context(event.parent)
+  local opts = {
+    captures = captures,
+  }
 
-  local form = lang.get_node_root(event.parent)
+  local form = ts_forms.get_node_root(event.parent, opts)
 
   local lhs
   local node
   if event.type == "barf-forwards" then
-    node = traversal.get_next_sibling_ignoring_comments(form, { lang = lang })
+    node = traversal.get_next_sibling_ignoring_comments(form, opts)
     lhs = form
   else
     node = form
-    lhs = traversal.get_prev_sibling_ignoring_comments(form, { lang = lang })
+    lhs = traversal.get_prev_sibling_ignoring_comments(form, opts)
   end
 
   if not node or not lhs then
@@ -91,7 +95,7 @@ local function indent_barf(event)
   local lhs_range = { lhs:range() }
   local node_range = { node:range() }
 
-  if not utils.node_is_first_on_line(node, { lang = lang }) or lhs_range[1] == node_range[1] then
+  if not utils.node_is_first_on_line(node, opts) or lhs_range[1] == node_range[1] then
     return
   end
 
@@ -102,12 +106,12 @@ local function indent_barf(event)
     delta = node_range[2]
   else
     local row
-    local ref_node = utils.get_first_sibling_on_upper_line(node, { lang = lang })
+    local ref_node = utils.get_first_sibling_on_upper_line(node, opts)
     if ref_node then
       local range = { ref_node:range() }
       row = range[2]
     else
-      local form_edges = lang.get_form_edges(parent)
+      local form_edges = ts_forms.get_form_edges(parent, opts)
       row = form_edges.left.range[2] - 1
     end
 
@@ -120,8 +124,12 @@ local function indent_barf(event)
 end
 
 local function indent_slurp(event)
-  local lang = langs.get_language_api()
-  local parent = lang.unwrap_form(event.parent)
+  local captures = ts_context.create_capture_context(event.parent)
+  local opts = {
+    captures = captures,
+  }
+
+  local parent = ts_forms.get_form_inner(event.parent, opts)
 
   local child
   if event.type == "slurp-forwards" then
@@ -133,19 +141,19 @@ local function indent_slurp(event)
   local parent_range = { parent:range() }
   local child_range = { child:range() }
 
-  if not utils.node_is_first_on_line(child, { lang = lang }) or parent_range[1] == child_range[1] then
+  if not utils.node_is_first_on_line(child, opts) or parent_range[1] == child_range[1] then
     return
   end
 
   local lines = utils.find_affected_lines(child, utils.get_node_line_range(child_range))
 
   local row
-  local ref_node = utils.get_first_sibling_on_upper_line(child, { lang = lang })
+  local ref_node = utils.get_first_sibling_on_upper_line(child, opts)
   if ref_node then
     local range = { ref_node:range() }
     row = range[2]
   else
-    local form_edges = lang.get_form_edges(parent)
+    local form_edges = ts_forms.get_form_edges(parent, opts)
     row = form_edges.left.range[4]
   end
 

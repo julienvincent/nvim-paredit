@@ -1,16 +1,16 @@
-local traversal = require("nvim-paredit.utils.traversal")
-local ts = require("nvim-treesitter.ts_utils")
-local langs = require("nvim-paredit.lang")
+local ts_context = require("nvim-paredit.treesitter.context")
+local ts_forms = require("nvim-paredit.treesitter.forms")
 
 local M = {}
 
 function M.raise_form()
-  local lang = langs.get_language_api()
-  local current_form = lang.get_node_root(
-    traversal.find_nearest_form(ts.get_node_at_cursor(), {
-      lang = lang,
-    })
-  )
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local form = ts_forms.find_nearest_form(context.node, context)
+  local current_form = ts_forms.get_node_root(form, context)
   if not current_form then
     return
   end
@@ -35,8 +35,12 @@ function M.raise_form()
 end
 
 function M.raise_element()
-  local lang = langs.get_language_api()
-  local current_node = lang.get_node_root(ts.get_node_at_cursor())
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local current_node = ts_forms.get_node_root(context.node, context)
 
   local parent = current_node:parent()
   if not parent or parent:type() == "source" then

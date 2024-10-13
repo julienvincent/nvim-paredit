@@ -6,7 +6,9 @@ local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
 describe("motions", function()
-  vim.api.nvim_buf_set_option(0, "filetype", "clojure")
+  vim.api.nvim_set_option_value("filetype", "clojure", {
+    buf = 0,
+  })
 
   it("should jump to next element in form (tail)", function()
     prepare_buffer({
@@ -288,7 +290,6 @@ describe("motions", function()
       cursor = { 1, 0 },
     })
   end)
-
 
   it("should move to parent form end", function()
     -- (aa (bb) |@(cc) #{1})

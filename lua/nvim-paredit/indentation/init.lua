@@ -9,6 +9,9 @@ function M.handle_indentation(event, opts)
   end
 
   local tree = vim.treesitter.get_parser(0)
+  if not tree then
+    return
+  end
 
   tree:parse()
   local parent = tree:named_node_for_range(event.parent_range)

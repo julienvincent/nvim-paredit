@@ -1,21 +1,15 @@
-local traversal = require("nvim-paredit.utils.traversal")
-local common = require("nvim-paredit.utils.common")
-local ts = require("nvim-treesitter.ts_utils")
-local langs = require("nvim-paredit.lang")
+local ts_context = require("nvim-paredit.treesitter.context")
+local ts_forms = require("nvim-paredit.treesitter.forms")
+local ts_utils = require("nvim-paredit.treesitter.utils")
+local whitespace = require("nvim-paredit.api.whitespace")
 
 local M = {}
 
-function M.find_element_under_cursor(lang)
-  local node = ts.get_node_at_cursor()
-  return lang.get_node_root(node)
-end
-
-function M.find_form(element, lang)
-  return traversal.find_nearest_form(element, { lang = lang, use_source = false })
-end
-
-function M.find_parend_form(element, lang)
-  local nearest_form = M.find_form(element, lang)
+local function find_parent_form(element, opts)
+  local nearest_form = ts_forms.find_nearest_form(element, {
+    captures = opts.captures,
+    use_source = false,
+  })
 
   if not nearest_form then
     return element
@@ -28,7 +22,10 @@ function M.find_parend_form(element, lang)
   end
 
   if parent and parent:type() ~= "source" then
-    return M.find_form(parent, lang)
+    return ts_forms.find_nearest_form(parent, {
+      captures = opts.captures,
+      use_source = false,
+    })
   end
   return nearest_form
 end
@@ -38,10 +35,20 @@ function M.wrap_element(buf, element, prefix, suffix)
   suffix = suffix or ""
 
   local range = { element:range() }
-  vim.api.nvim_buf_set_text(buf, range[3], range[4], range[3], range[4], { suffix })
-  vim.api.nvim_buf_set_text(buf, range[1], range[2], range[1], range[2], { prefix })
+  -- stylua: ignore
+  vim.api.nvim_buf_set_text(buf,
+    range[3], range[4],
+    range[3], range[4],
+    { suffix }
+  )
+  -- stylua: ignore
+  vim.api.nvim_buf_set_text(buf,
+    range[1], range[2],
+    range[1], range[2],
+    { prefix }
+  )
   local end_col
-  if (range[1] == range[3]) then
+  if range[1] == range[3] then
     end_col = range[4] + prefix:len() + suffix:len() - 1
   else
     end_col = range[4] + suffix:len() - 1
@@ -55,17 +62,21 @@ function M.wrap_element(buf, element, prefix, suffix)
 end
 
 function M.wrap_element_under_cursor(prefix, suffix)
-  local buf = vim.api.nvim_get_current_buf()
-  local lang = langs.get_language_api()
-  local current_element = M.find_element_under_cursor(lang)
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
 
+  local buf = vim.api.nvim_get_current_buf()
+  local current_element = ts_forms.get_node_root(context.node, context)
   if not current_element then
     return
   end
-  if lang.node_is_comment(current_element) then
+
+  if ts_utils.node_is_comment(current_element, context) then
     return
   end
-  if common.is_whitespace_under_cursor(lang) then
+  if whitespace.is_whitespace_under_cursor() then
     return
   end
 
@@ -73,20 +84,30 @@ function M.wrap_element_under_cursor(prefix, suffix)
 end
 
 function M.wrap_enclosing_form_under_cursor(prefix, suffix)
-  local buf = vim.api.nvim_get_current_buf()
-  local lang = langs.get_language_api()
-  local current_element = M.find_element_under_cursor(lang)
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
 
+  local buf = vim.api.nvim_get_current_buf()
+  local current_element = ts_forms.get_node_root(context.node, context)
   if not current_element then
     return
   end
 
-  local use_direct_parent = common.is_whitespace_under_cursor(lang)
-    or lang.node_is_comment(ts.get_node_at_cursor())
+  local is_whitespace = whitespace.is_whitespace_under_cursor()
+  local use_direct_parent = is_whitespace or ts_utils.node_is_comment(context.node, context)
 
-  local form = M.find_form(current_element, lang)
+  local form = ts_forms.find_nearest_form(current_element, {
+    captures = context.captures,
+    use_source = false,
+  })
+  if not form then
+    return
+  end
+
   if not use_direct_parent and form:type() ~= "source" then
-    form = M.find_parend_form(current_element, lang)
+    form = find_parent_form(current_element, context)
   end
 
   return M.wrap_element(buf, form, prefix, suffix)

@@ -1,3 +1,4 @@
+local ts_context = require("nvim-paredit.treesitter.context")
 local selections = require("nvim-paredit.api.selections")
 
 local M = {}
@@ -51,10 +52,12 @@ function M.delete_in_top_level_form()
 end
 
 function M.delete_element()
-  local range = selections.get_element_range()
-  if not range then
+  local context = ts_context.create_context()
+  if not context then
     return
   end
+
+  local range = selections.get_element_range(context)
 
   local buf = vim.api.nvim_get_current_buf()
   -- stylua: ignore
