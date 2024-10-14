@@ -2,10 +2,11 @@ local paredit = require("nvim-paredit")
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local expect = require("tests.nvim-paredit.utils").expect
 
-describe("form uwrap (e.g. splice)", function()
+describe("form uwrap ::", function()
   vim.api.nvim_set_option_value("filetype", "clojure", {
     buf = 0,
   })
+
   local unwrap = paredit.unwrap
 
   it("should uwrap list under cursor", function()

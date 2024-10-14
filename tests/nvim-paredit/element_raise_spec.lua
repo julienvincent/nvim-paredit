@@ -3,7 +3,7 @@ local paredit = require("nvim-paredit.api")
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local expect = require("tests.nvim-paredit.utils").expect
 
-describe("element raising", function()
+describe("element raising ::", function()
   vim.api.nvim_set_option_value("filetype", "clojure", {
     buf = 0,
   })

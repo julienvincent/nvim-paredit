@@ -2,7 +2,7 @@ local paredit = require("nvim-paredit")
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local expect = require("tests.nvim-paredit.utils").expect
 
-describe("element and form wrap", function()
+describe("form and element wrap ::", function()
   vim.api.nvim_set_option_value("filetype", "clojure", {
     buf = 0,
   })

@@ -60,7 +60,7 @@ describe("barfing ::", function()
           before_cursor = { 1, 3 },
           after_content = "#?(:cljs a :clj) b",
           after_cursor = { 1, 3 },
-        }
+        },
       })
     end)
 
@@ -147,15 +147,15 @@ describe("barfing ::", function()
           before_content = "(aa bb)",
           before_cursor = { 1, 5 },
           after_content = "(aa) bb",
-          after_cursor = { 1, 3 }
+          after_cursor = { 1, 3 },
         },
         {
           "multi line",
           before_content = { "(aa", "bb)" },
           before_cursor = { 2, 1 },
           after_content = { "(aa)", "bb" },
-          after_cursor = { 1, 3 }
-        }
+          after_cursor = { 1, 3 },
+        },
       })
     end)
 
@@ -170,15 +170,15 @@ describe("barfing ::", function()
           before_content = "(aa bb cc)",
           before_cursor = { 1, 4 },
           after_content = "(aa bb) cc",
-          after_cursor = { 1, 6 }
+          after_cursor = { 1, 6 },
         },
         {
           "multi line",
           before_content = { "(aa", "bb", "cc)" },
           before_cursor = { 1, 1 },
           after_content = { "(aa", "bb)", "cc" },
-          after_cursor = { 2, 2 }
-        }
+          after_cursor = { 2, 2 },
+        },
       })
     end)
   end)
@@ -248,7 +248,7 @@ describe("barfing ::", function()
       })
       paredit.barf_backwards()
       expect({
-        content = {"a ;; comment", "()"},
+        content = { "a ;; comment", "()" },
         cursor = { 2, 0 },
       })
     end)
@@ -314,15 +314,15 @@ describe("barfing ::", function()
           before_content = "(aa bb)",
           before_cursor = { 1, 1 },
           after_content = "aa (bb)",
-          after_cursor = { 1, 4 }
+          after_cursor = { 1, 4 },
         },
         {
           "multi line",
           before_content = { "(aa", "bb)" },
           before_cursor = { 1, 1 },
           after_content = { "aa", "(bb)" },
-          after_cursor = { 2, 0 }
-        }
+          after_cursor = { 2, 0 },
+        },
       })
     end)
 
@@ -337,15 +337,15 @@ describe("barfing ::", function()
           before_content = "(aa bb cc)",
           before_cursor = { 1, 1 },
           after_content = "aa (bb cc)",
-          after_cursor = { 1, 4 }
+          after_cursor = { 1, 4 },
         },
         {
           "multi line",
           before_content = { "(aa", "bb", "cc)" },
           before_cursor = { 1, 1 },
           after_content = { "aa", "(bb", "cc)" },
-          after_cursor = { 2, 0 }
-        }
+          after_cursor = { 2, 0 },
+        },
       })
     end)
   end)
