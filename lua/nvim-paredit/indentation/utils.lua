@@ -3,9 +3,19 @@ local common = require("nvim-paredit.utils.common")
 
 local M = {}
 
+local function get_corrected_line_range(range)
+  -- if the node is at the zeroth position on the last line, it's not actually
+  -- part of the line.
+  if range[4] == 0 then
+    return range[1], range[3] - 1
+  end
+  return range[1], range[3]
+end
+
 function M.get_node_line_range(range)
+  local start, _end = get_corrected_line_range(range)
   local lines = {}
-  for i = range[1], range[3], 1 do
+  for i = start, _end, 1 do
     table.insert(lines, i)
   end
   return lines
@@ -57,8 +67,8 @@ function M.node_is_first_on_line(node, opts)
     return true
   end
 
-  local sibling_range = { sibling:range() }
-  return sibling_range[3] ~= node_range[1]
+  local _, sibling_end = get_corrected_line_range({ sibling:range() })
+  return sibling_end ~= node_range[1]
 end
 
 -- This functions finds the closest sibling to a given `node` which is:

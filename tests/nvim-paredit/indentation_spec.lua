@@ -63,6 +63,13 @@ describe("indentation ::", function()
         after_cursor = { 1, 1 },
       },
       {
+        "should not indent when on same line [multiline]",
+        before_content = {"(", " a) b"},
+        before_cursor = { 1, 0 },
+        after_content = {"(", " a b)"},
+        after_cursor = { 1, 0 },
+      },
+      {
         "should dedent when node is too far indented",
         before_content = { "()", "  a" },
         before_cursor = { 1, 1 },
@@ -78,9 +85,9 @@ describe("indentation ::", function()
       },
       {
         "should indent the correct node ignoring comments",
-        before_content = { "()", ";; comment", "a" },
+        before_content = { "()", ";; comment", "a ;; another comment", "b" },
         before_cursor = { 1, 1 },
-        after_content = { "(", ";; comment", " a)" },
+        after_content = { "(", ";; comment", " a) ;; another comment", "b" },
         after_cursor = { 1, 0 },
       },
 
@@ -108,11 +115,25 @@ describe("indentation ::", function()
         after_cursor = { 2, 2 },
       },
       {
+        "should indent with a comment in the way",
+        before_content = { "a ;; comment", "(b)" },
+        before_cursor = { 2, 1 },
+        after_content = { "(a ;; comment", " b)" },
+        after_cursor = { 2, 2 },
+      },
+      {
         "should not indent when on same line",
         before_content = { "a (b)" },
         before_cursor = { 1, 3 },
         after_content = { "(a b)" },
         after_cursor = { 1, 3 },
+      },
+      {
+        "should handle empty children",
+        before_content = { "a", "()" },
+        before_cursor = { 2, 1 },
+        after_content = { "(a", ")" },
+        after_cursor = { 2, 0 },
       },
     })
   end)
@@ -146,9 +167,9 @@ describe("indentation ::", function()
       },
       {
         "should not dedent if node is on the same line",
-        before_content = { "(a", "b c)" },
+        before_content = { "(a", " b c)" },
         before_cursor = { 1, 1 },
-        after_content = { "(a", "b) c" },
+        after_content = { "(a", " b) c" },
         after_cursor = { 1, 1 },
       },
       {

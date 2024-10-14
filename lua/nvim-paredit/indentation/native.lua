@@ -96,7 +96,11 @@ local function indent_barf(event)
   local lhs_range = { lhs:range() }
   local node_range = { node:range() }
 
-  if not utils.node_is_first_on_line(node, opts) or lhs_range[1] == node_range[1] then
+  if lhs_range[3] == node_range[1] then
+    return
+  end
+
+  if not utils.node_is_first_on_line(node, opts) then
     return
   end
 
@@ -136,13 +140,25 @@ local function indent_slurp(event)
   if event.type == "slurp-forwards" then
     child = parent:named_child(parent:named_child_count() - 1)
   else
-    child = parent:named_child(1)
+    local first = parent:named_child(0)
+    if not first then
+      return
+    end
+    child = traversal.get_next_sibling_ignoring_comments(first, opts)
+  end
+
+  if not child then
+    return
   end
 
   local parent_range = { parent:range() }
   local child_range = { child:range() }
 
-  if not utils.node_is_first_on_line(child, opts) or parent_range[1] == child_range[1] then
+  if parent_range[1] == child_range[1] then
+    return
+  end
+
+  if not utils.node_is_first_on_line(child, opts) then
     return
   end
 
