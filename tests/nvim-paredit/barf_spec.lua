@@ -14,87 +14,73 @@ describe("barfing ::", function()
       expect_all(paredit.barf_forwards, {
         {
           "list",
-          before_content = "(a)",
-          before_cursor = { 1, 1 },
-          after_content = "()a",
-          after_cursor = { 1, 1 },
+          { "(|a)" },
+          { "(|)a" },
         },
         {
           "vector",
-          before_content = "[a]",
-          before_cursor = { 1, 1 },
-          after_content = "[]a",
-          after_cursor = { 1, 1 },
+          { "[|a]" },
+          { "[|]a" },
         },
         {
           "quoted list",
-          before_content = "`(a)",
-          before_cursor = { 1, 2 },
-          after_content = "`()a",
-          after_cursor = { 1, 2 },
+          "`(|a)",
+          { "`(|)a" },
         },
         {
           "quoted list",
-          before_content = "'(a)",
-          before_cursor = { 1, 2 },
-          after_content = "'()a",
-          after_cursor = { 1, 2 },
+          "'(|a)",
+          "'(|)a",
         },
         {
           "anon fn",
-          before_content = "#(a)",
-          before_cursor = { 1, 2 },
-          after_content = "#()a",
-          after_cursor = { 1, 2 },
+          { "#(|a)" },
+          { "#(|)a" },
         },
         {
           "set",
-          before_content = "#{a}",
-          before_cursor = { 1, 2 },
-          after_content = "#{}a",
-          after_cursor = { 1, 2 },
+          "#{|a}",
+          "#{|}a",
         },
         {
           "reader conditional",
-          before_content = "#?(:cljs a :clj b)",
-          before_cursor = { 1, 3 },
-          after_content = "#?(:cljs a :clj) b",
-          after_cursor = { 1, 3 },
+          { "#?(|:cljs a :clj b)" },
+          "#?(|:cljs a :clj) b",
         },
       })
     end)
 
     it("should skip comments", function()
       prepare_buffer({
-        content = { "(", ";; comment", "a)" },
-        cursor = { 1, 1 },
+        "(|",
+        ";; comment",
+        "a)",
       })
       paredit.barf_forwards()
       expect({
-        content = { "()", ";; comment", "a" },
-        cursor = { 1, 0 },
+        "|()",
+        ";; comment",
+        "a",
       })
 
       prepare_buffer({
-        content = { "(a ;; comment", ")" },
-        cursor = { 1, 1 },
+        "(|a ;; comment",
+        ")",
       })
       paredit.barf_forwards()
       expect({
-        content = "()a ;; comment",
-        cursor = { 1, 1 },
+        "(|)a ;; comment",
+        "",
       })
     end)
 
     it("should do nothing in an empty form", function()
       prepare_buffer({
-        content = "()",
-        cursor = { 1, 1 },
+        "(|)",
       })
       paredit.barf_forwards()
       expect({
-        content = "()",
-        cursor = { 1, 1 },
+        "(|)",
       })
     end)
 
@@ -102,17 +88,13 @@ describe("barfing ::", function()
       expect_all(paredit.barf_forwards, {
         {
           "from root",
-          before_content = { "(a)", "" },
-          before_cursor = { 2, 0 },
-          after_content = { "(a)", "" },
-          after_cursor = { 2, 0 },
+          { "(a)", "|" },
+          { "(a)", "|" },
         },
         {
           "from another list",
-          before_content = { "(a)", "()" },
-          before_cursor = { 2, 1 },
-          after_content = { "(a)", "()" },
-          after_cursor = { 2, 1 },
+          { "(a)", "(|)" },
+          { "(a)", "(|)" },
         },
       })
     end)
@@ -121,17 +103,13 @@ describe("barfing ::", function()
       expect_all(paredit.barf_forwards, {
         {
           "double nested list",
-          before_content = "(() a)",
-          before_cursor = { 1, 2 },
-          after_content = "(()) a",
-          after_cursor = { 1, 2 },
+          "((|) a)",
+          "((|)) a",
         },
         {
           "list with quoted list",
-          before_content = "('())",
-          before_cursor = { 1, 3 },
-          after_content = "()'()",
-          after_cursor = { 1, 1 },
+          { "('(|))" },
+          { "(|)'()" },
         },
       })
     end)
@@ -144,17 +122,13 @@ describe("barfing ::", function()
       expect_all(barf_with_behaviour, {
         {
           "single line",
-          before_content = "(aa bb)",
-          before_cursor = { 1, 5 },
-          after_content = "(aa) bb",
-          after_cursor = { 1, 3 },
+          { "(aa b|b)" },
+          "(aa|) bb",
         },
         {
           "multi line",
-          before_content = { "(aa", "bb)" },
-          before_cursor = { 2, 1 },
-          after_content = { "(aa)", "bb" },
-          after_cursor = { 1, 3 },
+          { "(aa", "b|b)" },
+          { "(aa|)", "bb" },
         },
       })
     end)
@@ -167,17 +141,13 @@ describe("barfing ::", function()
       expect_all(barf_with_behaviour, {
         {
           "single line",
-          before_content = "(aa bb cc)",
-          before_cursor = { 1, 4 },
-          after_content = "(aa bb) cc",
-          after_cursor = { 1, 6 },
+          { "(aa |bb cc)" },
+          "(aa bb|) cc",
         },
         {
           "multi line",
-          before_content = { "(aa", "bb", "cc)" },
-          before_cursor = { 1, 1 },
-          after_content = { "(aa", "bb)", "cc" },
-          after_cursor = { 2, 2 },
+          { "(|aa", "bb", "cc)" },
+          { "(aa", "bb|)", "cc" },
         },
       })
     end)
@@ -188,80 +158,68 @@ describe("barfing ::", function()
       expect_all(paredit.barf_backwards, {
         {
           "list",
-          before_content = "(a)",
-          before_cursor = { 1, 1 },
-          after_content = "a()",
-          after_cursor = { 1, 2 },
+          { "(|a)" },
+          { "a(|)" },
         },
         {
           "vector",
-          before_content = "[a]",
-          before_cursor = { 1, 1 },
-          after_content = "a[]",
-          after_cursor = { 1, 2 },
+          { "[|a]" },
+          { "a[|]" },
         },
         {
           "quoted list",
-          before_content = "`(a)",
-          before_cursor = { 1, 2 },
-          after_content = "a`()",
-          after_cursor = { 1, 3 },
+          { "`(|a)" },
+          { "a`(|)" },
         },
         {
           "quoted list",
-          before_content = "'(a)",
-          before_cursor = { 1, 2 },
-          after_content = "a'()",
-          after_cursor = { 1, 3 },
+          { "'(|a)" },
+          { "a'(|)" },
         },
         {
           "anon fn",
-          before_content = "#(a)",
-          before_cursor = { 1, 2 },
-          after_content = "a#()",
-          after_cursor = { 1, 3 },
+          { "#(|a)" },
+          { "a#(|)" },
         },
         {
           "set",
-          before_content = "#{a}",
-          before_cursor = { 1, 2 },
-          after_content = "a#{}",
-          after_cursor = { 1, 3 },
+          { "#{|a}" },
+          { "a#{|}" },
         },
       })
     end)
 
     it("should skip comments", function()
       prepare_buffer({
-        content = { "(", ";; comment", "a)" },
-        cursor = { 1, 1 },
+        "(|",
+        ";; comment",
+        "a)",
       })
       paredit.barf_backwards()
       expect({
-        content = { "", ";; comment", "a()" },
-        cursor = { 3, 1 },
+        "",
+        ";; comment",
+        "a|()",
       })
 
       prepare_buffer({
-        content = { "(a ;; comment", ")" },
-        cursor = { 1, 1 },
+        "(|a ;; comment",
+        ")",
       })
       paredit.barf_backwards()
       expect({
-        content = { "a ;; comment", "()" },
-        cursor = { 2, 0 },
+        "a ;; comment",
+        "|()",
       })
     end)
 
     it("should do nothing in an empty form", function()
       prepare_buffer({
-        content = "()",
-        cursor = { 1, 1 },
+        "(|)",
       })
       paredit.barf_backwards()
       expect({
-        content = "()",
-        cursor = { 1, 1 },
+        "(|)",
       })
     end)
 
@@ -269,17 +227,13 @@ describe("barfing ::", function()
       expect_all(paredit.barf_backwards, {
         {
           "from root",
-          before_content = { "(a)", "" },
-          before_cursor = { 2, 0 },
-          after_content = { "(a)", "" },
-          after_cursor = { 2, 0 },
+          { "(a)", "|" },
+          { "(a)", "|" },
         },
         {
           "from another list",
-          before_content = { "(a)", "()" },
-          before_cursor = { 2, 1 },
-          after_content = { "(a)", "()" },
-          after_cursor = { 2, 1 },
+          { "(a)", "(|)" },
+          { "(a)", "(|)" },
         },
       })
     end)
@@ -288,17 +242,13 @@ describe("barfing ::", function()
       expect_all(paredit.barf_backwards, {
         {
           "double nested list",
-          before_content = "(a ())",
-          before_cursor = { 1, 4 },
-          after_content = "a (())",
-          after_cursor = { 1, 4 },
+          { "(a (|))" },
+          { "a ((|))" },
         },
         {
           "list with quoted list",
-          before_content = "('())",
-          before_cursor = { 1, 3 },
-          after_content = "'()()",
-          after_cursor = { 1, 4 },
+          { "('(|))" },
+          "'()(|)",
         },
       })
     end)
@@ -311,17 +261,13 @@ describe("barfing ::", function()
       expect_all(barf_with_behaviour, {
         {
           "single line",
-          before_content = "(aa bb)",
-          before_cursor = { 1, 1 },
-          after_content = "aa (bb)",
-          after_cursor = { 1, 4 },
+          { "(|aa bb)" },
+          { "aa (|bb)" },
         },
         {
           "multi line",
-          before_content = { "(aa", "bb)" },
-          before_cursor = { 1, 1 },
-          after_content = { "aa", "(bb)" },
-          after_cursor = { 2, 0 },
+          { "(|aa", "bb)" },
+          { "aa", "|(bb)" },
         },
       })
     end)
@@ -334,17 +280,13 @@ describe("barfing ::", function()
       expect_all(barf_with_behaviour, {
         {
           "single line",
-          before_content = "(aa bb cc)",
-          before_cursor = { 1, 1 },
-          after_content = "aa (bb cc)",
-          after_cursor = { 1, 4 },
+          { "(|aa bb cc)" },
+          { "aa (|bb cc)" },
         },
         {
           "multi line",
-          before_content = { "(aa", "bb", "cc)" },
-          before_cursor = { 1, 1 },
-          after_content = { "aa", "(bb", "cc)" },
-          after_cursor = { 2, 0 },
+          { "(|aa", "bb", "cc)" },
+          { "aa", "|(bb", "cc)" },
         },
       })
     end)
