@@ -4,7 +4,7 @@ local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
-describe("form-dragging", function()
+describe("form dragging ::", function()
   vim.api.nvim_set_option_value("filetype", "clojure", {
     buf = 0,
   })

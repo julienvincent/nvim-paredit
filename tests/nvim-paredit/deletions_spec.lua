@@ -4,7 +4,7 @@ local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 local expect_all = require("tests.nvim-paredit.utils").expect_all
 local expect = require("tests.nvim-paredit.utils").expect
 
-describe("form deletions", function()
+describe("form deletions ::", function()
   vim.api.nvim_set_option_value("filetype", "clojure", {
     buf = 0,
   })
@@ -93,7 +93,7 @@ describe("form deletions", function()
   end)
 end)
 
-describe("form inner deletions", function()
+describe("form inner deletions ::", function()
   vim.api.nvim_set_option_value("filetype", "clojure", {
     buf = 0,
   })
@@ -182,7 +182,7 @@ describe("form inner deletions", function()
   end)
 end)
 
-describe("element deletions", function()
+describe("element deletions ::", function()
   vim.api.nvim_set_option_value("filetype", "clojure", {
     buf = 0,
   })
