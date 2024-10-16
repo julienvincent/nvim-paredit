@@ -9,8 +9,7 @@ describe("cursor pos api tests", function()
 
   it("should place cursor inside form at the beginning", function()
     prepare_buffer({
-      content = { "(a (b))" },
-      cursor = { 1, 0 },
+      "|(a (b))",
     })
 
     local cursor_pos = paredit.cursor.get_cursor_pos({ 0, 0, 0, 6 }, { placement = "inner_start" })
@@ -25,8 +24,7 @@ describe("cursor pos api tests", function()
 
   it("should place cursor outside form at the beginning", function()
     prepare_buffer({
-      content = { "(a (b))" },
-      cursor = { 1, 0 },
+      "|(a (b))",
     })
 
     local cursor_pos = paredit.cursor.get_cursor_pos({ 0, 0, 0, 6 }, { placement = "left_edge" })
@@ -41,8 +39,8 @@ describe("cursor pos api tests", function()
 
   it("should place cursor inside form at the end", function()
     prepare_buffer({
-      content = { "(a ", " (b))" },
-      cursor = { 1, 0 },
+      "|(a ",
+      " (b))",
     })
 
     local cursor_pos = paredit.cursor.get_cursor_pos({ 0, 0, 1, 4 }, { placement = "inner_end" })
@@ -57,8 +55,8 @@ describe("cursor pos api tests", function()
 
   it("should place cursor outside form at the end", function()
     prepare_buffer({
-      content = { "(a ", " (b))" },
-      cursor = { 1, 0 },
+      "|(a ",
+      " (b))",
     })
 
     local cursor_pos = paredit.cursor.get_cursor_pos({ 0, 0, 1, 4 }, { placement = "right_edge" })

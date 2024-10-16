@@ -94,7 +94,7 @@ end
 --   (list_lit
 --     (kw_lit)) @form.inner) @form.outer
 -- ```
--- 
+--
 -- Given the above AST we would want to extract the `list_lit` annotated in
 -- this example with @form.inner.
 function M.get_form_inner(form_node, opts)
@@ -140,6 +140,9 @@ local function get_last_anon_child_of_form_head(node)
       return current
     end
     local child = node:child(i)
+    if not child then
+      return
+    end
     if child:named() then
       return current
     end

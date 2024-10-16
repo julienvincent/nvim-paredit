@@ -11,6 +11,6 @@ vim.bo.swapfile = false
 
 require("nvim-treesitter.configs").setup({
   parser_install_dir = vim.fn.getcwd() .. "/.build/parsers",
-  ensure_installed = { "clojure", "fennel", "scheme" },
+  ensure_installed = { "clojure", "fennel", "scheme", "commonlisp" },
   sync_install = true,
 })
