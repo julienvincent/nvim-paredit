@@ -1,26 +1,47 @@
 (list_lit 
   (sym_lit) @fn-name
+  (#any-of? @fn-name
+   "let"
+   "loop"
+   "binding"
+   "with-open"
+   "with-redefs")
+
   (vec_lit
-    (_) @pair)
-  (#any-of? @fn-name "let" "loop" "binding" "with-open" "with-redefs"))
+    (_) @pair))
 
 (map_lit
   (_) @pair)
 
 (list_lit 
   (sym_lit) @fn-name
-  (_)
-  (_) @pair
-  (#eq? @fn-name "case"))
+  (#eq? @fn-name "case")
+
+  (_) .
+  ((_) @pair . (_) @pair)+
+  (_)?)
 
 (list_lit 
   (sym_lit) @fn-name
-  (_) @pair
-  (#eq? @fn-name "cond"))
+  (#eq? @fn-name "cond")
+
+  ((_) @pair (_) @pair)+)
+
+(list_lit
+  (sym_lit) @fn-name
+  (#any-of? @fn-name
+   "cond->"
+   "cond->>")
+  (_)
+  .
+  ((_) @pair . (_) @pair)+)
 
 (list_lit 
   (sym_lit) @fn-name
-  (_)
-  (_)
-  (_) @pair
-  (#eq? @fn-name "condp"))
+  (#eq? @fn-name "condp")
+
+  (_) (_)
+  .
+  ((_) @pair . (_) @pair)+
+  .
+  (_)?)
