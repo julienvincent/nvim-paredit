@@ -47,6 +47,20 @@ describe("pair dragging ::", function()
       })
     end)
 
+    it("should stop dragging at pair boundaries", function()
+      prepare_buffer({
+        "{:entity {|:a 1 :b 2}}",
+      })
+      paredit.drag_element_backwards({
+        dragging = {
+          auto_drag_pairs = true,
+        },
+      })
+      expect({
+        "{:entity {|:a 1 :b 2}}",
+      })
+    end)
+
     it("should detect various types", function()
       expect_all(function()
         paredit.drag_element_forwards({ dragging = { auto_drag_pairs = true } })
