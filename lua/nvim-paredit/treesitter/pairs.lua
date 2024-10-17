@@ -1,4 +1,5 @@
 local ts_utils = require("nvim-paredit.treesitter.utils")
+local ts_forms = require("nvim-paredit.treesitter.forms")
 
 local M = {}
 
@@ -9,6 +10,10 @@ local M = {}
 -- matched nodes.
 function M.find_pairwise_nodes(target_node, opts)
   local root_node = ts_utils.find_local_root(target_node)
+  local enclosing_form = ts_forms.find_nearest_form(target_node, opts)
+  if not enclosing_form then
+    return
+  end
 
   local bufnr = vim.api.nvim_get_current_buf()
   local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
@@ -27,9 +32,11 @@ function M.find_pairwise_nodes(target_node, opts)
   for id, node in captures do
     if query.captures[id] == "pair" then
       if not ts_utils.node_is_comment(node, opts) then
-        table.insert(pairwise_nodes, node)
-        if node:equal(target_node) then
-          found = true
+        if node:parent():equal(enclosing_form) then
+          table.insert(pairwise_nodes, node)
+          if node:equal(target_node) then
+            found = true
+          end
         end
       end
     end
