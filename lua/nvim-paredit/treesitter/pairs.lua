@@ -10,7 +10,7 @@ local M = {}
 -- matched nodes.
 function M.find_pairwise_nodes(target_node, opts)
   local root_node = ts_utils.find_local_root(target_node)
-  local enclosing_form = ts_forms.find_nearest_form(target_node, opts)
+  local enclosing_form = ts_forms.get_node_root(target_node, opts):parent()
   if not enclosing_form then
     return
   end

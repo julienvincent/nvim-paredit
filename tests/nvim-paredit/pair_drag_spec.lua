@@ -30,6 +30,44 @@ describe("pair dragging ::", function()
       })
     end)
 
+    it("should drag multiline pairs", function()
+      prepare_buffer({
+        "{:a |{:a1 1",
+        "     :a2 2}",
+        " :b {:b1 1",
+        "     :b2 2}}",
+      })
+      paredit.drag_element_forwards({
+        dragging = {
+          auto_drag_pairs = true,
+        },
+      })
+      expect({
+        "{:b {:b1 1",
+        "     :b2 2}",
+        " |:a {:a1 1",
+        "     :a2 2}}",
+      })
+    end)
+
+    it("should drag pairs with differing line counts", function()
+      prepare_buffer({
+        "{:a |{:a1 1",
+        "     :a2 2}",
+        " :b {:b1 1 :b2 2}}",
+      })
+      paredit.drag_element_forwards({
+        dragging = {
+          auto_drag_pairs = true,
+        },
+      })
+      expect({
+        "{:b {:b1 1 :b2 2}",
+        " |:a {:a1 1",
+        "     :a2 2}}",
+      })
+    end)
+
     it("should drag map pairs backwards", function()
       prepare_buffer({
         content = "{:a 1 :b 2}",

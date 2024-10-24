@@ -3,6 +3,7 @@ local ts_forms = require("nvim-paredit.treesitter.forms")
 local ts_pairs = require("nvim-paredit.treesitter.pairs")
 local traversal = require("nvim-paredit.utils.traversal")
 local common = require("nvim-paredit.utils.common")
+local text_api = require("nvim-paredit.api.text")
 local ts = require("nvim-treesitter.ts_utils")
 local config = require("nvim-paredit.config")
 
@@ -76,13 +77,46 @@ local function drag_node_in_pair(current_node, nodes, opts)
     return
   end
 
+  local left_pair, right_pair
+  if direction == 1 then
+    left_pair = pair
+    right_pair = corresponding_pair
+  else
+    left_pair = corresponding_pair
+    right_pair = pair
+  end
+
+  if not left_pair[1] or not left_pair[2] then
+    return
+  end
+
+  if not right_pair[1] or not right_pair[2] then
+    return
+  end
+
+  local left_range_1 = { left_pair[1]:range() }
+  local left_range_2 = { left_pair[2]:range() }
+  -- stylua: ignore
+  local left_range = {
+    left_range_1[1], left_range_1[2],
+    left_range_2[3], left_range_2[4]
+  }
+
+  local right_range_1 = { right_pair[1]:range() }
+  local right_range_2 = { right_pair[2]:range() }
+  -- stylua: ignore
+  local right_range = {
+    right_range_1[1], right_range_1[2],
+    right_range_2[3], right_range_2[4]
+  }
+
   local buf = vim.api.nvim_get_current_buf()
-  if pair[2] and corresponding_pair[2] then
-    ts.swap_nodes(pair[2], corresponding_pair[2], buf, true)
+  local cursor_pos = 1
+  if opts.reversed then
+    cursor_pos = 0
   end
-  if pair[1] and corresponding_pair[1] then
-    ts.swap_nodes(pair[1], corresponding_pair[1], buf, true)
-  end
+
+  text_api.swap_ranges(buf, left_range, right_range, cursor_pos)
 end
 
 local function drag_pair(opts)
