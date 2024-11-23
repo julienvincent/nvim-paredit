@@ -125,8 +125,8 @@ paredit.setup({
     [">e"] = { paredit.api.drag_element_forwards, "Drag element right" },
     ["<e"] = { paredit.api.drag_element_backwards, "Drag element left" },
 
-    [">p"] = { api.drag_pair_forwards, "Drag element pairs right" },
-    ["<p"] = { api.drag_pair_backwards, "Drag element pairs left" },
+    [">p"] = { paredit.api.drag_pair_forwards, "Drag element pairs right" },
+    ["<p"] = { paredit.api.drag_pair_backwards, "Drag element pairs left" },
 
     [">f"] = { paredit.api.drag_form_forwards, "Drag form right" },
     ["<f"] = { paredit.api.drag_form_backwards, "Drag form left" },
