@@ -16,7 +16,7 @@ jobs:
         channel: 
         - v0.9.5
         - v0.10.2
-        - nightly
+        # - nightly
     steps:
     - uses: actions/checkout@v2
 
