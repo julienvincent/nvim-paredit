@@ -16,7 +16,7 @@ local function adjust_range_for_whitespace(range)
   local end_line = vim.api.nvim_buf_get_lines(0, end_row, end_row + 1, false)[1]
   if end_col < #end_line then
     local after = end_line:sub(end_col + 1, end_col + 2)
-    if after:match(" [^;]") then
+    if after:match(" [^;| ]") then
       return { start_row, start_col, end_row, end_col + 1 }
     end
   end
@@ -24,7 +24,7 @@ local function adjust_range_for_whitespace(range)
   local start_line = vim.api.nvim_buf_get_lines(0, start_row, start_row + 1, false)[1]
   if start_col > 2 then
     local before = start_line:sub(start_col - 1, start_col)
-    if before:match("[^;] ") then
+    if before:match("[^ ] ") then
       return { start_row, start_col - 1, end_row, end_col }
     end
   end
