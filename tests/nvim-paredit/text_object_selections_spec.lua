@@ -47,8 +47,8 @@ describe("text object selections :: ", function()
       })
       feedkeys("daf")
       expect({
-        content = "(a )",
-        cursor = { 1, 3 },
+        content = "(a)",
+        cursor = { 1, 2 },
       })
     end)
 
@@ -109,7 +109,7 @@ describe("text object selections :: ", function()
       })
       feedkeys("daF")
       expect({
-        content = { "(+ 1 2)", " (comment thing)", "(x y)" },
+        content = { "(+ 1 2)", "(comment thing)", "(x y)" },
         cursor = { 2, 0 },
       })
     end)
@@ -154,7 +154,7 @@ describe("text object selections :: ", function()
         cursor = { 2, 6 },
       })
       feedkeys("vaF")
-      assert.are.same("(foo (a\na))", utils.get_selected_text())
+      assert.are.same("(foo (a\na)) ", utils.get_selected_text())
     end)
 
     it("should select within the form", function()
