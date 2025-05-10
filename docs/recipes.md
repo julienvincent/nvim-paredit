@@ -40,18 +40,6 @@ local function lsp_indent(event, opts)
   })
 end
 
-local child_range = { child:range() }
-local lines = utils.find_affected_lines(child, utils.get_node_line_range(child_range))
-
-vim.lsp.buf.format({
-  bufnr = opts.buf or 0,
-  range = {
-    ["start"] = { lines[1] + 1, 0 },
-    ["end"] = { lines[#lines] + 1, 0 },
-  },
-})
-end
-
 require("nvim-paredit").setup({
   indent = {
     enabled = true,
