@@ -10,12 +10,12 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         channel: 
-        - v0.9.5
-        - v0.10.2
+        - v0.10.4
+        - v0.11.1
         - nightly
     steps:
     - uses: actions/checkout@v2
