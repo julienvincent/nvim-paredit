@@ -20,6 +20,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - uses: tree-sitter/setup-action/cli@v1
+
     - uses: extractions/setup-just@v1
 
     - name: Run tests [${{ matrix.channel }}]
