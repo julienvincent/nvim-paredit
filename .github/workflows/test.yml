@@ -13,12 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        channel: 
-        - v0.10.4
+        channel:
         - v0.11.1
         - nightly
     steps:
     - uses: actions/checkout@v2
+
+    - uses: tree-sitter/setup-action/cli@v1
 
     - uses: extractions/setup-just@v1
 

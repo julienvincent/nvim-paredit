@@ -39,7 +39,7 @@ prepare-dependencies:
   test -d .build/dependencies || {
     mkdir -p ./.build/dependencies
     git clone --depth 1 https://github.com/nvim-lua/plenary.nvim ./.build/dependencies/plenary.nvim
-    git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter ./.build/dependencies/nvim-treesitter
+    git clone --depth 1 --branch main https://github.com/nvim-treesitter/nvim-treesitter ./.build/dependencies/nvim-treesitter
   }
 
 prepare channel: (prepare-nvim channel) prepare-dependencies
@@ -47,6 +47,9 @@ prepare channel: (prepare-nvim channel) prepare-dependencies
 test channel="stable" file="": (prepare channel)
   #!/usr/bin/env bash
   set -eo pipefail
+
+  # Needed for curl to download tree-sitter parsers
+  mkdir -p "$HOME/.cache/nvim"
 
   NVIM_DIR=".build/nvim/{{ channel }}"
 
