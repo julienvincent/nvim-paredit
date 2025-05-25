@@ -1,5 +1,4 @@
 local paredit = require("nvim-paredit")
-local ts = require("nvim-treesitter.ts_utils")
 local prepare_buffer = require("tests.nvim-paredit.utils").prepare_buffer
 
 describe("cursor pos api tests", function()
@@ -16,7 +15,7 @@ describe("cursor pos api tests", function()
 
     assert.are.same({ 1, 1 }, cursor_pos)
 
-    local node = ts.get_node_at_cursor()
+    local node = vim.treesitter.get_node()
     cursor_pos = paredit.cursor.get_cursor_pos(node, { placement = "inner_start" })
 
     assert.are.same({ 1, 1 }, cursor_pos)
@@ -31,7 +30,7 @@ describe("cursor pos api tests", function()
 
     assert.are.same({ 1, 0 }, cursor_pos)
 
-    local node = ts.get_node_at_cursor()
+    local node = vim.treesitter.get_node()
     cursor_pos = paredit.cursor.get_cursor_pos(node, { placement = "left_edge" })
 
     assert.are.same({ 1, 0 }, cursor_pos)
@@ -47,7 +46,7 @@ describe("cursor pos api tests", function()
 
     assert.are.same({ 2, 4 }, cursor_pos)
 
-    local node = ts.get_node_at_cursor()
+    local node = vim.treesitter.get_node()
     cursor_pos = paredit.cursor.get_cursor_pos(node, { placement = "inner_end" })
 
     assert.are.same({ 2, 4 }, cursor_pos)
@@ -63,7 +62,7 @@ describe("cursor pos api tests", function()
 
     assert.are.same({ 2, 5 }, cursor_pos)
 
-    local node = ts.get_node_at_cursor()
+    local node = vim.treesitter.get_node()
     cursor_pos = paredit.cursor.get_cursor_pos(node, { placement = "right_edge" })
 
     assert.are.same({ 2, 5 }, cursor_pos)

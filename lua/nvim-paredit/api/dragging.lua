@@ -1,10 +1,10 @@
 local ts_context = require("nvim-paredit.treesitter.context")
 local ts_forms = require("nvim-paredit.treesitter.forms")
 local ts_pairs = require("nvim-paredit.treesitter.pairs")
+local ts_utils = require("nvim-paredit.treesitter.utils")
 local traversal = require("nvim-paredit.utils.traversal")
 local common = require("nvim-paredit.utils.common")
 local text_api = require("nvim-paredit.api.text")
-local ts = require("nvim-treesitter.ts_utils")
 local config = require("nvim-paredit.config")
 
 local M = {}
@@ -28,7 +28,7 @@ function M.drag_form_forwards()
   end
 
   local buf = vim.api.nvim_get_current_buf()
-  ts.swap_nodes(root, sibling, buf, true)
+  ts_utils.swap_nodes(root, sibling, buf, true)
 end
 
 function M.drag_form_backwards()
@@ -50,7 +50,7 @@ function M.drag_form_backwards()
   end
 
   local buf = vim.api.nvim_get_current_buf()
-  ts.swap_nodes(root, sibling, buf, true)
+  ts_utils.swap_nodes(root, sibling, buf, true)
 end
 
 local function find_current_pair(pairs, current_node)
@@ -173,7 +173,7 @@ local function drag_element(opts)
   end
 
   local buf = vim.api.nvim_get_current_buf()
-  ts.swap_nodes(current_node, sibling, buf, true)
+  ts_utils.swap_nodes(current_node, sibling, buf, true)
 end
 
 function M.drag_element_forwards(opts)
