@@ -1,6 +1,6 @@
 # Recipes
 
-### Lsp Indentation
+### LSP Indentation
 
 Below is a reference implementation for using `vim.lsp.buf.format` to replace the native indent implementation. This
 implementation won't be nearly as performant, but it will be more correct.
@@ -9,9 +9,9 @@ implementation won't be nearly as performant, but it will be more correct.
 local function lsp_indent(event, opts)
   local traversal = require("nvim-paredit.utils.traversal")
   local utils = require("nvim-paredit.indentation.utils")
-  local langs = require("nvim-paredit.lang")
+  local ts_context = require("nvim-paredit.treesitter.context")
 
-  local lang = langs.get_language_api()
+  local context = ts_context.create_context()
 
   local parent = event.parent
 
@@ -21,7 +21,7 @@ local function lsp_indent(event, opts)
   elseif event.type == "slurp-backwards" then
     child = parent:named_child(1)
   elseif event.type == "barf-forwards" then
-    child = traversal.get_next_sibling_ignoring_comments(event.parent, { lang = lang })
+    child = traversal.get_next_sibling_ignoring_comments(event.parent, context)
   elseif event.type == "barf-backwards" then
     child = event.parent
   else
@@ -38,18 +38,6 @@ local function lsp_indent(event, opts)
       ["end"] = { lines[#lines] + 1, 0 },
     },
   })
-end
-
-local child_range = { child:range() }
-local lines = utils.find_affected_lines(child, utils.get_node_line_range(child_range))
-
-vim.lsp.buf.format({
-  bufnr = opts.buf or 0,
-  range = {
-    ["start"] = { lines[1] + 1, 0 },
-    ["end"] = { lines[#lines] + 1, 0 },
-  },
-})
 end
 
 require("nvim-paredit").setup({
