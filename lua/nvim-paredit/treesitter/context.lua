@@ -1,5 +1,4 @@
 local utils = require("nvim-paredit.treesitter.utils")
-local ts_utils = require("nvim-treesitter.ts_utils")
 
 local M = {}
 
@@ -33,7 +32,7 @@ function M.create_capture_context(target_node, opts)
 end
 
 function M.create_context(opts)
-  local node = ts_utils.get_node_at_cursor()
+  local node = vim.treesitter.get_node()
   if not node then
     return
   end
