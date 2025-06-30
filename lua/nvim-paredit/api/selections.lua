@@ -10,6 +10,27 @@ function M.ensure_visual_mode()
   end
 end
 
+local function adjust_range_for_whitespace(range)
+  local start_row, start_col, end_row, end_col = unpack(range)
+
+  local end_line = vim.api.nvim_buf_get_lines(0, end_row, end_row + 1, false)[1]
+  if end_col < #end_line then
+    local after = end_line:sub(end_col + 1, end_col + 2)
+    if after:match(" [^;| ]") then
+      return { start_row, start_col, end_row, end_col + 1 }
+    end
+  end
+
+  local start_line = vim.api.nvim_buf_get_lines(0, start_row, start_row + 1, false)[1]
+  if start_col > 2 then
+    local before = start_line:sub(start_col - 1, start_col)
+    if before:match("[^ ] ") then
+      return { start_row, start_col - 1, end_row, end_col }
+    end
+  end
+  return { start_row, start_col, end_row, end_col }
+end
+
 local function get_range_around_form_impl(node_fn)
   local context = ts_context.create_context()
   if not context then
@@ -34,10 +55,7 @@ local function get_range_around_form_impl(node_fn)
   local range = { root:range() }
 
   -- stylua: ignore
-  return {
-    range[1], range[2],
-    range[3], range[4],
-  }
+  return adjust_range_for_whitespace({ range[1], range[2], range[3], range[4] })
 end
 
 function M.get_range_around_form()
@@ -141,6 +159,20 @@ function M.select_element()
   end
 
   local range = M.get_element_range(context)
+
+  M.ensure_visual_mode()
+  vim.api.nvim_win_set_cursor(0, { range[1] + 1, range[2] })
+  vim.api.nvim_command("normal! o")
+  vim.api.nvim_win_set_cursor(0, { range[3] + 1, range[4] - 1 })
+end
+
+function M.select_around_element()
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local range = adjust_range_for_whitespace(M.get_element_range(context))
 
   M.ensure_visual_mode()
   vim.api.nvim_win_set_cursor(0, { range[1] + 1, range[2] })

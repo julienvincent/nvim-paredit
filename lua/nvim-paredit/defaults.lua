@@ -92,7 +92,7 @@ M.default_keys = {
   },
 
   ["ae"] = {
-    api.select_element,
+    api.select_around_element,
     "Around element",
     repeatable = false,
     mode = { "o", "v" },

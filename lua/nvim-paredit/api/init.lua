@@ -40,6 +40,7 @@ local M = {
   select_around_top_level_form = selections.select_around_top_level_form,
   select_in_top_level_form = selections.select_in_top_level_form,
   select_element = selections.select_element,
+  select_around_element = selections.select_around_element,
 
   delete_form = deletions.delete_form,
   delete_in_form = deletions.delete_in_form,
