@@ -307,4 +307,20 @@ describe("motions :: ", function()
       "(aa (bb) @(cc) #{1}|)",
     })
   end)
+
+  it("should move to top level form head", function()
+    prepare_buffer({
+      "(aa (bb) @(|cc) #{1})"
+    })
+
+    paredit.move_to_top_level_form_head()
+    expect({
+      "|(aa (bb) @(cc) #{1})"
+    })
+
+    paredit.move_to_top_level_form_head()
+    expect({
+      "|(aa (bb) @(cc) #{1})"
+    })
+  end)
 end)

@@ -264,4 +264,41 @@ function M.move_to_parent_form_end()
   move_to_parent_form_edge(MOTION_DIRECTIONS.RIGHT)
 end
 
+function M.move_to_top_level_form_head()
+  local context = ts_context.create_context()
+  if not context then
+    return
+  end
+
+  local current_form = ts_forms.find_nearest_form(context.node, {
+    use_source = false,
+    captures = context.captures,
+  })
+
+  if not current_form then
+    return
+  end
+
+  local top_level_form = current_form
+  while true do
+    local root = ts_forms.get_node_root(top_level_form, context)
+    if not root then
+      break
+    end
+
+    local parent = root:parent()
+    if not parent or ts_utils.is_document_root(parent) then
+      break
+    end
+
+    if ts_forms.node_is_form(parent, context) then
+      top_level_form = parent
+    else
+      break
+    end
+  end
+
+  move_to_form_edge(top_level_form, MOTION_DIRECTIONS.LEFT, context)
+end
+
 return M
