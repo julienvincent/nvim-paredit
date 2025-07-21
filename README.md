@@ -174,6 +174,13 @@ paredit.setup({
       mode = { "n", "x", "v" },
     },
 
+    ["T"] = {
+      paredit.api.move_to_top_level_form_head,
+      "Jump to top level form's head",
+      repeatable = false,
+      mode = { "n", "x", "v" },
+    },
+
     -- These are text object selection keybindings which can used with standard `d, y, c`, `v`
     ["af"] = {
       paredit.api.select_around_form,

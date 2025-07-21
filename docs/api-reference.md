@@ -234,6 +234,12 @@ Moves the cursor to the end of the parent form.
 
 ---
 
+#### `move_to_top_level_form_head()`
+
+Moves the cursor to the head of the top level form.
+
+---
+
 ### **[Selections](#selections)**
 
 #### `select_around_form()`
