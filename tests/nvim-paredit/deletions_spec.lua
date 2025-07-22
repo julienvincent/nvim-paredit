@@ -40,8 +40,8 @@ describe("form deletions ::", function()
     })
     paredit.delete_form()
     expect({
-      content = "(a )",
-      cursor = { 1, 3 },
+      content = "(a)",
+      cursor = { 1, 2 },
     })
   end)
 
