@@ -1,5 +1,20 @@
 local M = {}
 
+-- returns the first value that satisfies `pred`icate in the infinite sequence:
+-- init, f(init), f(f(init)), f(f(f(init))), ...
+function M.iterate_until(f, init, pred)
+  while not pred(init) do
+    init = f(init)
+  end
+  return init
+end
+
+-- returns the cursor position, normalised to zero-based indexing
+function M.get_cursor()
+  local cur = vim.api.nvim_win_get_cursor(0)
+  return { cur[1] - 1, cur[2] }
+end
+
 function M.included_in_table(table, item)
   for _, value in pairs(table) do
     if value == item then

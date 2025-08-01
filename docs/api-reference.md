@@ -31,6 +31,9 @@ The core API is exposed under the `paredit.api` module
   - [move_to_prev_element_head](#move_to_prev_element_head)
   - [move_to_parent_form_start](#move_to_parent_form_start)
   - [move_to_parent_form_end](#move_to_parent_form_end)
+  - [move_to_top_level_form_head](#move_to_top_level_form_head)
+  - [flow_form_next_head](#flow_form_next_head)
+  - [flow_form_prev_head](#flow_form_prev_head)
 - **[Selections](#selections)**
   - [select_around_form](#select_around_form)
   - [select_in_form](#select_in_form)
@@ -237,6 +240,18 @@ Moves the cursor to the end of the parent form.
 #### `move_to_top_level_form_head()`
 
 Moves the cursor to the head of the top level form.
+
+---
+
+#### `flow_form_next_head()`
+
+Moves the cursor to the first form starting after cursor, regardless of nesting level.
+
+---
+
+#### `flow_form_prev_head()`
+
+Moves the cursor to the last form starting before cursor, regardless of nesting level. Dual of `flow_form_next_head`
 
 ---
 

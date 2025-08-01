@@ -301,4 +301,36 @@ function M.move_to_top_level_form_head()
   move_to_form_edge(top_level_form, MOTION_DIRECTIONS.LEFT, context)
 end
 
+function M.flow_form_next_head()
+  local context = ts_context.create_context({ capture_root = true })
+  if not context then
+    return
+  end
+  local cursor = common.get_cursor()
+  move_to_form_edge(
+    common.iterate_until(ts_utils.dfs_next_node, vim.treesitter.get_node(), function(node)
+      return not node
+        or common.compare_positions({ node:start() }, cursor) == 1 and ts_forms.node_is_form(node, context)
+    end),
+    MOTION_DIRECTIONS.LEFT,
+    context
+  )
+end
+
+function M.flow_form_prev_head()
+  local context = ts_context.create_context({ capture_root = true })
+  if not context then
+    return
+  end
+  local cursor = common.get_cursor()
+  move_to_form_edge(
+    common.iterate_until(ts_utils.dfs_prev_node, vim.treesitter.get_node(), function(node)
+      return not node
+        or common.compare_positions({ node:start() }, cursor) == -1 and ts_forms.node_is_form(node, context)
+    end),
+    MOTION_DIRECTIONS.LEFT,
+    context
+  )
+end
+
 return M
