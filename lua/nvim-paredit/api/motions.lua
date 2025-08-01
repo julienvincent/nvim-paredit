@@ -179,7 +179,7 @@ local function move_to_form_edge(form_node, direction, context)
     return
   end
 
-  local form_edges = ts_forms.get_form_edges(form_node, context)
+  local form_edges = ts_forms.get_form_edges_without_text(form_node, context)
   local final_cursor_pos = {
     form_edges[direction].range[1] + 1,
     form_edges[direction].range[2],
@@ -189,7 +189,7 @@ local function move_to_form_edge(form_node, direction, context)
 end
 
 local function cursor_is_at_form_edge(form_node, direction, cur_cursor_pos, context)
-  local form_edges = ts_forms.get_form_edges(form_node, context)
+  local form_edges = ts_forms.get_form_edges_without_text(form_node, context)
   local edge_cursor_pos = {
     form_edges[direction].range[1] + 1,
     form_edges[direction].range[2],
@@ -323,8 +323,9 @@ function M.flow_form_prev_head()
     return
   end
   local cursor = common.get_cursor()
+  local start_node = ts_utils.right_most_descendant(vim.treesitter.get_node())
   move_to_form_edge(
-    common.iterate_until(ts_utils.dfs_prev_node, vim.treesitter.get_node(), function(node)
+    common.iterate_until(ts_utils.dfs_prev_node, start_node, function(node)
       return not node
         or common.compare_positions({ node:start() }, cursor) == -1 and ts_forms.node_is_form(node, context)
     end),

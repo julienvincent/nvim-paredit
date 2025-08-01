@@ -2,6 +2,17 @@ local common = require("nvim-paredit.utils.common")
 
 local M = {}
 
+-- Returns the right most descendant of the node, and node itself if it has no descendants.
+function M.right_most_descendant(node)
+  if not node then
+    return nil
+  end
+  while node:named_child_count() > 0 do
+    node = node:named_child(node:named_child_count() - 1)
+  end
+  return node
+end
+
 -- returns the next node in DFS order, nil if `node` is the last.
 function M.dfs_next_node(node)
   if not node then
@@ -27,10 +38,7 @@ function M.dfs_prev_node(node)
   if not prev then
     return node:parent()
   end
-  while prev:named_child_count() > 0 do
-    prev = prev:named_child(prev:named_child_count() - 1)
-  end
-  return prev
+  return M.right_most_descendant(prev)
 end
 
 function M.is_document_root(node)

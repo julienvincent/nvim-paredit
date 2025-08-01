@@ -151,7 +151,7 @@ local function get_last_anon_child_of_form_head(node)
   return current
 end
 
-function M.get_form_edges(node, opts)
+function M.get_form_edges_without_text(node, opts)
   local outer_range = { node:range() }
 
   local end_node = get_last_anon_child_of_form_head(M.get_form_inner(node, opts))
@@ -171,6 +171,20 @@ function M.get_form_edges(node, opts)
     outer_range[3], outer_range[4] - 1,
     outer_range[3], outer_range[4],
   }
+
+  return {
+    left = {
+      range = left_range,
+    },
+    right = {
+      range = right_range,
+    },
+  }
+end
+
+function M.get_form_edges(node, opts)
+  local ret = M.get_form_edges_without_text(node, opts)
+  local left_range, right_range = ret.left.range, ret.right.range
 
   -- stylua: ignore
   local left_text = vim.api.nvim_buf_get_text(0,
