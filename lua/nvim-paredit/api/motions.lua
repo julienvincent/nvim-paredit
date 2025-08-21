@@ -200,7 +200,8 @@ end
 
 local function move_to_parent_form_edge(direction)
   local context = ts_context.create_context()
-  if not context then
+  -- if we dont get a node, or are already at the root, we no-op.
+  if not context or not context.node or ts_utils.is_document_root(context.node) then
     return
   end
 
