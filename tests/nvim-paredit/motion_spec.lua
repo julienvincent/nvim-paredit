@@ -287,6 +287,12 @@ describe("motions :: ", function()
     })
   end)
 
+  it("should noop when moving to parent form, from between top forms", function()
+    prepare_buffer({ "(+ 1 2) | (+ 3 4)" })
+    internal_api.move_to_parent_form_start()
+    expect({ "(+ 1 2) | (+ 3 4)" })
+  end)
+
   it("should move to parent form end", function()
     prepare_buffer({
       "(aa (bb) |@(cc) #{1})",
