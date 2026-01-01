@@ -48,6 +48,9 @@ test channel="stable" file="": (prepare channel)
   #!/usr/bin/env bash
   set -eo pipefail
 
+  # Needed for curl to download tree-sitter parsers
+  mkdir -p "$HOME/.cache/nvim"
+
   NVIM_DIR=".build/nvim/{{ channel }}"
 
   ./$NVIM_DIR/bin/nvim --version
