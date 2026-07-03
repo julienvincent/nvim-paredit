@@ -59,31 +59,21 @@ function M.find_nearest_form(current_node, opts)
   end
 end
 
-local function find_next_parent_form(current_node, captures)
-  local is_form = M.node_is_form(current_node, {
+-- Climb up the node's parents and return the first enclosing form.
+function M.find_enclosing_form(node, captures)
+  local parent = node:parent()
+  if not parent then
+    return nil
+  end
+  return M.find_nearest_form(parent, {
     captures = captures,
     recursive = false,
   })
-  if is_form then
-    return current_node
-  end
-
-  local parent = current_node:parent()
-  if not parent then
-    return current_node
-  end
-
-  return find_next_parent_form(parent, captures)
 end
 
 function M.get_node_root(node, opts)
-  local search_point = node
-  if M.node_is_form(node, opts) then
-    search_point = node:parent()
-  end
-
-  local root = find_next_parent_form(search_point, opts.captures)
-  return ts_utils.find_root_element_relative_to(root, node)
+  local root = M.find_enclosing_form(node, opts.captures) or node
+  return ts_utils.find_root_element_relative_to(root, node, opts.captures)
 end
 
 -- If a wrapped form node is provided this will return the inner most form node

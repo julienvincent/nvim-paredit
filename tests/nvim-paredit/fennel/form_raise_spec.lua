@@ -41,6 +41,84 @@ describe("form raising", function()
     })
   end)
 
+  it("should raise a form out of an if pair", function()
+    prepare_buffer({
+      content = "(if a (b c))",
+      cursor = { 1, 7 },
+    })
+
+    paredit.raise_form()
+    expect({
+      content = "(b c)",
+      cursor = { 1, 0 },
+    })
+  end)
+
+  it("should raise a nested form from an if pair expression", function()
+    prepare_buffer({
+      content = "(if a (b (+ 1 1)))",
+      cursor = { 1, 12 },
+    })
+
+    paredit.raise_form()
+    expect({
+      content = "(if a (+ 1 1))",
+      cursor = { 1, 6 },
+    })
+  end)
+
+  it("should raise a form out of a later if pair expression", function()
+    prepare_buffer({
+      content = "(if a (b) c (d e f))",
+      cursor = { 1, 13 },
+    })
+
+    paredit.raise_form()
+    expect({
+      content = "(d e f)",
+      cursor = { 1, 0 },
+    })
+  end)
+
+  it("should raise the condition of an if", function()
+    prepare_buffer({
+      content = "(if a (b) (c))",
+      cursor = { 1, 6 },
+    })
+
+    paredit.raise_form()
+    expect({
+      content = "(b)",
+      cursor = { 1, 0 },
+    })
+  end)
+
+  it("should raise the else branch of an if", function()
+    prepare_buffer({
+      content = "(if a (b) (c))",
+      cursor = { 1, 10 },
+    })
+
+    paredit.raise_form()
+    expect({
+      content = "(c)",
+      cursor = { 1, 0 },
+    })
+  end)
+
+  it("should raise a form out of a multi-line if form", function()
+    prepare_buffer({
+      content = { "(if a (b)", "c (d e)", "f)" },
+      cursor = { 2, 3 },
+    })
+
+    paredit.raise_form()
+    expect({
+      content = { "(d e)" },
+      cursor = { 1, 0 },
+    })
+  end)
+
   it("should do nothing if it is a direct child of the document root", function()
     prepare_buffer({
       content = { "(a)", "b" },

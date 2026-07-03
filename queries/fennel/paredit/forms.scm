@@ -12,7 +12,10 @@
 (match_form) @form
 (case_try_form) @form
 (match_try_form) @form
-(if_form) @form
+(if_form
+  (if_pair
+    condition: (_) @form.element
+    expression: (_) @form.element)) @form
 (fn_form) @form
 (lambda_form) @form
 (macro_form) @form

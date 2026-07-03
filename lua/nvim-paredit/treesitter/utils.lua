@@ -20,6 +20,15 @@ function M.find_local_root(node)
   return current
 end
 
+-- Whether `node` is an element of `root` and therefore the node we should stop
+-- on. This is true when `node` is a direct child of `root`, or when it has been
+-- explicitly captured as a `form.element` (e.g. a clause nested below a Fennel
+-- `if_pair`).
+local function is_element_of(root, node, captures)
+  local parent = node:parent()
+  return not parent or root:equal(parent) or common.included_in_table(captures[node:id()] or {}, "form.element")
+end
+
 -- Find the root most parent of the given `child` node which is still contained within
 -- the given `root` node.
 --
@@ -31,15 +40,11 @@ end
 -- The enclosing `(` `)` brackets would be given as `root` while the inner list would be
 -- given as `child`. The inner list may be wrapped in a `quoting` node, which is the
 -- actual node we are wanting to operate on.
-function M.find_root_element_relative_to(root, child)
-  local parent = child:parent()
-  if not parent then
+function M.find_root_element_relative_to(root, child, captures)
+  if is_element_of(root, child, captures) then
     return child
   end
-  if root:equal(parent) then
-    return child
-  end
-  return M.find_root_element_relative_to(root, parent)
+  return M.find_root_element_relative_to(root, child:parent(), captures)
 end
 
 function M.node_is_comment(node, opts)

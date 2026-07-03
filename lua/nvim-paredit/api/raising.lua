@@ -16,7 +16,7 @@ function M.raise_form()
     return
   end
 
-  local parent = current_form:parent()
+  local parent = ts_forms.find_enclosing_form(current_form, context.captures)
   if not parent or ts_utils.is_document_root(parent) then
     return
   end
@@ -42,7 +42,7 @@ function M.raise_element()
 
   local current_node = ts_forms.get_node_root(context.node, context)
 
-  local parent = current_node:parent()
+  local parent = ts_forms.find_enclosing_form(current_node, context.captures)
   if not parent or ts_utils.is_document_root(parent) then
     return
   end
